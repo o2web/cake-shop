@@ -1,10 +1,11 @@
 <?php
 class ShopAppController extends AppController {
-	var $pluginVersion = "0.1.3.3";
+	var $pluginVersion = "0.1.3.3b";
 	
 	function __construct() {
 		//////// config ////////
-		config('plugins/shop');
+		App::import('Lib', 'Shop.ShopConfig');
+		ShopConfig::load();
 		
 		parent::__construct();
 	}

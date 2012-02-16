@@ -1,5 +1,8 @@
 <?php
 class SetMulti {
+
+	// App::import('Lib', 'SetMulti');
+	
 	function extractHierarchic($paths, $data = null, $options = array()) {
 		$defaultOptions = array(
 			'allowEmptyString' => false,
@@ -29,7 +32,7 @@ class SetMulti {
 		foreach($pathsAssoc as $name => $paths){
 			$val = SetMulti::extractHierarchic($paths, $data, $options);
 			if(!is_null($val) || $options['extractNull']){
-				$res[$name] = $val;
+				Set::insert($res, $name, $val);
 			}
 		}
 		return $res;
@@ -59,6 +62,34 @@ class SetMulti {
 			}
 		}
 		return $res;
+	}
+	function filterNot($array,$callback = null,$lvl=0){
+		if($lvl<1){
+			$array = array_diff_key($array,array_filter($array,$callback));
+		}
+		if($lvl != 0){
+			foreach($array as &$val){
+				if(is_array($val)){
+					$val = SetMulti::filterNot($val,$callback,$lvl-1);
+				}
+			}
+		}
+		return $array;
+	}
+	
+	function excludeKeys($array,$keys,$recursive = false){
+		$array = array_diff_key($array, array_flip($keys));
+		if($recursive){
+			foreach($array as &$val){
+				if(is_array($val)){
+					if($recursive !== true){
+						$recursive--;
+					}
+					$val = SetMulti::excludeKeys($val,$keys,$recursive);
+				}
+			}
+		}
+		return $array;
 	}
 	
 	function merge2($arr1, $arr2 = null) {
@@ -91,14 +122,14 @@ class SetMulti {
 
 		$newArr = array();
 		foreach ($array as $k=>$v) {
-		// Replace keys as well?
-		$add_key = $k;
-		if ($keys_too) {
-		  $add_key = str_replace($search, $replace, $k);
-		}
+			// Replace keys as well?
+			$add_key = $k;
+			if ($keys_too) {
+				$add_key = str_replace($search, $replace, $k);
+			}
 
-		// Recurse
-		$newArr[$add_key] = SetMulti::replaceTree($search, $replace, $v, $keys_too);
+			// Recurse
+			$newArr[$add_key] = SetMulti::replaceTree($search, $replace, $v, $keys_too);
 		}
 		return $newArr;
 	}

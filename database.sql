@@ -293,3 +293,54 @@ INSERT INTO `shop_taxes` (`id`, `country`, `region`, `code`, `name_fre`, `name_e
 (33, 'CA', 'NB', 'TPS', NULL, NULL, 0, 0, 0, 1, NULL, NULL),
 (34, 'CA', 'NL', 'TPS', NULL, NULL, 0, 0, 0, 1, NULL, NULL),
 (35, 'CA', 'NS', 'TPS', NULL, NULL, 0, 0, 0, 1, NULL, NULL);
+
+
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `shop_product_subproducts`
+--
+
+CREATE TABLE IF NOT EXISTS `shop_product_subproducts` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `shop_product_id` int(11) DEFAULT NULL,
+  `parent_subproduct_id` int(11) DEFAULT NULL,
+  `shop_subproduct_id` int(11) DEFAULT NULL,
+  `default` tinyint(1) DEFAULT NULL,
+  `active` tinyint(1) DEFAULT NULL,
+  `created` datetime DEFAULT NULL,
+  `modified` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
+
+--
+-- Dumping data for table `shop_product_subproducts`
+--
+
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `shop_subproducts`
+--
+
+CREATE TABLE IF NOT EXISTS `shop_subproducts` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `type` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `code` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `label` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `model` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `foreign_id` int(11) DEFAULT NULL,
+  `price` float DEFAULT NULL,
+  `data` text COLLATE utf8_unicode_ci,
+  `operator` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `active` tinyint(1) DEFAULT NULL,
+  `created` datetime DEFAULT NULL,
+  `modified` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
+
+--
+-- Dumping data for table `shop_subproducts`
+--

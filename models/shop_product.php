@@ -17,6 +17,24 @@ class ShopProduct extends ShopAppModel {
 	var $fullDataEnabled = true;
 	var $getPromos = true;
 	
+	var $hasMany = array(
+		'ShopProductSubproduct' => array(
+			'className' => 'ShopProductSubproduct',
+			'foreignKey' => 'shop_product_id',
+			'dependent' => false,
+			'conditions' => '',
+			'fields' => '',
+			'order' => '',
+			'limit' => '',
+			'offset' => '',
+			'exclusive' => '',
+			'finderQuery' => '',
+			'counterQuery' => ''
+		)
+	);
+	
+	
+	
 	function afterFind($results,$primary){
 		$results = parent::afterFind($results,$primary);
 		if(is_array($results) && $this->recursive > -1 && $this->fullDataEnabled){
