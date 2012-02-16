@@ -1,0 +1,1 @@
+<?php __d('shop',"No product selected.") ?>

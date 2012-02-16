@@ -1,0 +1,1 @@
+<?php __d('shop',"Permission denied.") ?>

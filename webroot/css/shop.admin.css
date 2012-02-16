@@ -1,0 +1,8 @@
+.ajaxContainer .loader{
+	display: none;
+	width: 32px;
+	height: 32px;
+	background: url(../img/ajax-loader.gif) center no-repeat;
+	margin:0px;
+	padding:0px;
+}

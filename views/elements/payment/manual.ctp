@@ -1,0 +1,1 @@
+<?php __d('shop',"Please contact us to discuss of a payment method. Your payment's reference number is %s.") ?>

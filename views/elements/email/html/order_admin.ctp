@@ -1,0 +1,1 @@
+<?php echo $this->element('email/html/order',array('plugin'=>'shop'))?>
