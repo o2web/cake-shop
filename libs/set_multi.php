@@ -32,7 +32,7 @@ class SetMulti {
 		foreach($pathsAssoc as $name => $paths){
 			$val = SetMulti::extractHierarchic($paths, $data, $options);
 			if(!is_null($val) || $options['extractNull']){
-				Set::insert($res, $name, $val);
+				$res = Set::insert($res, $name, $val);
 			}
 		}
 		return $res;

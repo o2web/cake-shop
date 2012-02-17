@@ -33,6 +33,24 @@ class ShopProduct extends ShopAppModel {
 		)
 	);
 	
+	var $hasAndBelongsToMany = array(
+		'ShopSubproduct' => array(
+			'className' => 'ShopSubproduct',
+			'joinTable' => 'shop_product_subproducts',
+			'foreignKey' => 'shop_subproduct_id',
+			'associationForeignKey' => 'shop_product_id',
+			'unique' => true,
+			'conditions' => '',
+			'fields' => '',
+			'order' => '',
+			'limit' => '',
+			'offset' => '',
+			'finderQuery' => '',
+			'deleteQuery' => '',
+			'insertQuery' => ''
+		)
+	);
+	
 	
 	
 	function afterFind($results,$primary){

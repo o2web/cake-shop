@@ -1,7 +1,7 @@
 <?php
 class ShopHelper extends AppHelper {
 
-	var $helpers = array('Number','Form');
+	var $helpers = array('Number','Form','O2form.O2form');
 	
 	var $currencyFormats = array(
 		'fre' => array('before'=>false, 'after'=>' $', 'thousands' => ' ', 'decimals'=>',', 'places'=>2),
@@ -45,48 +45,24 @@ class ShopHelper extends AppHelper {
 		$html .= '	'.$this->Form->input('ShopProduct.price')."\n";
 		
 		$types = ShopConfig::getSubProductTypes();
-		
+		if(empty($this->data['ShopSubproduct']) && !empty($this->data['ShopProduct']['ShopSubproduct'])){
+			App::import('Lib', 'SetMulti');
+			$this->data['ShopSubproduct'] = SetMulti::group($this->data['ShopProduct']['ShopSubproduct'],'type');
+			$this->O2form->data['ShopSubproduct'] = $this->data['ShopSubproduct'];
+			$this->Form->data['ShopSubproduct'] = $this->data['ShopSubproduct'];
+		}
 		if(!empty($types)){
 			$html .= '	<div class="shopSubProductSelector">'."\n";
 			$html .= '		<p class="label">'.__('subProduct',true).'</p>'."\n";
 			foreach($types as $key =>$type){
-				$html .= '		<div class="type">'."\n";
-				$html .= '			<p class="title">'.$type['label'].'</p>'."\n";
-				$html .= '			<a href="#" class="btAdd">+</a>'."\n";
-				$html .= '			<table class="subItems" cellspacing="0" cellpadding="0">'."\n";
-				$html .= '				<tr>'."\n";
-				$html .= '					<th>'.__('Code',true).'</th>'."\n";
-				$html .= '					<th>'.__('Label',true).'</th>'."\n";
-				if(count($type['operators'])>1){
-					$html .= '					<th>'.__('Operator',true).'</th>'."\n";
-				}
-				$html .= '					<th>'.__('Price',true).'</th>'."\n";
-				$html .= '					<th>'.__('Delete',true).'</th>'."\n";
-				$html .= '				</tr>'."\n";
-				$html .= '				<tr>'."\n";
-				$html .= '					<td>'."\n";
-				$html .= '						'.$this->Form->input('SubProduct.'.$key.'.code',array('div'=>false,'label'=>false))."\n";
-				$html .= '					</td>'."\n";
-				$html .= '					<td>'."\n";
-				$html .= '						'.$this->Form->input('SubProduct.'.$key.'.label',array('div'=>false,'label'=>false))."\n";
-				$html .= '					</td>'."\n";
-				if(count($type['operators'])>1){
-					$html .= '					<td>'."\n";
-					$html .= '						'.$this->Form->input('SubProduct.'.$key.'.operator',array('options'=>$type['operators'],'div'=>false,'label'=>false))."\n";
-					$html .= '					</td>'."\n";
-				}
-				$html .= '					<td>'."\n";
-				$html .= '						'.$this->Form->input('SubProduct.'.$key.'.price',array('div'=>false,'label'=>false))."\n";
-				$html .= '					</td>'."\n";
-				$html .= '					<td>'."\n";
+				$fields = set::normalize(array('id','code','label','operator','price'));
 				if(count($type['operators']==1)){
-					$html .= '						'.$this->Form->input('SubProduct.'.$key.'.operator',array('type'=>'hidden','value'=>$type['operators'][0]))."\n";
+					$fields['operator']['type'] = 'hidden';
+					$fields['operator']['value'] = $type['operators'][0];
+				}else{
+					$fields['operator']['options'] = $type['operators'];
 				}
-				$html .= '						<a href="#" class="btDelete">-</a>'."\n";
-				$html .= '					</td>'."\n";
-				$html .= '				</tr>'."\n";
-				$html .= '			</table>'."\n";
-				$html .= '		</div>'."\n";
+				$html .= $this->O2form->input('ShopSubproduct.'.$key,array('type'=>'multiple','fields'=>$fields,'div'=>array('class'=>'type')));
 			}
 			
 			$html .= '	<div>'."\n";

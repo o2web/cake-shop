@@ -54,7 +54,42 @@ class ProductBehavior extends ModelBehavior {
 			}
 		}
 		$model->ShopProduct->create();
-		$model->ShopProduct->save($data);
+		$success = $model->ShopProduct->save($data);
+		if($success && !empty($model->data['ShopSubproduct'])){
+			$subProducts = $model->data['ShopSubproduct'];
+			$def = array(
+				'active' => 1,
+				'operator' => '=',
+			);
+			$toSave = array();
+			$toDelete = array();
+			foreach ($subProducts as $type => $subs) {
+				foreach ($subs as $sub) {
+					if(!empty($sub['delete'])){
+						$toDelete = $sub;
+					}else{
+						$sub['type'] = $type;
+						$sub['ShopProductSubproduct'] = array('shop_product_id'=>$model->ShopProduct->id);
+						$sub = array_merge($def,$sub);
+						$toSave[] = $sub;
+					}
+				}
+			}
+			debug($toSave);
+			foreach ($toSave as $sub) {
+				$model->ShopProduct->ShopSubproduct->create();
+				if($model->ShopProduct->ShopSubproduct->save($sub)){
+					$sub['ShopProductSubproduct']['shop_subproduct_id'] = $model->ShopProduct->ShopSubproduct->id;
+					$unique = array('shop_product_id','shop_subproduct_id');
+					$existant = $model->ShopProduct->ShopProductSubproduct->find('first',array('conditions'=>array_intersect_key($sub['ShopProductSubproduct'],array_flip($unique))));
+					if($existant){
+						$sub['ShopProductSubproduct']['id'] = $existant['ShopProductSubproduct']['id'];
+					}
+					$model->ShopProduct->ShopProductSubproduct->create();
+					$model->ShopProduct->ShopProductSubproduct->save($sub['ShopProductSubproduct']);
+				}
+			}
+		}
 	}
 
 }

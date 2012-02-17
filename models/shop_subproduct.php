@@ -33,5 +33,24 @@ class ShopSubproduct extends ShopAppModel {
 		)
 	);
 	
+	
+	var $hasAndBelongsToMany = array(
+		'ShopProduct' => array(
+			'className' => 'ShopProduct',
+			'joinTable' => 'shop_product_subproducts',
+			'foreignKey' => 'shop_product_id',
+			'associationForeignKey' => 'shop_subproduct_id',
+			'unique' => true,
+			'conditions' => '',
+			'fields' => '',
+			'order' => '',
+			'limit' => '',
+			'offset' => '',
+			'finderQuery' => '',
+			'deleteQuery' => '',
+			'insertQuery' => ''
+		)
+	);
+	
 }
 ?>
