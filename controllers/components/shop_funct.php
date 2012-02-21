@@ -205,6 +205,10 @@ class ShopFunctComponent extends Object
 			$rawItems = $order['items'];
 		}
 		
+		if(empty($rawItems)){
+			return false;
+		}
+		
 		foreach($rawItems as $orderItem){
 			$orderItems[] = $this->extractOrderItemData($orderItem);
 		}

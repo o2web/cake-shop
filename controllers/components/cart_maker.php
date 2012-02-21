@@ -21,6 +21,7 @@ class CartMakerComponent extends Object{
 		if(empty($this->data)){
 			$this->data = array('products'=>array());
 		}
+		$this->controller->params['Shop']['nbItem'] = $this->nbItem();
 	}
 	
 	function itemList(){

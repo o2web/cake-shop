@@ -37,8 +37,8 @@ class ShopProduct extends ShopAppModel {
 		'ShopSubproduct' => array(
 			'className' => 'ShopSubproduct',
 			'joinTable' => 'shop_product_subproducts',
-			'foreignKey' => 'shop_subproduct_id',
-			'associationForeignKey' => 'shop_product_id',
+			'foreignKey' => 'shop_product_id',
+			'associationForeignKey' => 'shop_subproduct_id',
 			'unique' => true,
 			'conditions' => '',
 			'fields' => '',

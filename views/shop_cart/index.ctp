@@ -1,6 +1,9 @@
 <div class="shopCart index">
 	<h2><?php __('Your Shopping Cart');?></h2>
 	
+	<?php 
+	//debug($cartItems);
+	if(!empty($cartItems)){ ?>
 	<table cellpadding="0" cellspacing="0">
 		<tr>		
 			<th><?php __('Description');?></th>		
@@ -9,9 +12,6 @@
 			<th><?php __('Total');?></th>		
 			<th class="actions"><?php __('Actions');?></th>
 		</tr>
-		<?php 
-		//debug($cartItems);
-		if(!empty($cartItems)){ ?>
 		<?php
 			$i = 0;
 			$total = 0;
@@ -41,8 +41,10 @@
 			<td class="price"><?php echo number_format($total, 2, '.', ',') . ' $'; ?></td>
 			<td class="">&nbsp;</td>
 		</tr>
-		<?php } ?>
 	</table>
+	<?php }else{ ?>
+	<p><?php __('Your cart is empty.'); ?></p>
+	<?php } ?>
 	<div class="actions">
 		<ul>
 			<?php 

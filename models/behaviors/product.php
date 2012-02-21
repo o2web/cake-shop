@@ -65,28 +65,39 @@ class ProductBehavior extends ModelBehavior {
 			$toDelete = array();
 			foreach ($subProducts as $type => $subs) {
 				foreach ($subs as $sub) {
+					$sub['type'] = $type;
+					$sub['ShopProductSubproduct'] = array('active'=>1, 'shop_product_id'=>$model->ShopProduct->id);
+					$sub = array_merge($def,$sub);
 					if(!empty($sub['delete'])){
-						$toDelete = $sub;
+						$toDelete[] = $sub;
 					}else{
-						$sub['type'] = $type;
-						$sub['ShopProductSubproduct'] = array('shop_product_id'=>$model->ShopProduct->id);
-						$sub = array_merge($def,$sub);
 						$toSave[] = $sub;
 					}
 				}
 			}
 			debug($toSave);
+			debug($toDelete);
+			$unique = array('shop_product_id','shop_subproduct_id');
 			foreach ($toSave as $sub) {
 				$model->ShopProduct->ShopSubproduct->create();
 				if($model->ShopProduct->ShopSubproduct->save($sub)){
 					$sub['ShopProductSubproduct']['shop_subproduct_id'] = $model->ShopProduct->ShopSubproduct->id;
-					$unique = array('shop_product_id','shop_subproduct_id');
 					$existant = $model->ShopProduct->ShopProductSubproduct->find('first',array('conditions'=>array_intersect_key($sub['ShopProductSubproduct'],array_flip($unique))));
 					if($existant){
 						$sub['ShopProductSubproduct']['id'] = $existant['ShopProductSubproduct']['id'];
 					}
 					$model->ShopProduct->ShopProductSubproduct->create();
 					$model->ShopProduct->ShopProductSubproduct->save($sub['ShopProductSubproduct']);
+				}
+			}
+			foreach ($toDelete as $sub) {
+				if(!empty($sub['id'])){
+					$sub['ShopProductSubproduct']['shop_subproduct_id'] = $sub['id'];
+					$existant = $model->ShopProduct->ShopProductSubproduct->find('first',array('conditions'=>array_intersect_key($sub['ShopProductSubproduct'],array_flip($unique))));
+					if($existant){
+						$model->ShopProduct->ShopProductSubproduct->delete($existant['ShopProductSubproduct']['id']);
+					}
+					$model->ShopProduct->ShopSubproduct->delete($sub['id']);
 				}
 			}
 		}
