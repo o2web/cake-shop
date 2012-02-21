@@ -6,7 +6,7 @@ class ShopSubproduct extends ShopAppModel {
 
 	var $hasMany = array(
 		'ShopProductSubproduct' => array(
-			'className' => 'ShopProductSubproduct',
+			'className' => 'Shop.ShopProductSubproduct',
 			'foreignKey' => 'shop_subproduct_id',
 			'dependent' => false,
 			'conditions' => '',
@@ -19,7 +19,7 @@ class ShopSubproduct extends ShopAppModel {
 			'counterQuery' => ''
 		),
 		'ChildSubproduct' => array(
-			'className' => 'ShopProductSubproduct',
+			'className' => 'Shop.ShopProductSubproduct',
 			'foreignKey' => 'parent_subproduct_id',
 			'dependent' => false,
 			'conditions' => '',
@@ -36,7 +36,7 @@ class ShopSubproduct extends ShopAppModel {
 	
 	var $hasAndBelongsToMany = array(
 		'ShopProduct' => array(
-			'className' => 'ShopProduct',
+			'className' => 'Shop.ShopProduct',
 			'joinTable' => 'shop_product_subproducts',
 			'foreignKey' => 'shop_subproduct_id',
 			'associationForeignKey' => 'shop_product_id',

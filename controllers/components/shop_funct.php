@@ -119,6 +119,112 @@ class ShopFunctComponent extends Object
 		return !empty($data['country']) && !empty($data['region']);
 	}
 	
+	function calculSubItem($products){
+		App::import('Lib', 'Shop.SetMulti');
+		if(SetMulti::isAssoc($products)){
+			$prods =  array(&$products);
+		}else{
+			$prods = &$products;
+		}
+		App::import('Lib', 'Shop.ShopConfig');
+		$types = ShopConfig::getSubProductTypes();
+		$subItemDef = array(
+			'nb' => 1,
+		);
+		foreach($prods as &$prod){
+			$orderItemMode = isset($prod['item_price']);
+			if($orderItemMode){
+				$p = &$prod;
+			}else{
+				$p = $this->extractOrderItemData($p2 = $prod);
+			}
+			$cur_price = $p['item_price'];
+			$p['item_alone_price'] = $cur_price;
+			if(!empty($types) && !empty($p['SubItem'])) { 
+				$this->ShopSubproduct = ClassRegistry::init('Shop.ShopSubproduct');
+				$ids = array();
+				//============ normalize data ============//
+				$subItems = array();
+				foreach($types as $type){
+					$n = $type['name'];
+					if(isset($p['SubItem'][$n])){
+						$subItems[$n] = $p['SubItem'][$n];
+						if(!is_array($subItems[$n]) || SetMulti::isAssoc($subItems[$n])){
+							$subItems[$n] = array($subItems[$n]);
+						}
+						foreach($subItems[$n] as &$subItem){
+							if(!is_array($subItem)){
+								$subItem = array('id'=>$subItem);
+							}
+							$subItem = array_merge($subItemDef,$subItem);
+						}
+					}
+					$ids = array_merge($ids, SetMulti::extractKeepKey('id',$subItems[$n]));
+				}
+				//debug($ids);
+				
+				//============ fetch SubProducts ============//
+				$this->ShopSubproduct->ShopProductSubproduct->Behaviors->attach('Containable');
+				$this->ShopSubproduct->ShopProductSubproduct->contain(array('ShopSubproduct'));
+				$subProduct = $this->ShopSubproduct->ShopProductSubproduct->find('all', array(
+					'conditions' => array(
+							'ShopProductSubproduct.shop_product_id' => $p['product_id'],
+							'ShopProductSubproduct.shop_SUBproduct_id' => $ids,
+						)
+				));
+				$subProduct = SetMulti::group($subProduct,'ShopSubproduct.id',array('singleArray'=>false));
+				//debug($subProduct);
+				
+				//============ merge data ============//
+				$finalSubItems = array();
+				foreach($subItems as $type => $items){
+					foreach($items as $subItem){
+						if(!empty($subProduct[$subItem['id']])){
+							$data = array_merge($subProduct[$subItem['id']],$subItem);
+							$extract_data = array(
+								'shop_product_id' => 'ShopSubproduct.id',
+								'nb' => array('nb'),
+								'item_price' => array('ShopSubproduct.price'),
+								'item_operator' => 'ShopSubproduct.operator',
+								'type' => 'ShopSubproduct.type',
+							);
+							$data = SetMulti::extractHierarchicMulti($extract_data,$data);
+							$finalSubItems[] = $data;
+						}
+					}
+				}
+				
+				//============ calculate ============//
+				App::import('Lib', 'Shop.Operations');
+				foreach($finalSubItems as &$subItem){
+					$new_price = $cur_price;
+					$subPrice = $subItem['item_price'] * $subItem['nb'];
+					if($subItem['item_operator'] == '='){
+						$new_price = $subPrice;
+					}else{
+						$new_price = Operations::simpleOperation($cur_price,$subItem['item_operator'],$subPrice);
+					}
+					$subItem['modif'] = $new_price-$cur_price;
+					$cur_price = $new_price;
+				}
+				$p['SubItem'] = $finalSubItems;
+			}
+			$p['subitems_modif'] = $cur_price - $p['item_price'];
+			$p['item_price'] = $cur_price;
+			
+			if(!$orderItemMode){
+				if(isset($prod['ShopProduct']['DynamicField'])){
+					$dprod = &$prod['ShopProduct'];
+				}else{
+					$dprod = &$prod;
+				}
+				$dprod['DynamicField']['subitems_modif'] = $p['subitems_modif'];
+				$dprod['DynamicField']['alone_price'] = $p['item_alone_price'];
+				$dprod['DynamicField']['price'] = $p['item_price'];
+			}
+		}
+		return $products;
+	}
 
 	function calculPromo($products){
 		App::import('Lib', 'Shop.SetMulti');
@@ -212,6 +318,10 @@ class ShopFunctComponent extends Object
 		foreach($rawItems as $orderItem){
 			$orderItems[] = $this->extractOrderItemData($orderItem);
 		}
+		//============ calcul subItems ============//
+		$orderItems = $this->calculSubItem($orderItems);
+		//debug($orderItems);
+		
 		
 		//============ calcul promos ============//
 		$orderItems = $this->calculPromo($orderItems);
@@ -450,9 +560,11 @@ class ShopFunctComponent extends Object
 			'comment' => 'Options.comment',
 			'data' => 'Options.data',
 			'descr' => array('DynamicField.title','ShopProduct.DynamicField.title','ShopProduct.code'),
-			'item_price' => array('Options.price','ShopProduct.price','DynamicField.price','ShopProduct.DynamicField.price'),
+			'item_price' => array('ShopProduct.DynamicField.price','DynamicField.price','Options.price','ShopProduct.price'),
 			'item_tax_applied' => 'ShopProduct.tax_applied',
 			'ShopPromotion' => array('ShopProduct.ShopPromotion','ShopPromotion'),
+			'ShopSubproduct' => array('ShopProduct.ShopSubproduct','ShopSubproduct'),
+			'SubItem' => array('Options.SubItem','SubItem'),
 			'item_rebate' => 'DynamicField.rebate',
 			'item_original_price' => 'DynamicField.original_price',
 			'product_related_id' => array('ShopProduct.Related.id','Related.id'),

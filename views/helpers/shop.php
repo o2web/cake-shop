@@ -62,8 +62,8 @@ class ShopHelper extends AppHelper {
 				}else{
 					$fields['operator']['options'] = $type['operators'];
 				}
-				if(isset($type['fields'])){
-					$fields = set::merge($fields,array_intersect_key($type['fields'],$fields));
+				if(isset($type['adminFields'])){
+					$fields = set::merge($fields,$type['adminFields']);
 				}
 				$html .= $this->O2form->input('ShopSubproduct.'.$key,array('type'=>'multiple','fields'=>$fields,'div'=>array('class'=>'type')));
 			}

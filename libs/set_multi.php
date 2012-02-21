@@ -1,7 +1,7 @@
 <?php
 class SetMulti {
 
-	// App::import('Lib', 'SetMulti');
+	// App::import('Lib', 'Shop.SetMulti');
 	
 	function extractHierarchic($paths, $data = null, $options = array()) {
 		$defaultOptions = array(

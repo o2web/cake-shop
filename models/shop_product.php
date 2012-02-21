@@ -19,7 +19,7 @@ class ShopProduct extends ShopAppModel {
 	
 	var $hasMany = array(
 		'ShopProductSubproduct' => array(
-			'className' => 'ShopProductSubproduct',
+			'className' => 'Shop.ShopProductSubproduct',
 			'foreignKey' => 'shop_product_id',
 			'dependent' => false,
 			'conditions' => '',
@@ -35,7 +35,7 @@ class ShopProduct extends ShopAppModel {
 	
 	var $hasAndBelongsToMany = array(
 		'ShopSubproduct' => array(
-			'className' => 'ShopSubproduct',
+			'className' => 'Shop.ShopSubproduct',
 			'joinTable' => 'shop_product_subproducts',
 			'foreignKey' => 'shop_product_id',
 			'associationForeignKey' => 'shop_subproduct_id',

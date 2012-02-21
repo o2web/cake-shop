@@ -21,6 +21,7 @@ class CartMakerComponent extends Object{
 		if(empty($this->data)){
 			$this->data = array('products'=>array());
 		}
+		//debug($this->data);
 		$this->controller->params['Shop']['nbItem'] = $this->nbItem();
 	}
 	
@@ -74,6 +75,7 @@ class CartMakerComponent extends Object{
 			}elseif(!empty($product['model']) && !empty($product['foreign_id'])){
 				$productData = $ShopProduct->getFullData($productData);
 			}
+			$productData = $this->ShopFunct->calculSubItem($productData);
 			$productData = $this->ShopFunct->calculPromo($productData);
 			$data[] = $productData;
 		}
@@ -218,6 +220,15 @@ class CartMakerComponent extends Object{
 		save(array('order'=>$data));
 	}
 	
+	function toData(){
+		$res = array('ShopCart' => $this->data);
+		if(!empty($res['ShopCart']['ShopOrder'])){
+			$res['ShopOrder'] = $res['ShopCart']['ShopOrder'];
+			unset($res['ShopCart']['ShopOrder']);
+		}
+		return $res;
+	}
+	
 	function save($data = null){
 		if(!empty($data)){
 			$nomalized = $data;
@@ -230,6 +241,7 @@ class CartMakerComponent extends Object{
 			}
 			$this->data = Set::merge($this->data,$nomalized);
 		}
+		//debug($this->data);
 		$this->Session->write('Shop.cart', $this->data);
 		$this->_itemListData = null;
 	}

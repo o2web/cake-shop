@@ -101,7 +101,8 @@ class OrderMakerComponent extends Object
 				$this->ShopOrder->save($orderData);
 			}
 		}
-		
+		debug($products);
+		exit();
 		
 		if (!empty($products)) {
 			foreach($products as $product){
@@ -109,6 +110,7 @@ class OrderMakerComponent extends Object
 				$data = $this->ShopFunct->extractOrderItemData($product);
 				$data['order_id'] = $order_id;
 				$this->ShopOrder->ShopOrdersItem->save($data);
+				//extract sub items and save them
 			}
 		}
 		if($options['redirect'] && ($options['redirect'] != 'add' || !$options['id'])){

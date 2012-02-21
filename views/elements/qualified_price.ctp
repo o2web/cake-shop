@@ -19,10 +19,10 @@ $data = SetMulti::extractHierarchicMulti($extract_data,$source,array('extractNul
 ?>
 <div class="shopPrice">
 	<?php if(!empty($data['original_price']) && $data['original_price'] != $data['price']){ ?>
-	<span class="originalPrice"><?php echo $this->Number->currency($data['original_price'], $lang); ?></span>
+	<span class="originalPrice"><?php echo $this->Shop->currency($data['original_price']); ?></span>
 	<?php } ?>
 	<?php if(!empty($data['rebate'])){ ?>
-	<span class="priceRebate"><?php echo $this->Number->currency($data['rebate']*-1, $lang); ?></span>
+	<span class="priceRebate"><?php echo $this->Shop->currency($data['rebate']*-1); ?></span>
 	<?php } ?>
-	<span class="price<?php if(!empty($data['rebate'])) echo " priceReduced" ?>"><?php echo $this->Number->currency($data['price'], $lang); ?></span>
+	<span class="price<?php if(!empty($data['rebate'])) echo " priceReduced" ?>"><?php echo $this->Shop->currency($data['price']); ?></span>
 </div>
