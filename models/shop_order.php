@@ -101,7 +101,7 @@ class ShopOrder extends ShopAppModel {
 	function setupForFullData(){
 		$this->checkActive = false;
 		$this->Behaviors->attach('Containable');
-		$this->contain(array('ShopOrdersItem'=>array('ShopProduct','ShopOrdersSubitem'),'ShopProduct'));
+		$this->contain(array('ShopOrdersItem'=>array('ShopProduct','ShopOrdersSubitem'=>'ShopSubproduct'),'ShopProduct'));
 	}
 	
 	function beforeSave(){

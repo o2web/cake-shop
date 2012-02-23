@@ -359,7 +359,9 @@ class ShopOrdersController extends ShopAppController {
 			}
 		}
 		$this->data = $order;
-		$order['ShopOrder'] = array_merge($order['ShopOrder'],$this->_calculate($order));
+		$calcul = $this->_calculate($order);
+		//debug($calcul);
+		$order['ShopOrder'] = array_merge($order['ShopOrder'],$calcul);
 		$this->set('order',$order);
 	}
 	

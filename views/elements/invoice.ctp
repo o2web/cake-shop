@@ -36,18 +36,47 @@
         </tr>
         <?php 
 		//debug($order);
-		foreach($order['ShopOrdersItem'] as $orderItem){ ?>
-        <tr class="item">
-            <td><?php echo str_pad($orderItem['ShopProduct']['id'], 6, "0", STR_PAD_LEFT); ?></td>
-            <td><?php echo $orderItem['nb']; ?></td>
-            <td><?php echo $orderItem['descr'];
-				if(!empty($orderItem['comment'])){
-					echo "<span>".$orderItem[$orderItem['ShopProduct']['code']]."</span>"; 
-				}
-			?></td>
-            <td class="amount"><?php echo $this->Shop->currency($orderItem['item_price']); ?></td>
-            <td class="amount"><?php echo $this->Shop->currency($orderItem['item_price']*$orderItem['nb']); ?></td>
-        </tr>
+		foreach($order['ShopOrder']['OrderItem'] as $orderItem){ 
+			//debug($orderItem);
+		?>
+		
+			<tr class="item">
+				<td><?php echo str_pad($orderItem['product_id'], 6, "0", STR_PAD_LEFT); ?></td>
+				<td><?php echo $orderItem['nb']; ?></td>
+				<td><?php echo $orderItem['descr'];
+					if(!empty($orderItem['comment'])){
+						echo "<span>".$orderItem[$orderItem['ShopProduct']['code']]."</span>"; 
+					}
+				?></td>
+				<td class="amount"><?php if(empty($orderItem['overwritten_price'])) echo $this->Shop->currency($orderItem['item_alone_price']); ?></td>
+				<td class="amount"><?php echo $this->Shop->currency($orderItem['total']); ?></td>
+			</tr>
+			
+			<?php foreach($orderItem['SubItem'] as $orderSubItem){ ?>
+				<tr class="item itemSubItem">
+					<td>&nbsp;</td>
+					<td><?php 
+					if($orderItem['nb']>1){ 
+						echo $orderItem['nb'];
+						if($orderItem['nb']>1){ 
+							echo '*';
+						}
+					}
+					if($orderItem['nb']>1){ 
+						echo $orderItem['nb'];
+					}
+					?></td>
+					<td><?php echo $orderSubItem['descr']; ?></td>
+					<?php  ?>
+					<td class="amount"><?php echo $this->Shop->currency(
+						($orderSubItem['item_operator'] == "=")?
+							$orderSubItem['item_price']
+						:
+							$orderSubItem['modif']
+					); ?></td>
+					<td class="amount">&nbsp;</td>
+				</tr>
+			<?php } ?>
         <?php } ?>
 		
 		<?php if(!empty($order['ShopOrder']['discount']) || !empty($order['ShopOrder']['taxes']) || !empty($order['ShopOrder']['total_shipping'])){ ?>

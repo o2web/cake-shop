@@ -135,6 +135,7 @@ class ShopFunctComponent extends Object
 			}
 			$cur_price = $p['item_price'];
 			$p['item_alone_price'] = $cur_price;
+			$p['overwritten_price'] = false;
 			$subItems = $this->extractSubItemData($prod);
 			if(!empty($subItems)) { 
 				//============ calculate ============//
@@ -144,6 +145,7 @@ class ShopFunctComponent extends Object
 					$subPrice = $subItem['item_price'] * $subItem['nb'];
 					if($subItem['item_operator'] == '='){
 						$new_price = $subPrice;
+						$p['overwritten_price'] = true;
 					}else{
 						$new_price = Operations::simpleOperation($cur_price,$subItem['item_operator'],$subPrice);
 					}
@@ -164,6 +166,7 @@ class ShopFunctComponent extends Object
 				$dprod['DynamicField']['subitems_modif'] = $p['subitems_modif'];
 				$dprod['DynamicField']['alone_price'] = $p['item_alone_price'];
 				$dprod['DynamicField']['price'] = $p['item_price'];
+				$dprod['DynamicField']['overwritten_price'] = $p['overwritten_price'];
 			}
 		}
 		return $products;
@@ -273,13 +276,16 @@ class ShopFunctComponent extends Object
 		//============ total_items ============//
 		$result['total_items'] = 0;
 		$result['nb_total'] = 0;
+		$excludeFromResult = array('ShopPromotion','ShopSubproduct','ShopOrdersSubitem');
 		if(!empty($orderItems)){
 			foreach($orderItems as &$orderItem){
 				$result['nb_total'] += $orderItem['nb'];
 				$orderItem['total'] = $orderItem['item_price']*$orderItem['nb'];
 				$result['total_items'] += $orderItem['total'];
+				$result['OrderItem'][] = array_diff_key($orderItem,array_flip($excludeFromResult));
 			}
 		}
+		
 		
 		//============ sub_total ============//
 		$result['sub_total'] = 0;
@@ -558,6 +564,7 @@ class ShopFunctComponent extends Object
 						$data = array_merge($subProduct[$subItem['id']],$subItem);
 						$extract_data = array(
 							'shop_subproduct_id' => 'ShopSubproduct.id',
+							'descr' => array('ShopSubproduct.label'),
 							'nb' => array('nb'),
 							'item_price' => array('ShopSubproduct.price'),
 							'item_operator' => 'ShopSubproduct.operator',

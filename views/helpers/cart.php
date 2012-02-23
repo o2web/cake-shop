@@ -39,6 +39,14 @@ class CartHelper extends AppHelper {
 		return $this->Html->url(array('plugin'=>'shop','controller'=>'shop_cart','action'=>'add', 'model'=>$options['model'], 'id'=>$options['id'], 'nb'=>$options['nb']));
 	}
 	
+	function qteInput($options = array()){
+		$defOpt = array(
+			'default'=>1
+		);
+		$opt = array_merge($defOpt, $options);
+		return $this->O2form->input('ShopCart.nb',$opt);
+	}
+	
 	function cartUrl(){
 		return $this->Html->url(array('plugin'=>'shop','controller'=>'shop_cart','action'=>'index'));
 	}
