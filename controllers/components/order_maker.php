@@ -47,10 +47,11 @@ class OrderMakerComponent extends Object
 			foreach((array)$options['products'] as $productOpt){
 				$productOpt = $this->ShopFunct->formatProductAddOption($productOpt);
 				$conditions = $this->ShopFunct->productFindConditions($productOpt);
+				$this->initShopOrder();
+				$this->ShopOrder->ShopProduct->Behaviors->attach('Containable');
+				$this->ShopOrder->ShopProduct->contain(array('ShopSubproduct'));
 				if($conditions !== false){
 					$product = array();
-					$this->initShopOrder();
-					$this->ShopOrder->ShopProduct->recursive = 0;
 					$product = $this->ShopOrder->ShopProduct->find('first',array('conditions'=>$conditions));
 				}
 				if(empty($product) && empty($productOpt['id'])){
@@ -101,16 +102,23 @@ class OrderMakerComponent extends Object
 				$this->ShopOrder->save($orderData);
 			}
 		}
-		debug($products);
-		exit();
 		
 		if (!empty($products)) {
 			foreach($products as $product){
 				$this->ShopOrder->ShopOrdersItem->create();
 				$data = $this->ShopFunct->extractOrderItemData($product);
+				$subItems = $this->ShopFunct->extractSubItemData($data);//extract sub items
+				//debug($data);
+				//debug($subItems);
+				//exit();
 				$data['order_id'] = $order_id;
-				$this->ShopOrder->ShopOrdersItem->save($data);
-				//extract sub items and save them
+				////////// save sub items //////////
+				if($this->ShopOrder->ShopOrdersItem->save($data)){
+					foreach($subItems as $subItem){
+						$subItem['shop_orders_item_id'] = $this->ShopOrder->ShopOrdersItem->id;
+						$this->ShopOrder->ShopOrdersItem->ShopOrdersSubitem->save($subItem);
+					}
+				}
 			}
 		}
 		if($options['redirect'] && ($options['redirect'] != 'add' || !$options['id'])){

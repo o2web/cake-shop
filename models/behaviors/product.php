@@ -75,8 +75,8 @@ class ProductBehavior extends ModelBehavior {
 					}
 				}
 			}
-			debug($toSave);
-			debug($toDelete);
+			//debug($toSave);
+			//debug($toDelete);
 			$unique = array('shop_product_id','shop_subproduct_id');
 			foreach ($toSave as $sub) {
 				$model->ShopProduct->ShopSubproduct->create();

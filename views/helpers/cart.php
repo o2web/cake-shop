@@ -3,7 +3,7 @@ class CartHelper extends AppHelper {
 
 	var $helpers = array('Html', 'Form', 'Javascript', 'O2form.O2form');
 	
-	function buyUrl($id,$nb=null,$model=null,$options=array()){
+	function buyUrl($id=null,$nb=null,$model=null,$options=array()){
 		if(is_array($id)){
 			$options = $id;
 		}else{
@@ -14,6 +14,18 @@ class CartHelper extends AppHelper {
 			if(!empty($model)){
 				$options['model'] = $model;
 			}
+		}
+		if(empty($options['id'])){
+			if(!empty($this->params['id'])){
+				$options['id'] = $this->params['id'];
+			}else if(!empty($this->params['named']['id'])){
+				$options['id'] = $this->params['named']['id'];
+			}else if(!empty($this->params['pass'][0]) && is_numeric($this->params['pass'][0])){
+				$options['id'] = $this->params['named']['id'];
+			}
+		}
+		if(empty($options['id']) || !is_numeric($options['id'])){
+			return null;
 		}
 		$defmodel = $this->model();
 		if($defmodel == null){

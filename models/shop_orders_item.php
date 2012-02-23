@@ -22,5 +22,21 @@ class ShopOrdersItem extends ShopAppModel {
 			'order' => ''
 		)
 	);
+	
+	var $hasMany = array(
+		'ShopOrdersSubitem' => array(
+			'className' => 'Shop.ShopOrdersSubitem',
+			'foreignKey' => 'shop_orders_item_id',
+			'dependent' => false,
+			'conditions' => '',
+			'fields' => '',
+			'order' => '',
+			'limit' => '',
+			'offset' => '',
+			'exclusive' => '',
+			'finderQuery' => '',
+			'counterQuery' => ''
+		)
+	);
 }
 ?>

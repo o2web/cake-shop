@@ -126,11 +126,6 @@ class ShopFunctComponent extends Object
 		}else{
 			$prods = &$products;
 		}
-		App::import('Lib', 'Shop.ShopConfig');
-		$types = ShopConfig::getSubProductTypes();
-		$subItemDef = array(
-			'nb' => 1,
-		);
 		foreach($prods as &$prod){
 			$orderItemMode = isset($prod['item_price']);
 			if($orderItemMode){
@@ -140,63 +135,11 @@ class ShopFunctComponent extends Object
 			}
 			$cur_price = $p['item_price'];
 			$p['item_alone_price'] = $cur_price;
-			if(!empty($types) && !empty($p['SubItem'])) { 
-				$this->ShopSubproduct = ClassRegistry::init('Shop.ShopSubproduct');
-				$ids = array();
-				//============ normalize data ============//
-				$subItems = array();
-				foreach($types as $type){
-					$n = $type['name'];
-					if(isset($p['SubItem'][$n])){
-						$subItems[$n] = $p['SubItem'][$n];
-						if(!is_array($subItems[$n]) || SetMulti::isAssoc($subItems[$n])){
-							$subItems[$n] = array($subItems[$n]);
-						}
-						foreach($subItems[$n] as &$subItem){
-							if(!is_array($subItem)){
-								$subItem = array('id'=>$subItem);
-							}
-							$subItem = array_merge($subItemDef,$subItem);
-						}
-					}
-					$ids = array_merge($ids, SetMulti::extractKeepKey('id',$subItems[$n]));
-				}
-				//debug($ids);
-				
-				//============ fetch SubProducts ============//
-				$this->ShopSubproduct->ShopProductSubproduct->Behaviors->attach('Containable');
-				$this->ShopSubproduct->ShopProductSubproduct->contain(array('ShopSubproduct'));
-				$subProduct = $this->ShopSubproduct->ShopProductSubproduct->find('all', array(
-					'conditions' => array(
-							'ShopProductSubproduct.shop_product_id' => $p['product_id'],
-							'ShopProductSubproduct.shop_SUBproduct_id' => $ids,
-						)
-				));
-				$subProduct = SetMulti::group($subProduct,'ShopSubproduct.id',array('singleArray'=>false));
-				//debug($subProduct);
-				
-				//============ merge data ============//
-				$finalSubItems = array();
-				foreach($subItems as $type => $items){
-					foreach($items as $subItem){
-						if(!empty($subProduct[$subItem['id']])){
-							$data = array_merge($subProduct[$subItem['id']],$subItem);
-							$extract_data = array(
-								'shop_product_id' => 'ShopSubproduct.id',
-								'nb' => array('nb'),
-								'item_price' => array('ShopSubproduct.price'),
-								'item_operator' => 'ShopSubproduct.operator',
-								'type' => 'ShopSubproduct.type',
-							);
-							$data = SetMulti::extractHierarchicMulti($extract_data,$data);
-							$finalSubItems[] = $data;
-						}
-					}
-				}
-				
+			$subItems = $this->extractSubItemData($prod);
+			if(!empty($subItems)) { 
 				//============ calculate ============//
 				App::import('Lib', 'Shop.Operations');
-				foreach($finalSubItems as &$subItem){
+				foreach($subItems as &$subItem){
 					$new_price = $cur_price;
 					$subPrice = $subItem['item_price'] * $subItem['nb'];
 					if($subItem['item_operator'] == '='){
@@ -207,7 +150,7 @@ class ShopFunctComponent extends Object
 					$subItem['modif'] = $new_price-$cur_price;
 					$cur_price = $new_price;
 				}
-				$p['SubItem'] = $finalSubItems;
+				$p['SubItem'] = $subItems;
 			}
 			$p['subitems_modif'] = $cur_price - $p['item_price'];
 			$p['item_price'] = $cur_price;
@@ -553,6 +496,82 @@ class ShopFunctComponent extends Object
 		return $conditions;
 	}
 	
+	function extractSubItemData($productAndOptions){
+		if(!empty($productAndOptions['ShopOrdersSubitem'])){
+			return $productAndOptions['ShopOrdersSubitem'];
+		}
+		
+		$subItemDef = array(
+			'nb' => 1,
+		);
+		
+		$orderItemMode = isset($productAndOptions['item_price']);
+		if($orderItemMode){
+			$p = &$productAndOptions;
+		}else{
+			$p = $this->extractOrderItemData($p2 = $productAndOptions);
+		}
+		$cur_price = $p['item_price'];
+		$p['item_alone_price'] = $cur_price;
+		App::import('Lib', 'Shop.ShopConfig');
+		$types = ShopConfig::getSubProductTypes();
+		if(!empty($types) && !empty($p['SubItem'])) { 
+			$this->ShopSubproduct = ClassRegistry::init('Shop.ShopSubproduct');
+			$ids = array();
+			//============ normalize data ============//
+			$subItems = array();
+			foreach($types as $type){
+				$n = $type['name'];
+				if(isset($p['SubItem'][$n])){
+					$subItems[$n] = $p['SubItem'][$n];
+					if(!is_array($subItems[$n]) || SetMulti::isAssoc($subItems[$n])){
+						$subItems[$n] = array($subItems[$n]);
+					}
+					foreach($subItems[$n] as &$subItem){
+						if(!is_array($subItem)){
+							$subItem = array('id'=>$subItem);
+						}
+						$subItem = array_merge($subItemDef,$subItem);
+					}
+				}
+				$ids = array_merge($ids, SetMulti::extractKeepKey('id',$subItems[$n]));
+			}
+			//debug($ids);
+			
+			//============ fetch SubProducts ============//
+			$this->ShopSubproduct->ShopProductSubproduct->Behaviors->attach('Containable');
+			$this->ShopSubproduct->ShopProductSubproduct->contain(array('ShopSubproduct'));
+			$subProduct = $this->ShopSubproduct->ShopProductSubproduct->find('all', array(
+				'conditions' => array(
+						'ShopProductSubproduct.shop_product_id' => $p['product_id'],
+						'ShopProductSubproduct.shop_SUBproduct_id' => $ids,
+					)
+			));
+			$subProduct = SetMulti::group($subProduct,'ShopSubproduct.id',array('singleArray'=>false));
+			//debug($subProduct);
+			
+			//============ merge data ============//
+			$finalSubItems = array();
+			foreach($subItems as $type => $items){
+				foreach($items as $subItem){
+					if(!empty($subProduct[$subItem['id']])){
+						$data = array_merge($subProduct[$subItem['id']],$subItem);
+						$extract_data = array(
+							'shop_subproduct_id' => 'ShopSubproduct.id',
+							'nb' => array('nb'),
+							'item_price' => array('ShopSubproduct.price'),
+							'item_operator' => 'ShopSubproduct.operator',
+							'type' => 'ShopSubproduct.type',
+						);
+						$data = SetMulti::extractHierarchicMulti($extract_data,$data);
+						$finalSubItems[] = $data;
+					}
+				}
+			}
+			return $finalSubItems;
+		}
+		return null;
+	}
 	function extractOrderItemData($productAndOptions){
 		$extract_data = array(
 			'product_id' => 'ShopProduct.id',
@@ -565,6 +584,7 @@ class ShopFunctComponent extends Object
 			'ShopPromotion' => array('ShopProduct.ShopPromotion','ShopPromotion'),
 			'ShopSubproduct' => array('ShopProduct.ShopSubproduct','ShopSubproduct'),
 			'SubItem' => array('Options.SubItem','SubItem'),
+			'ShopOrdersSubitem' => array('ShopOrdersSubitem'),
 			'item_rebate' => 'DynamicField.rebate',
 			'item_original_price' => 'DynamicField.original_price',
 			'product_related_id' => array('ShopProduct.Related.id','Related.id'),
