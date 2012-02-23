@@ -17,10 +17,7 @@
 					<th><?php echo $type['label'] ?></th>
 				<?php 
 					$nbCols++;
-				} ?>
-				<th></th>	
-				<?php 
-					$nbCols++;
+				} 
 			} ?>
 			<th><?php __('Price');?></th>					
 			<th><?php __('Amount');?></th>		
@@ -45,12 +42,12 @@
 							foreach($types as $key => $type){ ?>
 								<td class="SubItem <?php echo $key ?>"><?php echo $this->element('subproduct_select',array('plugin'=>'shop','type'=>$type,'product'=>$cartItem,'cartPos'=>$no))?></td>
 							<?php } ?>
-							<td class="Price"><?php echo $this->Form->submit(__('Update',true)); ?></td>
 						<?php } ?>
 						<td class="Price"><?php echo $this->element('qualified_price',array('plugin'=>'shop','product'=>$cartItem))?>&nbsp;</td>
-						<td class="Amount"><?php echo $cartItem['Options']['nb']; ?>&nbsp;</td>
+						<td class="Amount"><?php echo $this->Cart->qteInput($no,array('div'=>false,'label'=>false,'class'=>'qte')); ?></td>
 						<td class="Total"><?php echo number_format($itemTotal, 2, '.', ',') . ' $'; ?></td>
 						<td class="actions">
+							<?php echo $this->Form->submit(__('Update',true)); ?>
 							<?php echo $this->Html->link(__('Remove', true), array('action' => 'remove', $no), array('class' => 'remove')); ?>
 						</td>
 					</tr>

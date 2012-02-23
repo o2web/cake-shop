@@ -39,12 +39,21 @@ class CartHelper extends AppHelper {
 		return $this->Html->url(array('plugin'=>'shop','controller'=>'shop_cart','action'=>'add', 'model'=>$options['model'], 'id'=>$options['id'], 'nb'=>$options['nb']));
 	}
 	
-	function qteInput($options = array()){
+	function qteInput($no = null, $options = array()){
+		if(is_array($no)){
+			$options = $no;
+			$no = null;
+		}
 		$defOpt = array(
 			'default'=>1
 		);
 		$opt = array_merge($defOpt, $options);
-		return $this->O2form->input('ShopCart.nb',$opt);
+		if(!is_null($no) && is_numeric($no)){
+			$name = 'ShopCart.products.'.$no.'.nb';
+		}else{
+			$name = 'ShopCart.nb';
+		}
+		return $this->O2form->input($name,$opt);
 	}
 	
 	function cartUrl(){

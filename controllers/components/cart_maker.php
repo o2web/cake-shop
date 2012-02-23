@@ -21,7 +21,6 @@ class CartMakerComponent extends Object{
 		if(empty($this->data)){
 			$this->data = array('products'=>array());
 		}
-		//debug($this->data);
 		$this->controller->params['Shop']['nbItem'] = $this->nbItem();
 	}
 	

@@ -22,6 +22,7 @@ class ShopCartController extends ShopAppController {
 			$this->CartMaker->save($this->data);
 		}else{
 			$this->data = $this->CartMaker->toData();
+			debug($this->data);
 		}
 		$data = $this->CartMaker->calculate();
 		$cartItems = $data['items'];
