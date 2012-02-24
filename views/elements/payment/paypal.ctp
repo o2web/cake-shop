@@ -1,4 +1,4 @@
-<p><?php __('Passer au paiement sécurisé avec Paypal.'); ?></p>
+<p><?php __('Passer au paiement sÃ©curisÃ© avec Paypal.'); ?></p>
 
-<?php debug($buttonData);  ?>
+<?php //debug($buttonData);  ?>
 <?php echo $paypal->button('Checkout', $buttonData);  ?>
