@@ -39,6 +39,44 @@ class CartHelper extends AppHelper {
 		return $this->Html->url(array('plugin'=>'shop','controller'=>'shop_cart','action'=>'add', 'model'=>$options['model'], 'id'=>$options['id'], 'nb'=>$options['nb']));
 	}
 	
+	function subitemInput($type, $prod = null, $options = array(), $no = null){
+		$view =& ClassRegistry::getObject('view');
+		if(!is_array($type)){
+			App::import('Lib', 'Shop.ShopConfig');
+			$types = ShopConfig::getSubProductTypes();
+			if(empty($types[$type])){
+				return null;
+			}
+			$type = $types[$type];
+		}
+		$defOpt = array(
+			'label'=>$type['label'],
+		);
+		$opt = array_merge($defOpt, $options);
+		if(!is_array($prod)){
+			$prod = null;
+			$no = $prod;
+		}
+		$sources = array(
+			'prod.ShopProduct.ShopSubproduct.'.$type['name'],
+			'prod.ShopSubproduct.'.$type['name'],
+			'data.ShopProduct.ShopSubproduct.'.$type['name'],
+			'vars.'.Inflector::singularize($this->params['controller']).'.ShopProduct.ShopSubproduct.'.$type['name'],
+		);
+		App::import('Lib', 'Shop.SetMulti');
+		$data = array('prod'=>$prod, 'data'=>$this->data,'vars'=>$view->viewVars,'params'=>$this->params);
+		$subProducts = SetMulti::extractHierarchic($sources, $data);
+		if(empty($subProducts)){
+			return null;
+		}
+		if(!is_null($no) && is_numeric($no)){
+			$name = 'ShopCart.products.'.$no.'.SubItem.'.$type['name'];
+		}else{
+			$name = 'ShopCart.SubItem.'.$type['name'];
+		}
+		return $view->element('subproduct_select',array('plugin'=>'shop','type'=>$type,'subProducts'=>$subProducts,'name'=>$name,'options'=>$opt));
+	}
+	
 	function qteInput($no = null, $options = array()){
 		if(is_array($no)){
 			$options = $no;

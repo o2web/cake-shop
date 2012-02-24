@@ -40,7 +40,7 @@
 						<?php 
 						if(!empty($types) && Configure::read('Shop.cart.inlineSubProduct') ) { 
 							foreach($types as $key => $type){ ?>
-								<td class="SubItem <?php echo $key ?>"><?php echo $this->element('subproduct_select',array('plugin'=>'shop','type'=>$type,'product'=>$cartItem,'cartPos'=>$no))?></td>
+								<td class="SubItem <?php echo $key ?>"><?php echo $this->Cart->subitemInput('Size',$cartItem,array('div'=>false,'label'=>false),$no); ?></td>
 							<?php } ?>
 						<?php } ?>
 						<td class="Price"><?php echo $this->element('qualified_price',array('plugin'=>'shop','product'=>$cartItem))?>&nbsp;</td>
