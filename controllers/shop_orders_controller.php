@@ -73,6 +73,8 @@ class ShopOrdersController extends ShopAppController {
 		if($order_id){
 			$this->ShopOrder->setupForFullData();
 			$order = $this->ShopOrder->read(null,$order_id);
+			//debug($order['ShopProduct']);
+			//exit();
 			
 			$needData = false;
 			foreach($order['ShopProduct'] as $product){

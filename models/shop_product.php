@@ -55,6 +55,9 @@ class ShopProduct extends ShopAppModel {
 	
 	function afterFind($results,$primary){
 		$results = parent::afterFind($results,$primary);
+		if(!empty($results[0][$this->alias][0]['id'])){
+			return $results;
+		}
 		if(is_array($results) && $this->recursive > -1 && $this->fullDataEnabled){
 			$results = $this->getFullData($results);
 			if(!$primary){
@@ -278,15 +281,19 @@ class ShopProduct extends ShopAppModel {
 	function getFullData($products=null,$opt=array()){
 		App::import('Lib', 'Shop.SetMulti');
 		$single = false;
-		if(!is_array($products) || SetMulti::isAssoc($products)){
-			$products = array($products);
+		//debug($products);
+		$prods = $products;
+		if(!is_array($prods) || SetMulti::isAssoc($prods)){
+			$prods = array($prods);
 			$single = true;
 		}
+		if(isset($prods[0]['DynamicField'])){
+			return $products;
+		}
+		$prods = $this->getAllRelated($prods,$opt);
 		
-		$products = $this->getAllRelated($products,$opt);
 		
-		
-		foreach($products as &$product){
+		foreach($prods as &$product){
 			$dynamicField = $this->getDynamicFields($product);
 			$product['DynamicField'] = $dynamicField;
 			if($this->getPromos){
@@ -296,11 +303,11 @@ class ShopProduct extends ShopAppModel {
 				$product['ShopSubproduct'] = SetMulti::group($product['ShopSubproduct'],'type');
 			}
 		}
-		//debug($products);
+		//debug($prods);
 		if($single){
-			return $products[0];
+			return $prods[0];
 		}else{
-			return $products;
+			return $prods;
 		}
 	}
 	
