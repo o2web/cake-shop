@@ -74,6 +74,8 @@ class ShopConfig {
 			$type = array_merge($def,(array)$type);
 			if(empty($type['label'])){
 				$type['label'] = __($key,true);
+			}else{
+				$type['label'] = __($type['label'],true);
 			}
 			if(empty($type['name'])){
 				$type['name'] = $key;

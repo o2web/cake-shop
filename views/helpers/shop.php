@@ -47,7 +47,7 @@ class ShopHelper extends AppHelper {
 		$types = ShopConfig::getSubProductTypes();
 		if(empty($this->data['ShopSubproduct']) && !empty($this->data['ShopProduct']['ShopSubproduct'])){
 			App::import('Lib', 'SetMulti');
-			$this->data['ShopSubproduct'] = SetMulti::group($this->data['ShopProduct']['ShopSubproduct'],'type');
+			$this->data['ShopSubproduct'] = $this->data['ShopProduct']['ShopSubproduct'];
 			$this->O2form->data['ShopSubproduct'] = $this->data['ShopSubproduct'];
 			$this->Form->data['ShopSubproduct'] = $this->data['ShopSubproduct'];
 		}

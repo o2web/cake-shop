@@ -27,7 +27,8 @@ class CartHelper extends AppHelper {
 		if(empty($options['id']) || !is_numeric($options['id'])){
 			return null;
 		}
-		$defmodel = $this->model();
+		$defmodel = null;
+		//$defmodel = $this->model();
 		if($defmodel == null){
 			$defmodel = Inflector::classify($this->params['controller']);
 		}
