@@ -33,7 +33,6 @@
 					$class = ' class="altrow"';
 				}
 				$itemTotal = $cartItem['DynamicField']['price']*$cartItem['Options']['nb'];
-				$total += $itemTotal;
 				?>
 					<tr<?php echo $class;?>>
 						<td class="Description"><?php echo $cartItem['DynamicField']['title']; ?>&nbsp;</td>
@@ -45,7 +44,7 @@
 						<?php } ?>
 						<td class="Price"><?php echo $this->element('qualified_price',array('plugin'=>'shop','product'=>$cartItem))?>&nbsp;</td>
 						<td class="Amount"><?php echo $this->Cart->qteInput($no,array('div'=>false,'label'=>false,'class'=>'qte')); ?></td>
-						<td class="Total"><?php echo number_format($itemTotal, 2, '.', ',') . ' $'; ?></td>
+						<td class="Total"><?php echo $this->Shop->currency($itemTotal); ?></td>
 						<td class="actions">
 							<?php echo $this->Form->submit(__('Update',true)); ?>
 							<?php echo $this->Html->link(__('Remove', true), array('action' => 'remove', $no), array('class' => 'remove')); ?>
@@ -56,8 +55,8 @@
 		?>
 		<tr class="rowtotal">
 			<td colspan="<?php echo $nbCols-3 ?>">&nbsp;</td>
-			<td class="price_total"><?php __('Total:'); ?></td>
-			<td class="price"><?php echo number_format($total, 2, '.', ',') . ' $'; ?></td>
+			<td class="price_total"><?php __('Subtotal:'); ?></td>
+			<td class="price"><?php echo $this->Shop->currency($calcul['sub_total']); ?></td>
 			<td class="">&nbsp;</td>
 		</tr>
 	</table>
