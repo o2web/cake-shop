@@ -55,7 +55,10 @@ class ShopProduct extends ShopAppModel {
 	
 	function afterFind($results,$primary){
 		$results = parent::afterFind($results,$primary);
-		if(!empty($results[0][$this->alias][0]['id'])){
+		if(!$primary && empty($results[0])){
+			//return $results;
+		}
+		if(!$primary && !empty($results[0][$this->alias])){
 			return $results;
 		}
 		if(is_array($results) && $this->recursive > -1 && $this->fullDataEnabled){
@@ -281,13 +284,12 @@ class ShopProduct extends ShopAppModel {
 	function getFullData($products=null,$opt=array()){
 		App::import('Lib', 'Shop.SetMulti');
 		$single = false;
-		//debug($products);
 		$prods = $products;
 		if(!is_array($prods) || SetMulti::isAssoc($prods)){
 			$prods = array($prods);
 			$single = true;
 		}
-		if(isset($prods[0]['DynamicField'])){
+		if(isset($prods[0]['ShopProduct']['DynamicField']) || isset($prods[0]['DynamicField'])){
 			return $products;
 		}
 		$prods = $this->getAllRelated($prods,$opt);
@@ -303,7 +305,6 @@ class ShopProduct extends ShopAppModel {
 				$product['ShopSubproduct'] = SetMulti::group($product['ShopSubproduct'],'type');
 			}
 		}
-		//debug($prods);
 		if($single){
 			return $prods[0];
 		}else{
