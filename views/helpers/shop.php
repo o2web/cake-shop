@@ -5,7 +5,7 @@ class ShopHelper extends AppHelper {
 	
 	var $currencyFormats = array(
 		'fre' => array('before'=>false, 'after'=>' $', 'thousands' => ' ', 'decimals'=>',', 'places'=>2),
-		'eng'=> array('before'=>'$ ', 'thousands' => ',', 'decimals'=>'.', 'places'=>2)
+		'eng'=> array('before'=>'$', 'thousands' => ',', 'decimals'=>'.', 'places'=>2)
 	);
 	
 	function beforeRender(){
