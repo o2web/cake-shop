@@ -114,9 +114,11 @@ class OrderMakerComponent extends Object
 				$data['order_id'] = $order_id;
 				////////// save sub items //////////
 				if($this->ShopOrder->ShopOrdersItem->save($data)){
-					foreach($subItems as $subItem){
-						$subItem['shop_orders_item_id'] = $this->ShopOrder->ShopOrdersItem->id;
-						$this->ShopOrder->ShopOrdersItem->ShopOrdersSubitem->save($subItem);
+					if(!empty($subItems)){
+						foreach($subItems as $subItem){
+							$subItem['shop_orders_item_id'] = $this->ShopOrder->ShopOrdersItem->id;
+							$this->ShopOrder->ShopOrdersItem->ShopOrdersSubitem->save($subItem);
+						}
 					}
 				}
 			}
