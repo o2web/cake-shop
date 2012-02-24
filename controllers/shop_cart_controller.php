@@ -56,11 +56,16 @@ class ShopCartController extends ShopAppController {
 		if(!empty($this->data['ShopCart']['id'])){
 			$id = $this->data['ShopCart']['id'];
 		}
+		$SubItem = array();
+		if(!empty($this->data['ShopCart']['SubItem'])){
+			$SubItem = $this->data['ShopCart']['SubItem'];
+		}
+		
 		if (!$id || !$model) {
 			$this->Session->setFlash(sprintf(__('Invalid %s', true), 'product'));
 			$this->redirect(array('action' => 'index', 'lang'=>$this->lang));
 		}
-		$this->CartMaker->add(array('products'=>array('model'=>$model,'foreign_id'=>$id,'nb'=>$nb, 'lang'=>$this->lang)));
+		$this->CartMaker->add(array('products'=>array('model'=>$model,'foreign_id'=>$id,'nb'=>$nb, 'lang'=>$this->lang, 'SubItem'=>$SubItem)));
 	}
 	
 	function clear(){

@@ -156,7 +156,10 @@ class CartMakerComponent extends Object{
 			$product = $this->ShopFunct->formatProductAddOption($product);
 			//debug($product);
 			$conditions = $this->ShopFunct->productFindConditions($product,array('tcheckActive'=>false));
-			
+			//debug($conditions);
+			//debug($this->data['products']);
+			//exit();
+			$conditions['SubItem'] = $product['SubItem'];
 			$pos = $this->indexOf($conditions);
 			if($pos>-1){
 				$this->data['products'][$pos]['nb']+=$product['nb'];
