@@ -55,7 +55,7 @@ class ShopHelper extends AppHelper {
 			$html .= '	<div class="shopSubProductSelector">'."\n";
 			$html .= '		<p class="label">'.__('subProduct',true).'</p>'."\n";
 			foreach($types as $key =>$type){
-				$fields = set::normalize(array('id','code','label','operator','price'));
+				$fields = set::normalize(array('id','code','label_fre','label_eng', 'operator','price'));
 				if(count($type['operators']==1)){
 					$fields['operator']['type'] = 'hidden';
 					$fields['operator']['value'] = $type['operators'][0];
