@@ -408,6 +408,11 @@ class ShopOrdersController extends ShopAppController {
 		
 		$this->ShopOrder->setupForFullData();
 		$order = $this->ShopOrder->read(null,$id);
+		$calcul = $this->_calculate($order);
+		//debug($calcul);
+		$order['ShopOrder'] = array_merge($order['ShopOrder'],$calcul);
+		//debug($order);
+		
 		$this->data = $order;
 		$this->set('order',$order);
 	}

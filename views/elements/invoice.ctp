@@ -36,6 +36,9 @@
         </tr>
         <?php 
 		//debug($order);
+		//$extractData = array('ShopOrder.OrderItem','ShopOrdersItem');
+		//App::import('Lib', 'Shop.SetMulti');
+		//$data = SetMulti::extractHierarchic($extractData, $order);
 		foreach($order['ShopOrder']['OrderItem'] as $orderItem){ 
 			//debug($orderItem);
 		?>

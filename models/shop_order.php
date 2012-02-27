@@ -104,6 +104,14 @@ class ShopOrder extends ShopAppModel {
 		$this->contain(array('ShopOrdersItem'=>array('ShopProduct','ShopOrdersSubitem'=>'ShopSubproduct'),'ShopProduct'));
 	}
 	
+	/*function afterFind($results,$primary){
+		$results = parent::afterFind($results,$primary);
+		if($primary){
+			debug($results);
+		}
+		return $results;
+	}*/
+	
 	function beforeSave(){
 		if(isset($this->data[$this->name])){
 			$data = &$this->data[$this->name];

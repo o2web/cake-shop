@@ -104,6 +104,9 @@ class OrderFunctComponent extends Object
 		$this->initShopOrder();
 		$this->ShopOrder->setupForFullData();
 		$order = $this->ShopOrder->read(null,$order_id);
+		$calcul = $this->_calculate($order);
+		//debug($calcul);
+		$order['ShopOrder'] = array_merge($order['ShopOrder'],$calcul);
 		
 		$emailBuyer = Configure::read('Shop.emailBuyer');
 		if(!empty($emailBuyer)){
@@ -133,7 +136,7 @@ class OrderFunctComponent extends Object
 			'replyTo' => null,
 			'sendAs' => 'both', // because we like to send pretty mail
 			'template' => 'order_admin',
-			'layout' => null
+			//'layout' => null
 		);
 		$conf = Configure::read('Shop.emailAdmin');
 		if(is_array($conf)){
@@ -173,7 +176,7 @@ class OrderFunctComponent extends Object
 			'replyTo' => null,
 			'sendAs' => 'both', // because we like to send pretty mail
 			'template' => 'order_admin',
-			'layout' => null
+			//'layout' => null
 		);
 		$conf = Configure::read('Shop.emailBuyer');
 		if(is_array($conf)){
