@@ -28,6 +28,7 @@ class PaymentFunctComponent extends Object
 	}
 	
 	function setStatus($payment,$status){
+		$this->log('Payment setStatus : '.$status,LOG_DEBUG);
 		$this->initShopPayment();
 		if(is_numeric($payment)){
 			$payment = $this->ShopPayment->read(Null,$payment);
