@@ -43,6 +43,14 @@ class ShopOrdersSubitem extends ShopAppModel {
 			'counterQuery' => ''
 		)
 	);
+	
+	
+	var $validate = array(
+		'nb' => array(
+			'rule' => array('comparison', '>', 1),
+			'message' => 'Quantity must be positive.'
+		)
+	);
 
 }
 ?>

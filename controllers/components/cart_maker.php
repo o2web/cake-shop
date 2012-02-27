@@ -241,8 +241,17 @@ class CartMakerComponent extends Object{
 				$nomalized['order'] = $data['ShopOrder'];
 				unset($nomalized['ShopOrder']);
 			}
+			if(!empty($nomalized['order']['products'])){
+				foreach($tmp = $nomalized['order']['products'] as $no => $prod){
+					if($prod['nb'] <= 0){
+						unset($nomalized['order']['products'][$no]);
+						$this->remove($no);
+					}
+				}
+			}
 			$this->data = Set::merge($this->data,$nomalized);
 		}
+		
 		//debug($this->data);
 		$this->Session->write('Shop.cart', $this->data);
 		$this->_itemListData = null;
