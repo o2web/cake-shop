@@ -47,7 +47,7 @@ class ShopOrdersSubitem extends ShopAppModel {
 	
 	var $validate = array(
 		'nb' => array(
-			'rule' => array('comparison', '>', 1),
+			'rule' => array('comparison', '>', 0),
 			'message' => 'Quantity must be positive.'
 		)
 	);

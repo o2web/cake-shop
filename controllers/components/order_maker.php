@@ -99,7 +99,9 @@ class OrderMakerComponent extends Object
 			$orderData = $this->ShopOrder->filterExposedfields($options['order']);
 			if(!empty($orderData)){
 				$orderData['id'] = $order_id;
-				$this->ShopOrder->save($orderData);
+				if(!$this->ShopOrder->save($orderData)){
+					$this->log('Could not save Order',LOG_DEBUG);
+				}
 			}
 		}
 		
@@ -117,9 +119,14 @@ class OrderMakerComponent extends Object
 					if(!empty($subItems)){
 						foreach($subItems as $subItem){
 							$subItem['shop_orders_item_id'] = $this->ShopOrder->ShopOrdersItem->id;
-							$this->ShopOrder->ShopOrdersItem->ShopOrdersSubitem->save($subItem);
+							if($this->ShopOrder->ShopOrdersItem->ShopOrdersSubitem->save($subItem)){
+							}else{
+								$this->log('Could not save OrderSubitem',LOG_DEBUG);
+							}
 						}
 					}
+				}else{
+					$this->log('Could not save OrderItem',LOG_DEBUG);
 				}
 			}
 		}

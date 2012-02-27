@@ -40,7 +40,11 @@ class PaymentFunctComponent extends Object
 				foreach($payment['ShopOrder'] as $order){
 					$this->OrderMaker->refresh($order['id']);
 				}
+			}else{
+				$this->log('Payment is not associated to any Order',LOG_DEBUG);
 			}
+		}elseif(!empty($payment)){
+			$this->log('Payment Could not be found',LOG_DEBUG);
 		}
 	}
 	

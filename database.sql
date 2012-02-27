@@ -157,6 +157,29 @@ CREATE TABLE IF NOT EXISTS `shop_orders_items` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `shop_orders_subitems`
+--
+
+CREATE TABLE IF NOT EXISTS `shop_orders_subitems` (
+  `id` int(11) NOT NULL auto_increment,
+  `shop_orders_item_id` int(11) default NULL,
+  `shop_subproduct_id` int(11) default NULL,
+  `descr` varchar(255) collate utf8_unicode_ci default NULL,
+  `nb` int(11) default NULL,
+  `item_price` float default NULL,
+  `item_operator` varchar(255) collate utf8_unicode_ci default NULL,
+  `lft` int(11) default NULL,
+  `rght` int(11) default NULL,
+  `parent_id` int(11) default NULL,
+  `active` tinyint(1) default NULL,
+  `created` datetime default NULL,
+  `modified` datetime default NULL,
+  PRIMARY KEY  (`id`)
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=40 ;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `shop_orders_payments`
 --
 

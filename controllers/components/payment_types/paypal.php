@@ -74,6 +74,7 @@ class PaypalPaymentComponent extends PaymentComponent{
 	
 	
 	function responsePreprocess(){
+		$this->log('responsePreprocess',LOG_DEBUG);
 	    $ipn = ClassRegistry::init("PaypalIpn.InstantPaymentNotification");
 		if($ipn->isValid($_POST)){
 			$notification = $ipn->buildAssociationsFromIPN($_POST);
@@ -81,6 +82,8 @@ class PaypalPaymentComponent extends PaymentComponent{
 			
 			if($_POST["payment_status"]=="Completed"){
 				$this->PaymentFunct->setStatus($this->payment,"approved");
+			}else{
+				$this->log('Incomplete payment',LOG_DEBUG);
 			}
 
 			/*$conf = Configure::read('Shop.emailAdmin');
@@ -95,7 +98,7 @@ class PaypalPaymentComponent extends PaymentComponent{
 				Debugger::log('response email sent');
 			}*/
 		}else{
-			Debugger::log('Invalide Paypal IPN response');
+			$this->log('Invalide Paypal IPN response',LOG_DEBUG);
 		}
 	}
 	
