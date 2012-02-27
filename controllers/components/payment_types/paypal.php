@@ -77,6 +77,7 @@ class PaypalPaymentComponent extends PaymentComponent{
 		$this->log('responsePreprocess',LOG_DEBUG);
 	    $ipn = ClassRegistry::init("PaypalIpn.InstantPaymentNotification");
 		if($ipn->isValid($_POST)){
+			$this->log('responsePreprocess 2',LOG_DEBUG);
 			$notification = $ipn->buildAssociationsFromIPN($_POST);
 			$ipn->saveAll($notification);
 			
@@ -100,6 +101,7 @@ class PaypalPaymentComponent extends PaymentComponent{
 		}else{
 			$this->log('Invalide Paypal IPN response',LOG_DEBUG);
 		}
+		$this->log('responsePreprocess END',LOG_DEBUG);
 	}
 	
 }
