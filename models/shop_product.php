@@ -401,7 +401,7 @@ class ShopProduct extends ShopAppModel {
 			//debug($product);
 			//debug('wtf');
 		}
-		if(!empty($this->extractDataCache[$relatedModel->name])){
+		if(!empty($relatedModel) && !empty($this->extractDataCache[$relatedModel->name])){
 			return $this->extractDataCache[$relatedModel->name];
 		}
 		$extract_data = $this->dynamicFields;
@@ -436,7 +436,9 @@ class ShopProduct extends ShopAppModel {
 			}
 		}
 		//debug($extract_data);
-		$this->extractDataCache[$relatedModel->name] = $extract_data;
+		if(!empty($relatedModel)){
+			$this->extractDataCache[$relatedModel->name] = $extract_data;
+		}
 		return $extract_data;
 	}
 	function getDynamicFields($product=null){
