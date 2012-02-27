@@ -3,6 +3,8 @@
 		<fieldset>
 			<legend><?php printf(__('Edit %s', true), __('Shop Order', true)); ?></legend>
 			<?php
+				//debug($this->data);
+				
 				echo $this->Form->input('active');
 				echo $this->Form->input('id');
 				echo $this->Form->input('discount');
@@ -15,31 +17,38 @@
 				echo $this->Form->input('paid');
 				echo $this->Form->input('owner_model');
 				echo $this->Form->input('owner_foreign_id');
-				echo $this->Form->input('billing_first_name');
-				echo $this->Form->input('billing_last_name');
-				echo $this->Form->input('billing_enterprise');
-				echo $this->Form->input('billing_adress');
-				echo $this->Form->input('billing_appart_num');
-				echo $this->Form->input('billing_city');
-				echo $this->Form->input('billing_region');
-				echo $this->Form->input('billing_postal_code');
-				echo $this->Form->input('billing_tel');
-				echo $this->Form->input('billing_tel2');
-				echo $this->Form->input('billing_email');
-				echo $this->Form->input('shipping_first_name');
-				echo $this->Form->input('shipping_last_name');
-				echo $this->Form->input('shipping_enterprise');
-				echo $this->Form->input('shipping_adress');
-				echo $this->Form->input('shipping_appart_num');
-				echo $this->Form->input('shipping_city');
-				echo $this->Form->input('shipping_region');
-				echo $this->Form->input('shipping_postal_code');
-				echo $this->Form->input('shipping_tel');
-				echo $this->Form->input('shipping_tel2');
-				echo $this->Form->input('shipping_email');
-				echo $this->Form->input('lock');
-				echo $this->Form->input('ShopProduct');
-				echo $this->Form->input('ShopPayment');
+				echo '<fieldset>';
+					echo '<legend>'.__d('shop','Billing address', true).'</legend>';
+					echo $this->Form->input('billing_first_name');
+					echo $this->Form->input('billing_last_name');
+					echo $this->Form->input('billing_enterprise');
+					echo $this->Form->input('billing_adress');
+					echo $this->Form->input('billing_appart_num');
+					echo $this->Form->input('billing_city');
+					echo $this->Form->input('billing_region');
+					echo $this->Form->input('billing_postal_code');
+					echo $this->Form->input('billing_tel');
+					echo $this->Form->input('billing_tel2');
+					echo $this->Form->input('billing_email');
+				echo '</fieldset>';
+				
+				echo '<fieldset>';
+					echo '<legend>'.__d('shop','Shipping address', true).'</legend>';
+					echo $this->Form->input('shipping_first_name');
+					echo $this->Form->input('shipping_last_name');
+					echo $this->Form->input('shipping_enterprise');
+					echo $this->Form->input('shipping_adress');
+					echo $this->Form->input('shipping_appart_num');
+					echo $this->Form->input('shipping_city');
+					echo $this->Form->input('shipping_region');
+					echo $this->Form->input('shipping_postal_code');
+					echo $this->Form->input('shipping_tel');
+					echo $this->Form->input('shipping_tel2');
+					echo $this->Form->input('shipping_email');
+				echo '</fieldset>';
+				//echo $this->Form->input('lock');
+				//echo $this->Form->input('ShopProduct');
+				//echo $this->Form->input('ShopPayment');
 			?>
 		</fieldset>
 	<?php echo $this->Form->end(__('Submit', true));?>

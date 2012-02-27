@@ -77,7 +77,8 @@
             			<td><?php echo $this->element('address',array('plugin'=>'shop','address'=>$shopOrder['ShopOrder'],'prefix'=>'shipping_'))?></td>		
 						<td class="lock"><?php echo $shopOrder['ShopOrder']['lock']; ?>&nbsp;</td>
 						<td class="actions">
-							<?php echo $this->Html->link(__('Edit', true), array('action' => 'edit', $shopOrder['ShopOrder']['id']), array('class' => 'edit')); ?>
+							<?php //echo $this->Html->link(__('Edit', true), array('action' => 'edit', $shopOrder['ShopOrder']['id']), array('class' => 'edit')); ?>
+							<?php echo $this->Html->link(__('View', true), array('action' => 'view', $shopOrder['ShopOrder']['id']), array('class' => 'view')); ?>
 							<?php echo $this->Html->link(__('Delete', true), array('action' => 'delete', $shopOrder['ShopOrder']['id']), array('class' => 'delete'), sprintf(__('Are you sure you want to delete # %s?', true), $shopOrder['ShopOrder']['id'])); ?>
                             <?php echo $this->Html->link(__('Add Payment', true), array('plugin'=>'shop', 'controller' => 'shop_payments', 'action' => 'add', 'order' => $shopOrder['ShopOrder']['id'])); ?>
 						</td>

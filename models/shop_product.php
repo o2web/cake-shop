@@ -398,8 +398,8 @@ class ShopProduct extends ShopAppModel {
 		}
 		
 		if(empty($relatedModel)){
-			debug($product);
-			debug('wtf');
+			//debug($product);
+			//debug('wtf');
 		}
 		if(!empty($this->extractDataCache[$relatedModel->name])){
 			return $this->extractDataCache[$relatedModel->name];

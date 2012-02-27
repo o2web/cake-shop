@@ -500,6 +500,42 @@ class ShopOrdersController extends ShopAppController {
 		$shopPayments = $this->ShopOrder->ShopPayment->find('list');
 		$this->set(compact('shopProducts', 'shopPayments'));
 	}*/
+	
+	function admin_shipping($id = null) {
+		if (!$id && empty($this->data)) {
+			$this->Session->setFlash(sprintf(__('Invalid %s', true), 'shop order'));
+			$this->redirect(array('action' => 'index'));
+		}
+		if (!empty($this->data)) {
+			if ($this->ShopOrder->save($this->data)) {
+				$this->Session->setFlash(sprintf(__('The %s has been saved', true), 'shop order'));
+				$this->redirect(array('action' => 'index'));
+			} else {
+				$this->Session->setFlash(sprintf(__('The %s could not be saved. Please, try again.', true), 'shop order'));
+			}
+		}
+		if (empty($this->data)) {
+			$this->data = $this->ShopOrder->read(null, $id);
+		}
+	}
+
+	function admin_billing($id = null) {
+		if (!$id && empty($this->data)) {
+			$this->Session->setFlash(sprintf(__('Invalid %s', true), 'shop order'));
+			$this->redirect(array('action' => 'index'));
+		}
+		if (!empty($this->data)) {
+			if ($this->ShopOrder->save($this->data)) {
+				$this->Session->setFlash(sprintf(__('The %s has been saved', true), 'shop order'));
+				$this->redirect(array('action' => 'index'));
+			} else {
+				$this->Session->setFlash(sprintf(__('The %s could not be saved. Please, try again.', true), 'shop order'));
+			}
+		}
+		if (empty($this->data)) {
+			$this->data = $this->ShopOrder->read(null, $id);
+		}
+	}
 
 	function admin_delete($id = null) {
 		if (!$id) {
@@ -525,7 +561,13 @@ class ShopOrdersController extends ShopAppController {
 			$this->Session->setFlash(sprintf(__('Invalid %s', true), 'shopOrder'));
 			$this->redirect(array('action' => 'index'));
 		}
-		$this->set('shopOrder', $this->ShopOrder->read(null, $id));
+		$this->ShopOrder->setupForFullData();
+		$shopOrder = $this->ShopOrder->read(null, $id);
+		
+		$calcul = $this->_calculate($shopOrder);
+		//debug($calcul);
+		$shopOrder['ShopOrder'] = array_merge($shopOrder['ShopOrder'],$calcul);
+		$this->set('shopOrder', $shopOrder);
 	}
 	
 }
