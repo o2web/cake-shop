@@ -142,7 +142,7 @@ class OrderMakerComponent extends Object
 		$this->initShopOrder();
 		$this->ShopOrder->recursive = 1;
 		$order = $this->ShopOrder->read(null,$order_id);
-		if(empty($order)){
+		if(!empty($order)){
 			$updateStatus = array('ready','ordered');
 			$oldStatus = $order['ShopOrder']['status'];
 			if(in_array($oldStatus,$updateStatus)){
@@ -171,7 +171,6 @@ class OrderMakerComponent extends Object
 	}
 	
 	function statusUpdated($order_id,$status){
-		$this->log('statusUpdated : '.$status,LOG_DEBUG);
 		
 		$callback = 'on'.Inflector::humanize($status).'Status';
 		if(method_exists($this->OrderFunct,$callback)){
