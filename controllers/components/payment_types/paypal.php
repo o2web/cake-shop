@@ -74,7 +74,6 @@ class PaypalPaymentComponent extends PaymentComponent{
 	
 	
 	function responsePreprocess(){
-		$this->log('responsePreprocess',LOG_DEBUG);
 	    $ipn = ClassRegistry::init("PaypalIpn.InstantPaymentNotification");
 		if($ipn->isValid($_POST)){
 			$notification = $ipn->buildAssociationsFromIPN($_POST);

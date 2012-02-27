@@ -44,7 +44,7 @@ class PaymentFunctComponent extends Object
 				$this->log('Payment is not associated to any Order',LOG_DEBUG);
 			}
 		}elseif(!empty($payment)){
-			$this->log('Payment Could not be found',LOG_DEBUG);
+			$this->log('Payment could not be found',LOG_DEBUG);
 		}
 	}
 	

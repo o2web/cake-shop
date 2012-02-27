@@ -138,36 +138,41 @@ class OrderMakerComponent extends Object
 	}
 	
 	function refresh($order_id){
+		$this->log('refresh Order',LOG_DEBUG);
 		$this->initShopOrder();
 		$this->ShopOrder->recursive = 1;
 		$order = $this->ShopOrder->read(null,$order_id);
-		$updateStatus = array('ready','ordered');
-		$oldStatus = $order['ShopOrder']['status'];
-		if(in_array($oldStatus,$updateStatus)){
-			$total_paid = 0;
-			foreach($order['ShopPayment'] as $shopPayment){
-				if(in_array($shopPayment['status'],$this->ShopOrder->ShopPayment->okStatus)){
-					$total_paid += $shopPayment['ShopOrdersPayment']['amount'];
+		if(empty($order)){
+			$updateStatus = array('ready','ordered');
+			$oldStatus = $order['ShopOrder']['status'];
+			if(in_array($oldStatus,$updateStatus)){
+				$total_paid = 0;
+				foreach($order['ShopPayment'] as $shopPayment){
+					if(in_array($shopPayment['status'],$this->ShopOrder->ShopPayment->okStatus)){
+						$total_paid += $shopPayment['ShopOrdersPayment']['amount'];
+					}
+				}
+				$data = array();
+				$data['id'] = $order_id;
+				$data['amount_paid'] = $total_paid;
+				if($total_paid >= $order['ShopOrder']['total']){
+					$data['status'] = 'ordered';
+				}else{
+					$data['status'] = 'ready';
+				}
+				$this->ShopOrder->save($data);
+				if($data['status'] != $oldStatus){
+					$this->statusUpdated($order_id,$data['status']);
 				}
 			}
-			$data = array();
-			$data['id'] = $order_id;
-			$data['amount_paid'] = $total_paid;
-			if($total_paid >= $order['ShopOrder']['total']){
-				$data['status'] = 'ordered';
-			}else{
-				$data['status'] = 'ready';
-			}
-			$this->ShopOrder->save($data);
-			if($data['status'] != $oldStatus){
-				$this->statusUpdated($order_id,$data['status']);
-			}
+		}else{
+			$this->log('Order could not be found',LOG_DEBUG);
 		}
-		
 	}
 	
 	function statusUpdated($order_id,$status){
-	
+		$this->log('statusUpdated : '.$status,LOG_DEBUG);
+		
 		$callback = 'on'.Inflector::humanize($status).'Status';
 		if(method_exists($this->OrderFunct,$callback)){
 			$this->OrderFunct->{$callback}($order_id);
