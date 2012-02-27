@@ -241,10 +241,10 @@ class CartMakerComponent extends Object{
 				$nomalized['order'] = $data['ShopOrder'];
 				unset($nomalized['ShopOrder']);
 			}
-			if(!empty($nomalized['order']['products'])){
-				foreach($tmp = $nomalized['order']['products'] as $no => $prod){
+			if(!empty($nomalized['products'])){
+				foreach($tmp = $nomalized['products'] as $no => $prod){
 					if($prod['nb'] <= 0){
-						unset($nomalized['order']['products'][$no]);
+						unset($nomalized['products'][$no]);
 						$this->remove($no);
 					}
 				}
