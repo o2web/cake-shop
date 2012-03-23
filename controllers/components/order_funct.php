@@ -104,7 +104,7 @@ class OrderFunctComponent extends Object
 		$this->initShopOrder();
 		$this->ShopOrder->setupForFullData();
 		$order = $this->ShopOrder->read(null,$order_id);
-		$calcul = $this->_calculate($order);
+		$calcul = $this->ShopFunct->calculate($order);
 		//debug($calcul);
 		$order['ShopOrder'] = array_merge($order['ShopOrder'],$calcul);
 		
@@ -152,7 +152,7 @@ class OrderFunctComponent extends Object
 		$this->EmailUtils->set('siteName', $siteName);
 		
 		if(!$this->Email->send()){
-			Debugger::log('Cound not send Email to administrator');
+			$this->log('Cound not send Email to administrator',LOG_DEBUG);
 			return false;
 		}else{
 			return true;

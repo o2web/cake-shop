@@ -42,13 +42,14 @@ class ShopOrdersController extends ShopAppController {
 		$this->set('shopOrder', $this->ShopOrder->read(null, $id));
 	
 	}
-	function test(){
-		$this->autoRender = false;
-		$test = array(
-			'shipping_name' => '1',
-			'test' => '1'
-		);
-		debug($this->ShopOrder->filterExposedfields($test));
+	function test($id=null){
+		//$this->autoRender = false;
+		//$test = array(
+		//	'shipping_name' => '1',
+		//	'test' => '1'
+		//);
+		//debug($this->ShopOrder->filterExposedfields($test));
+		$this->OrderFunct->onOrderedStatus($id);
 	}
 	*/
 	
