@@ -63,6 +63,9 @@ class ShopConfig {
 	
 	function getSubProductTypes(){
 		$types = ShopConfig::load('SubProductTypes');
+		if(empty($types)){
+			return null;
+		}
 		$def = array(
 			'operators'=>array('=','+','*','-','%','-%'),
 			'min'=>0,

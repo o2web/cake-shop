@@ -14,6 +14,7 @@ class ProductBehavior extends ModelBehavior {
 			$Model->productOptions = array();
 		}
 		$Model->productOptions = array_merge($Model->productOptions,$this->settings[$Model->alias]);
+		$Model->Behaviors->attach('Shop.AssociationEvent');
 		
 		$Model->bindModel(
 			array('hasOne' => array(

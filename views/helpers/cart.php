@@ -32,12 +32,46 @@ class CartHelper extends AppHelper {
 		if($defmodel == null){
 			$defmodel = Inflector::classify($this->params['controller']);
 		}
+		$localOpt = array('routed');
 		$defaultOptions = array(
 			'model' => $defmodel,
-			'nb' => 1
+			'nb' => 1,
+			'routed' => true,
 		);
 		$options = array_merge($defaultOptions,$options);
-		return $this->Html->url(array('plugin'=>'shop','controller'=>'shop_cart','action'=>'add', 'model'=>$options['model'], 'id'=>$options['id'], 'nb'=>$options['nb']));
+		$urlOpt = array('plugin'=>'shop','controller'=>'shop_cart','action'=>'add');
+		$urlOpt = array_merge(array_diff_key($options,array_flip($localOpt)),$urlOpt);
+		if($options['routed']){
+			return $this->Html->url($urlOpt);
+		}else{
+			return $urlOpt;
+		}
+	}
+	
+	function buyLink($label=null,$id=null,$nb=null,$model=null,$options=array()){
+		if(is_array($label)){
+			$options = $label;
+		}else{
+			if(!empty($label)){
+				$options['label'] = $label;
+			}
+			if(!empty($id)){
+				$options['id'] = $id;
+			}
+			if(!empty($nb)){
+				$options['nb'] = $nb;
+			}
+			if(!empty($model)){
+				$options['model'] = $model;
+			}
+		}
+		if(empty($options['label'])){
+			$options['label'] = __('Add to your cart',true);
+		}
+		$localOpt = array('label','id','nb','model','routed');
+		$options['routed'] = false;
+		$url = $this->buyUrl($options);
+		return $this->Html->link($options['label'],$url,$this->O2form->normalizeAttributesOpt($options,$localOpt));
 	}
 	
 	function subitemInput($type, $prod = null, $options = array(), $no = null){

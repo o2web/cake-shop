@@ -2,7 +2,7 @@
 class ShopCartController extends ShopAppController {
 
 	var $name = 'ShopCart';
-	var $helpers = array('Shop.Shop');
+	var $helpers = array('Shop.Shop', 'Shop.Cart');
 	var $components = array('Shop.CartMaker');
 	var $uses = array();
 	

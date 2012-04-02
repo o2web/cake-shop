@@ -21,13 +21,13 @@ class ShopHelper extends AppHelper {
 		//$this->Number->addFormat($formatName, $options);
 	}
 	
-	function editForm($model,$options = array()){
+	function editForm($model = null,$options = array()){
 		App::import('Lib', 'Shop.ShopConfig');
 		$config = ShopConfig::load();
 		
 		if(is_array($model)){
 			$options = $model;
-		}else{
+		}elseif(!empty($model)){
 			$options['model'] = $model;
 		}
 		$defOpt = array(
@@ -93,6 +93,49 @@ class ShopHelper extends AppHelper {
 		return $this->Number->format($number,$this->currencyFormats[$cur]);
 	}
 	
+	function fullPrice($product=null,$options=array()){
+		if(is_array($product)){
+			$options = $product;
+		}else{
+			if(!empty($product)){
+				$options['product'] = $product;
+			}
+		}
+		$defOpt = array(
+			'product'=>null,
+			'sources'=> array('product','viewVars.product','viewVars.product'),
+			'paths'=>array(
+				'original_price' => array(
+					'ShopProduct.DynamicField.original_price','DynamicField.original_price','item_original_price',
+				),
+				'rebate' => array(
+					'ShopProduct.DynamicField.rebate','DynamicField.rebate','item_rebate',
+				),
+				'price' => array(
+					'ShopProduct.DynamicField.price','DynamicField.price','item_price',
+				),
+			),
+			'dataOnly' => false,
+		);
+		$opt = array_merge($defOpt,$options);
+		$view =& ClassRegistry::getObject('view');
+		$source = array('product'=>$opt['product'], 'viewVars'=>$view->viewVars, 'params'=>$this->params);
+		$extract_data = array();
+		foreach ($opt['paths'] as $prop_name => $paths) {
+			foreach ($opt['sources'] as $sname) {
+				foreach ($paths as $path) {
+					$extract_data[$prop_name][] = $sname.'.'.$path;
+				}
+			}
+		}
+		App::import('Lib', 'Shop.SetMulti');
+		$data = SetMulti::extractHierarchicMulti($extract_data,$source,array('extractNull'=>false));
+		if($opt['dataOnly']){
+			return $data;
+		}else{
+			return $view->element('qualified_price',array('plugin'=>'shop','fullPrice'=>$data));
+		}
+	}
 	
 }
 

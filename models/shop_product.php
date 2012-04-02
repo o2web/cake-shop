@@ -55,29 +55,15 @@ class ShopProduct extends ShopAppModel {
 	
 	function afterFind($results,$primary){
 		$results = parent::afterFind($results,$primary);
-		if(!$primary && empty($results[0])){
-			//return $results;
-		}
-		if(!$primary && !empty($results[0][$this->alias])){
-			return $results;
-		}
-		if(is_array($results) && $this->recursive > -1 && $this->fullDataEnabled){
+		if($primary && $this->recursive > -1 && $this->fullDataEnabled){
 			$results = $this->getFullData($results);
-			if(!$primary){
-				App::import('Lib', 'Shop.SetMulti');
-				if(!SetMulti::isAssoc($results)){
-					foreach($results as &$result){
-						if(isset($result[$this->alias])){
-							$more = $result;
-							unset($more[$this->alias]);
-							$result[$this->alias] = array_merge($result[$this->alias],$more);
-						}
-					}
-				}
-				//debug($results);
-			}
 		}
 		return $results;
+	}
+	
+	function afterFindAssoc($results,$fullData,$path){
+		debug($results);
+		return true;
 	}
 	
 	
@@ -460,7 +446,7 @@ class ShopProduct extends ShopAppModel {
 				$id = $this->id;
 			}
 			$this->recursive = -1;
-			$product = $this->read(array('model','foreign_id'),$id);
+			$product = $this->find('first',array('field' => array('model','foreign_id'), 'conditions'=>array($this->alias.'.id',$id)));
 		}
 		$extract_data = array(
 			'model' => array('model',$this->name.'.model','Options.model'),
