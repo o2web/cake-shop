@@ -62,7 +62,26 @@ class ShopProduct extends ShopAppModel {
 	}
 	
 	function afterFindAssoc($results,$fullData,$path){
-		debug($results);
+		if(count($results) == 1 && empty($results[0]['ShopProduct']['Related']) && !empty($results[0]['ShopProduct']['model'])){
+			$relatedAlias = $results[0]['ShopProduct']['model'];
+			if(!empty($fullData[0][$relatedAlias])){
+				$results[0]['ShopProduct']['Related'] = $fullData[0][$relatedAlias];
+			}
+		}
+		$results = $this->getFullData($results);
+		App::import('Lib', 'Shop.SetMulti');
+		if(!SetMulti::isAssoc($results)){
+			foreach($results as &$result){
+				if(isset($result[$this->alias])){
+					$more = $result;
+					unset($more[$this->alias]);
+					$result = array($this->alias=>array_merge($result[$this->alias],$more));
+				}
+			}
+		}
+		//debug($results);
+		return $results;
+		
 		return true;
 	}
 	
@@ -305,20 +324,22 @@ class ShopProduct extends ShopAppModel {
 		$opt = array_merge($defOpt,$opt);
 		$relatedModels = array();
 		foreach($products as $key => $product){
-			$relatedRef = $this->getRelatedRef($product);
-			$relatedRef['key'] = $key;
-			if(empty($relatedModels[$relatedRef['model']])){
-				$relatedModel = $this->getRelatedClass($relatedRef);
-				//if(!empty($relatedModel->data[$relatedModel->alias]['id']) && $relatedModel->data[$relatedModel->alias]['id'] == $relatedRef['foreign_id']){
-				//	$products[$key]['Related'] = $relatedModel->data[$relatedModel->alias];
-				//}else{
-					if($relatedModel){
-						$relatedModels[$relatedRef['model']]['class'] = $relatedModel;
-						$relatedModels[$relatedRef['model']][] = $relatedRef;
-					}
-				//}
-			}else{
-				$relatedModels[$relatedRef['model']][] = $relatedRef;
+			if(empty($product['Related']) && empty($product[$this->alias]['Related'])){
+				$relatedRef = $this->getRelatedRef($product);
+				$relatedRef['key'] = $key;
+				if(empty($relatedModels[$relatedRef['model']])){
+					$relatedModel = $this->getRelatedClass($relatedRef);
+					//if(!empty($relatedModel->data[$relatedModel->alias]['id']) && $relatedModel->data[$relatedModel->alias]['id'] == $relatedRef['foreign_id']){
+					//	$products[$key]['Related'] = $relatedModel->data[$relatedModel->alias];
+					//}else{
+						if($relatedModel){
+							$relatedModels[$relatedRef['model']]['class'] = $relatedModel;
+							$relatedModels[$relatedRef['model']][] = $relatedRef;
+						}
+					//}
+				}else{
+					$relatedModels[$relatedRef['model']][] = $relatedRef;
+				}
 			}
 		}
 		foreach($relatedModels as $alias => $refs){

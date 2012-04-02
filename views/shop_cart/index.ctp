@@ -42,7 +42,7 @@
 								<td class="SubItem <?php echo $key ?>"><?php echo $this->Cart->subitemInput('Size',$cartItem,array('div'=>false,'label'=>false),$no); ?></td>
 							<?php } ?>
 						<?php } ?>
-						<td class="Price"><?php echo $this->element('qualified_price',array('plugin'=>'shop','product'=>$cartItem))?>&nbsp;</td>
+						<td class="Price"><?php echo $this->Shop->fullprice($cartItem); ?>&nbsp;</td>
 						<td class="Amount"><?php echo $this->Cart->qteInput($no,array('div'=>false,'label'=>false,'class'=>'qte')); ?></td>
 						<td class="Total"><?php echo $this->Shop->currency($itemTotal); ?></td>
 						<td class="actions">

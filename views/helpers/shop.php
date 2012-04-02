@@ -94,7 +94,7 @@ class ShopHelper extends AppHelper {
 	}
 	
 	function fullPrice($product=null,$options=array()){
-		if(is_array($product)){
+		if(is_array($product) && empty($product['ShopProduct']) &&  empty($product[0]['ShopProduct'])){
 			$options = $product;
 		}else{
 			if(!empty($product)){
@@ -130,6 +130,7 @@ class ShopHelper extends AppHelper {
 		}
 		App::import('Lib', 'Shop.SetMulti');
 		$data = SetMulti::extractHierarchicMulti($extract_data,$source,array('extractNull'=>false));
+		//debug($data);
 		if($opt['dataOnly']){
 			return $data;
 		}else{
