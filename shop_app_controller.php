@@ -1,6 +1,6 @@
 <?php
 class ShopAppController extends AppController {
-	var $pluginVersion = "0.1.4.0";
+	var $pluginVersion = "0.1.4.0b";
 	
 	function __construct() {
 		//////// config ////////
