@@ -28,13 +28,41 @@ class SerializedBehavior extends ModelBehavior {
 	}
 	
 	function afterFind(&$Model, $results, $primary) {
-		return $this->tcheckResults($Model, $results);
+		return $this->unserialize($Model, $results);
 	}
 	function assocAfterFind(&$Model, $results, $primary) {
-		return $this->tcheckResults($Model, $results);
+		return $this->unserialize($Model, $results);
 	}
 	
-	function tcheckResults(&$Model, $results){
+	function serialize(&$Model, $data = null){
+		if(is_null($data)){
+			$data =& $Model->data;
+		}
+		if(isset($Model->serializeFields)){
+			$serializeFields = $Model->serializeFields;
+			if(!$serializeFields){
+				$serializeFields = array();
+			}else if(!is_array($serializeFields) && $serializeFields){
+				$serializeFields = array($serializeFields);
+			}
+			if(isset($data[$Model->alias])){
+				$res =& $data[$Model->alias];
+			}else{
+				$res =& $data;
+			}
+			foreach($serializeFields as $field){
+				if(isset($res[$field]) && $res[$field] != NULL){
+					$res[$field] = serialize($res[$field]);
+				}
+			}
+		}
+		return $data;
+	}
+	
+	function unserialize(&$Model, $results = null){
+		if(is_null($results)){
+			$results =& $Model->data;
+		}
 		if(isset($Model->serializeFields)){
 			$serializeFields = $Model->serializeFields;
 			if(!$serializeFields){

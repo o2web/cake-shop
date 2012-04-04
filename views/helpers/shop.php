@@ -62,7 +62,7 @@ class ShopHelper extends AppHelper {
 		}
 		
 		$view =& ClassRegistry::getObject('view');
-		$html = $view->element('edit_form',array('plugin'=>'shop','opt'=>$opt,'typeFields'=>$typeFields));
+		$html = $view->element('edit_form',array('plugin'=>'shop','opt'=>$opt,'typeFields'=>$typeFields,'currencies'=>$config['currencies']));
 		
 		return $html;
 	}

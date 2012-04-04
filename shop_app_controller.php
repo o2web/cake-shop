@@ -13,6 +13,16 @@ class ShopAppController extends AppController {
 		parent::__construct();
 	}
 	
+	
+	function beforeFilter() {
+		parent::beforeFilter();
+		
+		App::import('Lib', 'Shop.ShopConfig');
+		$enabled = ShopConfig::load('enabled');
+		if(!$enabled){
+			$this->redirect(array('plugin' => 'auth', 'controller' => 'users', 'action' => 'permission_denied', 'admin' => false));
+		}
+	}
 	/*function dispatchComponentCallback($callback, $params = array()){
 		$result = true;
 		foreach (array_keys($this->components) as $name) {

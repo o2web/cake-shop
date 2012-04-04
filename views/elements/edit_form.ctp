@@ -3,8 +3,22 @@
 	<legend><?php echo $opt['legend'] ?></legend>
 <?php } ?>
 <?php
-	echo '	'.$this->Form->input('ShopProduct.price')."\n";
-	echo '	'.$this->O2form->input('ShopProduct.currency_prices',array('type'=>'multiple','fields'=>array('price','currency'),'div'=>array('class'=>'type')))."\n";
+	$fOpt = array();
+	if(!empty($currencies)){
+		$fOpt['label'] = __('Default Price',true);
+	}
+	echo '	'.$this->Form->input('ShopProduct.price',$fOpt)."\n";
+	
+	if(!empty($currencies)){
+		foreach($currencies as $currency){
+		;
+			$fOpt = array(
+				'label' => str_replace('%currency%',$currency,__('Price %currency%',true)),
+				'type' => 'text',
+			);
+			echo '	'.$this->Form->input('ShopProduct.currency_prices.'.$currency,$fOpt)."\n";
+		}
+	}
  
 	if(!empty($typeFields)){
 ?>

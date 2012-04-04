@@ -234,6 +234,7 @@ CREATE TABLE IF NOT EXISTS `shop_products` (
   `model` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `foreign_id` int(11) DEFAULT NULL,
   `price` float DEFAULT NULL,
+  `currency_prices` text collate utf8_unicode_ci,
   `shipping_req` tinyint(1) DEFAULT NULL,
   `needed_data` text COLLATE utf8_unicode_ci,
   `tax_applied` text COLLATE utf8_unicode_ci,

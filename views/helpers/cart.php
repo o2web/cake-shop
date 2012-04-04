@@ -49,6 +49,12 @@ class CartHelper extends AppHelper {
 	}
 	
 	function buyLink($label=null,$id=null,$nb=null,$model=null,$options=array()){
+		App::import('Lib', 'Shop.ShopConfig');
+		$enabled = ShopConfig::load('enabled');
+		if(!$enabled){
+			return '';
+		}
+		
 		if(is_array($label)){
 			$options = $label;
 		}else{
@@ -134,6 +140,12 @@ class CartHelper extends AppHelper {
 	}
 	
 	function cartLink($options = array()){
+		App::import('Lib', 'Shop.ShopConfig');
+		$enabled = ShopConfig::load('enabled');
+		if(!$enabled){
+			return '';
+		}
+		
 		$defaultOptions = array(
 			'label' => __("Your cart (%nbItem%)",true),
 			'class' => array('cart'),

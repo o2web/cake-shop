@@ -4,11 +4,11 @@ class ShopProduct extends ShopAppModel {
 	var $displayField = 'code';
 	
 	
-	var $actsAs = array('Acl' => array('type' => 'requester'),'Shop.Serialized'=>array('needed_data','tax_applied'));
+	var $actsAs = array('Acl' => array('type' => 'requester'),'Shop.Serialized'=>array('needed_data','tax_applied','currency_prices'));
 	
 	var $rootNodeAlias = "shopProducts";
 	var $dynamicFields = array(
-							'price'=>array('ShopProduct.price','(Related)','Related.price_(currency)','Related.price'),
+							'price'=>array('ShopProduct.currency_prices.(currency)','ShopProduct.price','(Related)','Related.price_(currency)','Related.price'),
 							'title'=>array('(Related)','(Related.displayField)','Related.title_fre','Related.title','ShopProduct.code'),
 							'descr'=>array('(Related)','Related.descr')
 						);
@@ -85,6 +85,23 @@ class ShopProduct extends ShopAppModel {
 		return true;
 	}
 	
+	
+	function beforeSave($options){
+		$data = $this->unserialize($this->data[$this->alias]);
+		if(!empty($data['currency_prices'])){
+			$cprices = $data['currency_prices'];
+			foreach($cprices as $key => $val){
+				if($val === ''){
+					$cprices[$key] = null;
+				}else{
+					$cprices[$key] = (float)$val;
+				}
+			}
+			$data['currency_prices'] = $cprices;
+		}
+		$this->data[$this->alias] = $this->serialize($data);
+		return true;
+	}
 	
 	function possiblePromo($product = null){
 		if(is_numeric($product)){
