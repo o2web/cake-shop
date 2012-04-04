@@ -93,7 +93,7 @@ class ShopProduct extends ShopAppModel {
 			foreach($cprices as $key => $val){
 				if($val === ''){
 					$cprices[$key] = null;
-				}else{
+				}elseif(!is_null($val)){
 					$cprices[$key] = (float)$val;
 				}
 			}
