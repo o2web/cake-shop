@@ -37,13 +37,6 @@ class ShopHelper extends AppHelper {
 		);
 		$opt = array_merge($defOpt,$options);
 		
-		$html = '';
-		if($opt['fieldset']){
-			$html .= '<fieldset>'."\n";
-			$html .= '	<legend>'.$opt['legend'].'</legend>'."\n";
-		}
-		$html .= '	'.$this->Form->input('ShopProduct.price')."\n";
-		
 		$types = ShopConfig::getSubProductTypes();
 		if(empty($this->data['ShopSubproduct']) && !empty($this->data['ShopProduct']['ShopSubproduct'])){
 			App::import('Lib', 'SetMulti');
@@ -51,9 +44,8 @@ class ShopHelper extends AppHelper {
 			$this->O2form->data['ShopSubproduct'] = $this->data['ShopSubproduct'];
 			$this->Form->data['ShopSubproduct'] = $this->data['ShopSubproduct'];
 		}
+		$typeFields = array();
 		if(!empty($types)){
-			$html .= '	<div class="shopSubProductSelector">'."\n";
-			$html .= '		<p class="label">'.__('subProduct',true).'</p>'."\n";
 			foreach($types as $key =>$type){
 				$fields = set::normalize(array('id','code','label_fre','label_eng', 'operator','price'));
 				if(count($type['operators']==1)){
@@ -65,16 +57,13 @@ class ShopHelper extends AppHelper {
 				if(isset($type['adminFields'])){
 					$fields = set::merge($fields,$type['adminFields']);
 				}
-				$html .= $this->O2form->input('ShopSubproduct.'.$key,array('type'=>'multiple','fields'=>$fields,'div'=>array('class'=>'type')));
+				$typeFields['ShopSubproduct.'.$key] = array('type'=>'multiple','fields'=>$fields,'div'=>array('class'=>'type'));
 			}
-			
-			$html .= '	<div>'."\n";
 		}
 		
+		$view =& ClassRegistry::getObject('view');
+		$html = $view->element('edit_form',array('plugin'=>'shop','opt'=>$opt,'typeFields'=>$typeFields));
 		
-		if($opt['fieldset']){
-			$html .= '</fieldset>'."\n";
-		}
 		return $html;
 	}
 	

@@ -36,6 +36,7 @@ class ShopConfig {
 		'defaultShippingRequired' => true,
 		'groupShippingBilling' => true,
 		'emailBuyer' => true,
+		'plugComponent' => null,
 	);
 	
 	//$_this =& ShopConfig::getInstance();

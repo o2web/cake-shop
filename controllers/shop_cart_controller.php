@@ -21,15 +21,18 @@ class ShopCartController extends ShopAppController {
 			//debug($this->data);
 			$this->CartMaker->save($this->data);
 		}else{
-			$this->data = $this->CartMaker->toData();
 			//debug($this->data);
 		}
+		$this->data = $this->CartMaker->toData();
+		
 		$data = $this->CartMaker->calculate();
 		$cartItems = $data['items'];
 		$calcul = $data;
 		unset($calcul['items']);
 		$this->set('cartItems',$cartItems);
 		$this->set('calcul',$calcul);
+		
+		$this->Component->triggerCallback('shopCartBeforeRender', $this);
 		
 		if(isset($this->params['named']['display']) && $this->params['named']['display'] == 'print'){
 			$this->layout = 'print';

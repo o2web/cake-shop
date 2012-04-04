@@ -5,7 +5,10 @@ class ShopAppController extends AppController {
 	function __construct() {
 		//////// config ////////
 		App::import('Lib', 'Shop.ShopConfig');
-		ShopConfig::load();
+		$conf = ShopConfig::load();
+		if(!empty($conf['plugComponent'])){
+			$this->components = array_merge($this->components,$conf['plugComponent']);
+		}
 		
 		parent::__construct();
 	}

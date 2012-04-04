@@ -247,7 +247,8 @@ class CartMakerComponent extends Object{
 			if(!empty($nomalized['products'])){
 				foreach($tmp = $nomalized['products'] as $no => $prod){
 					if($prod['nb'] <= 0){
-						unset($nomalized['products'][$no]);
+						//unset($nomalized['products'][$no]);
+						array_splice($nomalized['products'],$no,1);
 						$this->remove($no);
 					}
 				}
