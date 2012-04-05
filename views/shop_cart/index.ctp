@@ -59,6 +59,12 @@
 			<td class="price"><?php echo $this->Shop->currency($calcul['sub_total']); ?></td>
 			<td class="">&nbsp;</td>
 		</tr>
+		<tr class="rowtotal rowtotal_shipping">
+			<td colspan="<?php echo $nbCols-3 ?>">&nbsp;</td>
+			<td class="price_shipping"><?php __('shipping:'); ?></td>
+			<td class="price"><?php echo $this->Shop->currency($calcul['total_shipping']); ?></td>
+			<td class="">&nbsp;</td>
+		</tr>
 	</table>
 	<?php echo $this->Form->end(null); ?>
 	<?php }else{ ?>
