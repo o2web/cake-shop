@@ -85,7 +85,7 @@ class SerializedBehavior extends ModelBehavior {
 					if(isset($r[$Model->alias])){
 						$r =& $r[$Model->alias];
 					}
-					if(isset($r[$field]) && !empty($r[$field])){
+					if(isset($r[$field]) && !empty($r[$field]) && !is_array($r[$field])){
 						$r[$field] = unserialize($r[$field]);
 					}
 				}
