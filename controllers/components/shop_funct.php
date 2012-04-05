@@ -1,7 +1,7 @@
 <?php 
 class ShopFunctComponent extends Object
 {
-	var $components = array();
+	var $components = array('Shop.SupplementMethod');
 	var $controller = null;
 	
 	function initialize(&$controller) {
@@ -358,15 +358,30 @@ class ShopFunctComponent extends Object
 			if(!empty($supplementItem['calculFunction'])){
 				if($supplementItem['calculFunction'] == 'multiplyByNb'){
 					$supplementItem['total'] = $supplementItem['price'] * $result['nb_total'];
+				}elseif(is_string($supplementItem['calculFunction']) && method_exists($this->SupplementMethod,$supplementItem['calculFunction']) ){
+					$res = $this->SupplementMethod->{$supplementItem['calculFunction']}($supplementItem,$order,$supplement_choice,$result);
+					if(!is_array($res)){
+						$res = array('total' => $res);
+					}
+					if(!array_key_exists('total',$res) || $res['total'] === true){
+						$res['total'] = $res['price'];
+					}elseif($res['total'] === false){
+						$res['total'] = 0;
+					}
+					$supplementItem = array_merge($supplementItem,$res);
+					unset($supplementItem['calculFunction']);
 				}else{
 					$supplementItem['calculFunction']['params'][] = $supplementItem;
 					$supplementItem['calculFunction']['params'][] = $order;
 					$supplementItem['calculFunction']['params'][] = $supplement_choice;
+					$supplementItem['calculFunction']['params'][] = $result;
 					$res = $this->callExternalfunction($supplementItem['calculFunction']);
 					if(!is_array($res)){
 						$res = array('total' => $res);
 					}
-					if(empty($res['total'])){
+					if(!array_key_exists('total',$res) || $res['total'] === true){
+						$res['total'] = $supplementItem['price'];
+					}elseif($res['total'] === false){
 						$res['total'] = 0;
 					}
 					$supplementItem = array_merge($supplementItem,$res);
