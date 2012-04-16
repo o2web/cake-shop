@@ -1,6 +1,9 @@
 <?php
 class ShopAppModel extends AppModel {
 	
+	
+	var $actsAs = array('Shop.AssociationEvent');
+	
 	function afterFind($results,$primary){
 		$results = parent::afterFind($results,$primary);
 		

@@ -260,7 +260,7 @@ class ShopFunctComponent extends Object
 		if(empty($rawItems)){
 			return false;
 		}
-		
+		debug($rawItems);
 		foreach($rawItems as $orderItem){
 			$orderItems[] = $this->extractOrderItemData($orderItem);
 		}
@@ -595,13 +595,14 @@ class ShopFunctComponent extends Object
 		return null;
 	}
 	function extractOrderItemData($productAndOptions){
+		$currency = Configure::read('Shop.currency');
 		$extract_data = array(
 			'product_id' => 'ShopProduct.id',
 			'nb' => array('nb','Options.nb'),
 			'comment' => 'Options.comment',
 			'data' => 'Options.data',
 			'descr' => array('DynamicField.title','ShopProduct.DynamicField.title','ShopProduct.code'),
-			'item_price' => array('ShopProduct.DynamicField.price','DynamicField.price','Options.price','ShopProduct.price'),
+			'item_price' => array('ShopProduct.DynamicField.price','DynamicField.price','Options.currency_prices.'.$currency,'Options.price','ShopProduct.currency_prices.'.$currency,'ShopProduct.price'),
 			'item_tax_applied' => 'ShopProduct.tax_applied',
 			'ShopPromotion' => array('ShopProduct.ShopPromotion','ShopPromotion'),
 			'ShopSubproduct' => array('ShopProduct.ShopSubproduct','ShopSubproduct'),
