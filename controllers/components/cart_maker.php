@@ -174,7 +174,8 @@ class CartMakerComponent extends Object{
 		//exit();
 		$this->save();
 		if($options['redirect']){
-			$this->controller->redirect(array('plugin'=>'shop', 'controller'=>'shop_cart', 'action' => 'index', 'lang'=>$this->controller->lang));
+			$this->controller->redirect(array('plugin'=>'shop', 'controller'=>'shop_cart', 'action' => 'index'));
+			exit();
 		}
 	}
 	

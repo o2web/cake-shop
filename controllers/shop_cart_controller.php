@@ -66,20 +66,20 @@ class ShopCartController extends ShopAppController {
 		
 		if (!$id || !$model) {
 			$this->Session->setFlash(sprintf(__('Invalid %s', true), 'product'));
-			$this->redirect(array('action' => 'index', 'lang'=>$this->lang));
+			$this->redirect(array('action' => 'index'));
 		}
 		$this->CartMaker->add(array('products'=>array('model'=>$model,'foreign_id'=>$id,'nb'=>$nb, 'lang'=>$this->lang, 'SubItem'=>$SubItem)));
 	}
 	
 	function clear(){
 		$this->CartMaker->clear();
-		$this->redirect(array('action' => 'index', 'lang'=>$this->lang));
+		$this->redirect(array('action' => 'index'));
 	}
 	function remove($num=null){
 		if(!is_null($num)){
 			$this->CartMaker->remove($num);
 		}
-		$this->redirect(array('action' => 'index', 'lang'=>$this->lang));
+		$this->redirect(array('action' => 'index'));
 	}
 	function order_now(){
 		if(!empty($this->data)){
@@ -102,6 +102,6 @@ class ShopCartController extends ShopAppController {
 		}
 		$this->CartMaker->changeQty($id,$qty);
 		
-		$this->redirect(array('action' => 'index', 'lang'=>$this->lang));
+		$this->redirect(array('action' => 'index'));
 	}
 }

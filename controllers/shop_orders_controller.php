@@ -101,7 +101,7 @@ class ShopOrdersController extends ShopAppController {
 				}
 			}
 			if($needData){
-				$this->redirect(array('action' => 'data', $order_id, 'lang'=>$this->lang));
+				$this->redirect(array('action' => 'data', $order_id));
 			}
 			
 			$needShipping = false;
@@ -114,19 +114,19 @@ class ShopOrdersController extends ShopAppController {
 			if(Configure::read('Shop.groupShippingBilling')){
 				if(($needShipping && empty($order['ShopOrder']['shipping_address'])) ||
 				   (Configure::read('Shop.billingAddressRequired') && empty($order['ShopOrder']['billing_address']))){
-					$this->redirect(array('action' => 'shipping_billing', $order_id, 'lang'=>$this->lang));
+					$this->redirect(array('action' => 'shipping_billing', $order_id));
 				}
 			}else{
 				if($needShipping && empty($order['ShopOrder']['shipping_address'])){
-					$this->redirect(array('action' => 'shipping', $order_id, 'lang'=>$this->lang));
+					$this->redirect(array('action' => 'shipping', $order_id));
 				}
 				
 				if(Configure::read('Shop.billingAddressRequired') && empty($order['ShopOrder']['billing_address'])){
-					$this->redirect(array('action' => 'billing', $order_id, 'lang'=>$this->lang));
+					$this->redirect(array('action' => 'billing', $order_id));
 				}
 			}
 			if(empty($order['ShopOrder']['confirm'])){
-				$this->redirect(array('action' => 'confirm', $order_id, 'lang'=>$this->lang));
+				$this->redirect(array('action' => 'confirm', $order_id));
 			}
 			
 			//////////////////// Finalize order ////////////////////
@@ -148,7 +148,7 @@ class ShopOrdersController extends ShopAppController {
 			
 			if($order['ShopOrder']['status']=='ready'){
 				if(Configure::read('Shop.payment.enabled')){//add condition when payment is added
-					$this->redirect(array('controller' => 'shop_payments','action' => 'add', 'order'=>$order_id, 'lang'=>$this->lang));
+					$this->redirect(array('controller' => 'shop_payments','action' => 'add', 'order'=>$order_id));
 				}else{
 					$data = array();
 					$data['id'] = $order_id;
@@ -160,7 +160,7 @@ class ShopOrdersController extends ShopAppController {
 			}
 			
 			if($order['ShopOrder']['status']=='ordered'){
-				$this->redirect(array('action' => 'ordered', $order_id, 'lang'=>$this->lang));
+				$this->redirect(array('action' => 'ordered', $order_id));
 			}
 			
 		}
@@ -180,7 +180,7 @@ class ShopOrdersController extends ShopAppController {
 		}
 		if (!$id) {
 			$this->Session->setFlash(sprintf(__('Invalid %s', true), 'shop order'));
-			$this->redirect(array('action' => 'index', 'lang'=>$this->lang));
+			$this->redirect(array('action' => 'index'));
 		}
 		$this->OrderFunct->tcheckAcl($id);
 		if($submited){
@@ -198,7 +198,7 @@ class ShopOrdersController extends ShopAppController {
 					$this->ShopOrder->ShopOrdersItem->save($data);
 				}
 			}
-			$this->redirect(array('action' => 'add', $id, 'lang'=>$this->lang));
+			$this->redirect(array('action' => 'add', $id));
 		}
 		$this->ShopOrder->setupForFullData();
 		$order = $this->ShopOrder->read(null,$id);
@@ -244,7 +244,7 @@ class ShopOrdersController extends ShopAppController {
 		}
 		if (!$id) {
 			$this->Session->setFlash(sprintf(__('Invalid %s', true), 'shop order'));
-			$this->redirect(array('action' => 'index', 'lang'=>$this->lang));
+			$this->redirect(array('action' => 'index'));
 		}
 		$this->OrderFunct->tcheckAcl($id);
 		if (!empty($this->data)) {
@@ -257,7 +257,7 @@ class ShopOrdersController extends ShopAppController {
 				}
 			}
 			$this->ShopOrder->save($data);
-			$this->redirect(array('action' => 'add', $id, 'lang'=>$this->lang));
+			$this->redirect(array('action' => 'add', $id));
 		}else{
 			$this->ShopOrder->checkActive = false;
 			$this->ShopOrder->recursive = -1;
@@ -290,7 +290,7 @@ class ShopOrdersController extends ShopAppController {
 				}
 			}
 			$this->ShopOrder->save($data);
-			$this->redirect(array('action' => 'add', $id, 'lang'=>$this->lang));
+			$this->redirect(array('action' => 'add', $id));
 		}else{
 			$this->ShopOrder->checkActive = false;
 			$this->ShopOrder->recursive = -1;
@@ -319,7 +319,7 @@ class ShopOrdersController extends ShopAppController {
 			App::import('Lib', 'Shop.SetMulti');
 			$data = SetMulti::pregFilterKey($pattern,$data);
 			$this->ShopOrder->save($data);
-			$this->redirect(array('action' => 'add', $id, 'lang'=>$this->lang));
+			$this->redirect(array('action' => 'add', $id));
 		}else{
 			$this->ShopOrder->checkActive = false;
 			$this->ShopOrder->recursive = -1;
@@ -341,7 +341,7 @@ class ShopOrdersController extends ShopAppController {
 		}
 		if (!$id) {
 			$this->Session->setFlash(sprintf(__('Invalid %s', true), 'shop order'));
-			$this->redirect(array('action' => 'index', 'lang'=>$this->lang));
+			$this->redirect(array('action' => 'index'));
 		}
 		$this->OrderFunct->tcheckAcl($id);
 		
@@ -355,7 +355,7 @@ class ShopOrdersController extends ShopAppController {
 				$order['ShopOrder']['confirm'] = 1;
 			}
 			if($order['ShopOrder']['confirm'] == 1){
-				$this->redirect(array('action' => 'add', $id, 'lang'=>$this->lang));
+				$this->redirect(array('action' => 'add', $id));
 			}else{
 				$this->Session->setFlash(__('You must validate you order', true));
 			}
@@ -384,7 +384,7 @@ class ShopOrdersController extends ShopAppController {
 		}
 		if (!$id) {
 			$this->Session->setFlash(sprintf(__('Invalid %s', true), 'shop order'));
-			$this->redirect(array('action' => 'index', 'lang'=>$this->lang));
+			$this->redirect(array('action' => 'index'));
 		}
 		$this->OrderFunct->tcheckAcl($id);
 		
@@ -403,7 +403,7 @@ class ShopOrdersController extends ShopAppController {
 		}
 		if (!$id) {
 			$this->Session->setFlash(sprintf(__('Invalid %s', true), 'shop order'));
-			$this->redirect(array('action' => 'index', 'lang'=>$this->lang));
+			$this->redirect(array('action' => 'index'));
 		}
 		$this->OrderFunct->tcheckAcl($id);
 		
