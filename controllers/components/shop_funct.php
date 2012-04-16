@@ -260,10 +260,11 @@ class ShopFunctComponent extends Object
 		if(empty($rawItems)){
 			return false;
 		}
-		debug($rawItems);
+		
 		foreach($rawItems as $orderItem){
 			$orderItems[] = $this->extractOrderItemData($orderItem);
 		}
+		
 		//============ calcul subItems ============//
 		$orderItems = $this->calculSubItem($orderItems);
 		//debug($orderItems);
