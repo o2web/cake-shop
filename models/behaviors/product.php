@@ -49,9 +49,9 @@ class ProductBehavior extends ModelBehavior {
 			}
 		}else{
 			if(empty($data['needed_data'])){
-				$data['needed_data'] = $this->settings[$Model->alias]['needed_data'];
+				$data['needed_data'] = $this->settings[$model->alias]['needed_data'];
 			}else{
-				$data['needed_data'] = array_filter(array_merge((array)$data['needed_data'],(array)$this->settings[$Model->alias]['needed_data']));
+				$data['needed_data'] = array_filter(array_merge((array)$data['needed_data'],(array)$this->settings[$model->alias]['needed_data']));
 			}
 		}
 		$model->ShopProduct->create();

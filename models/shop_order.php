@@ -113,10 +113,11 @@ class ShopOrder extends ShopAppModel {
 	}*/
 	
 	function beforeSave(){
-		if(isset($this->data[$this->name])){
-			$data = &$this->data[$this->name];
+		$named = isset($this->data[$this->name]);
+		if($named){
+			$data = $this->data[$this->name];
 		}else{
-			$data = &$this->data;
+			$data = $this->data;
 		}
 		if(isset($data['id'])){
 			$id = $data['id'];
@@ -183,6 +184,11 @@ class ShopOrder extends ShopAppModel {
 		);
 		App::import('lib','Shop.Alias');
 		$data = Alias::applyAliasMulti($data, $fieldsToAlias);
+		if($named){
+			$this->data[$this->name] = $data;
+		}else{
+			$this->data = $data;
+		}
 		
 		return true;
 	}
