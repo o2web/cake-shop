@@ -312,7 +312,7 @@ INSERT INTO `shop_taxes` (`id`, `country`, `region`, `code`, `name_fre`, `name_e
 (28, 'CA', 'MB', 'PST', NULL, NULL, 0.07, 0, 1, 1, NULL, NULL),
 (29, 'CA', 'ON', 'PST', NULL, NULL, 0.08, 0, 1, 1, NULL, NULL),
 (30, 'CA', 'PE', 'PST', NULL, NULL, 0.1, 1, 1, 1, NULL, NULL),
-(31, 'CA', 'QC', 'TVQ', NULL, NULL, 0.085, 1, 1, 1, NULL, NULL),
+(31, 'CA', 'QC', 'TVQ', NULL, NULL, 0.095, 1, 1, 1, NULL, NULL),
 (32, 'CA', 'SK', 'PST', NULL, NULL, 0.05, 0, 1, 1, NULL, NULL),
 (33, 'CA', 'NB', 'TPS', NULL, NULL, 0, 0, 0, 1, NULL, NULL),
 (34, 'CA', 'NL', 'TPS', NULL, NULL, 0, 0, 0, 1, NULL, NULL),
