@@ -170,7 +170,7 @@ class OrderFunctComponent extends Object
 		}
 		
 		$default_conf = array(
-			'subject' => __('Your order at '.$siteName,true),
+			'subject' => str_replace('%siteName%',$siteName,__('Your order at %siteName%',true)),
 			'to' => $order['ShopOrder']['billing_email'],
 			'sender' => $this->EmailUtils->defaultEmail(),
 			'replyTo' => null,
