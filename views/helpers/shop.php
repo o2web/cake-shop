@@ -68,11 +68,13 @@ class ShopHelper extends AppHelper {
 	}
 	
 	function countryInput($fieldName, $options = array() ){
-		
+		$options['type'] = 'country';
+		return $this->O2form->input($fieldName, $options);
 	}
 	
 	function regionInput($fieldName, $options = array() ){
-		
+		$options['type'] = 'region';
+		return $this->O2form->input($fieldName, $options);
 	}
 	
 	function currency($number){
