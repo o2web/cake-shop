@@ -1,3 +1,19 @@
+<?php
+	$this->Html->scriptBlock('
+		(function( $ ) {
+			$(function(){
+				$("#ShopCartIndexForm .btUpdate").hide();
+				$("#ShopCartIndexForm input").change(function(){
+					$("#ShopCartIndexForm .btUpdate").show();
+				});
+				$("#ShopCartIndexForm input").keyup(function(){
+					$("#ShopCartIndexForm .btUpdate").show();
+				});
+			});
+		})( jQuery );
+	',array('inline'=>false));
+?>
+
 <div class="shopCart index">
 	<h2><?php __('Your Shopping Cart');?></h2>
 	
@@ -46,7 +62,6 @@
 						<td class="Amount"><?php echo $this->Cart->qteInput($no,array('div'=>false,'label'=>false,'class'=>'qte')); ?></td>
 						<td class="Total"><?php echo $this->Shop->currency($itemTotal); ?></td>
 						<td class="actions">
-							<?php echo $this->Form->submit(__('Update',true)); ?>
 							<?php echo $this->Html->link(__('Remove', true), array('action' => 'remove', $no), array('class' => 'remove')); ?>
 						</td>
 					</tr>
@@ -57,7 +72,7 @@
 			<td colspan="<?php echo $nbCols-3 ?>">&nbsp;</td>
 			<td class="price_total"><?php __('Subtotal:'); ?></td>
 			<td class="price"><?php echo $this->Shop->currency($calcul['sub_total']); ?></td>
-			<td class="">&nbsp;</td>
+			<td class="actions"><?php echo $this->Form->submit(__('Update',true),array('div'=>array('class'=>"submit btUpdate"))); ?></td>
 		</tr>
 		<tr class="rowtotal rowtotal_shipping">
 			<td colspan="<?php echo $nbCols-3 ?>">&nbsp;</td>
@@ -70,12 +85,18 @@
 	<?php }else{ ?>
 	<p><?php __('Your cart is empty.'); ?></p>
 	<?php } ?>
+	<?php
+		if( !empty($prevUrl) ) { 
+			echo $this->Form->input('redirect',array('type'=>'hidden','value'=>$prevUrl));
+		}
+	?>
 	<div class="actions">
 		<ul>
-			<?php 
-			//debug($cartItems);
-			if(!empty($cartItems)){ ?>
-			<li><?php echo $this->Html->link(__('Order Now',true), array('action' => 'order_now'));?></li>
+			<?php if( !empty($prevUrl) ) { ?>
+			<li><a href="<?php echo $prevUrl ?>" class="btBack"><?php __('Continue Shopping'); ?></a></li>
+			<?php }?>
+			<?php if(!empty($cartItems)){ ?>
+			<li><?php echo $this->Html->link(__('Order Now',true), array('action' => 'order_now'),array('class'=>'btNextStep'));?></li>
 			<?php } ?>
 		</ul>
 	</div>

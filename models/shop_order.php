@@ -137,9 +137,9 @@ class ShopOrder extends ShopAppModel {
 				foreach($shipping_data as $key => $val){
 					if(substr($key,0,strlen($prefix_from)) == $prefix_from){
 						$sufix = substr($key,strlen($prefix_from));
-						if(empty($data[$prefix_to.$sufix])){
-							$data[$prefix_to.$sufix] = $shipping_data[$key];
-						}
+						//if(empty($data[$prefix_to.$sufix])){
+						$data[$prefix_to.$sufix] = $shipping_data[$key];
+						//}
 					}
 				}
 			}
@@ -157,13 +157,14 @@ class ShopOrder extends ShopAppModel {
 				foreach($billing_data as $key => $val){
 					if(substr($key,0,strlen($prefix_from)) == $prefix_from){
 						$sufix = substr($key,strlen($prefix_from));
-						if(empty($data[$prefix_to.$sufix])){
-							$data[$prefix_to.$sufix] = $billing_data[$key];
-						}
+						//if(empty($data[$prefix_to.$sufix])){
+						$data[$prefix_to.$sufix] = $billing_data[$key];
+						//}
 					}
 				}
 			}
 		}
+		
 		App::import('Lib', 'Shop.SetMulti');
 		$both_keys = SetMulti::pregFilterKey('/^both_/',$data);
 		foreach($both_keys as $key => $val){

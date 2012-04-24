@@ -21,7 +21,7 @@ class CartHelper extends AppHelper {
 			}else if(!empty($this->params['named']['id'])){
 				$options['id'] = $this->params['named']['id'];
 			}else if(!empty($this->params['pass'][0]) && is_numeric($this->params['pass'][0])){
-				$options['id'] = $this->params['named']['id'];
+				$options['id'] = $this->params['pass'][0];
 			}
 		}
 		if(empty($options['id']) || !is_numeric($options['id'])){
@@ -74,9 +74,10 @@ class CartHelper extends AppHelper {
 		if(empty($options['label'])){
 			$options['label'] = __('Add to your cart',true);
 		}
-		$localOpt = array('label','id','nb','model','routed');
+		$localOpt = array('label');
 		$options['routed'] = false;
-		$url = $this->buyUrl($options);
+		$url = $this->buyUrl(array_diff_key($options,array_flip($localOpt)));
+		$localOpt = array('label','id','nb','model','routed');
 		return $this->Html->link($options['label'],$url,$this->O2form->normalizeAttributesOpt($options,$localOpt));
 	}
 	

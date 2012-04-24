@@ -3,11 +3,22 @@ class ShopCartController extends ShopAppController {
 
 	var $name = 'ShopCart';
 	var $helpers = array('Shop.Shop', 'Shop.Cart');
-	var $components = array('Shop.CartMaker');
+	var $components = array('Shop.CartMaker','Shop.ShopFunct');
 	var $uses = array();
 	
 	function index() {
+		$prevUrl = null;
+		if(!empty($_SERVER['HTTP_REFERER']) && !$this->ShopFunct->isInternalUrl($_SERVER['HTTP_REFERER'])){
+			$prevUrl = $_SERVER['HTTP_REFERER'];
+		}
+		if(!empty($this->params['named']['redirect'])){
+			$prevUrl = $this->params['named']['redirect'];
+		}
+		
 		if(!empty($this->data)){
+			if(!empty($this->data['ShopCart']['redirect'])){
+				$prevUrl = $this->data['ShopCart']['redirect'];
+			}
 			if(!empty($this->data['ShopCart']['order']['shipping_postal_code'])){
 				$location = $this->CartMaker->gessLocation($this->data['ShopCart']['order']['shipping_postal_code']);
 				if(!empty($location)){
@@ -34,6 +45,7 @@ class ShopCartController extends ShopAppController {
 		
 		$this->Component->triggerCallback('shopCartBeforeRender', $this);
 		
+		$this->set('prevUrl',$prevUrl);
 		if(isset($this->params['named']['display']) && $this->params['named']['display'] == 'print'){
 			$this->layout = 'print';
 			$this->render('print_cart');

@@ -67,6 +67,14 @@ class ShopHelper extends AppHelper {
 		return $html;
 	}
 	
+	function countryInput($fieldName, $options = array() ){
+		
+	}
+	
+	function regionInput($fieldName, $options = array() ){
+		
+	}
+	
 	function currency($number){
 		$currency = Configure::read('Shop.currency');
 		$lang = Configure::read('Config.language');
@@ -82,6 +90,43 @@ class ShopHelper extends AppHelper {
 		return $this->Number->format($number,$this->currencyFormats[$cur]);
 	}
 	
+	function productDispo($product=null,$options=array()){
+		if(is_array($product) && empty($product['ShopProduct']) &&  empty($product[0]['ShopProduct'])){
+			$options = $product;
+		}else{
+			if(!empty($product)){
+				$options['product'] = $product;
+			}
+		}
+		$defOpt = array(
+			'product'=>null,
+			'sources'=> array('product','viewVars.product','viewVars'),
+			'paths'=>array(
+				'product' => array(
+					'ShopProduct',
+				),
+				'price' => array(
+					'ShopProduct.DynamicField.price','DynamicField.price','item_price',
+				),
+			),
+			'dataOnly' => false,
+		);
+		$opt = array_merge($defOpt,$options);
+		$view =& ClassRegistry::getObject('view');
+		$source = array('product'=>$opt['product'], 'viewVars'=>$view->viewVars, 'params'=>$this->params);
+		$extract_data = array();
+		foreach ($opt['paths'] as $prop_name => $paths) {
+			foreach ($opt['sources'] as $sname) {
+				foreach ($paths as $path) {
+					$extract_data[$prop_name][] = $sname.'.'.$path;
+				}
+			}
+		}
+		App::import('Lib', 'Shop.SetMulti');
+		$data = SetMulti::extractHierarchicMulti($extract_data,$source,array('extractNull'=>false));
+		return !empty($data['product']) && isset($data['price']);
+	}
+	
 	function fullPrice($product=null,$options=array()){
 		if(is_array($product) && empty($product['ShopProduct']) &&  empty($product[0]['ShopProduct'])){
 			$options = $product;
@@ -92,7 +137,7 @@ class ShopHelper extends AppHelper {
 		}
 		$defOpt = array(
 			'product'=>null,
-			'sources'=> array('product','viewVars.product','viewVars.product'),
+			'sources'=> array('product','viewVars.product'),
 			'paths'=>array(
 				'original_price' => array(
 					'ShopProduct.DynamicField.original_price','DynamicField.original_price','item_original_price',
@@ -119,11 +164,12 @@ class ShopHelper extends AppHelper {
 		}
 		App::import('Lib', 'Shop.SetMulti');
 		$data = SetMulti::extractHierarchicMulti($extract_data,$source,array('extractNull'=>false));
-		//debug($data);
 		if($opt['dataOnly']){
 			return $data;
 		}else{
-			return $view->element('qualified_price',array('plugin'=>'shop','fullPrice'=>$data));
+			if(!empty($data)){
+				return $view->element('qualified_price',array('plugin'=>'shop','fullPrice'=>$data));
+			}
 		}
 	}
 	

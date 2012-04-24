@@ -7,15 +7,23 @@ class SupplementMethodComponent extends Object
 		$this->controller =& $controller;
 	}
 	
-	function rangesOpt($supplementItem,$order,$supplement_choice,$calcul){
-		$opt = array(
+	function rangesOpt($options,$supplementItem,$order,$supplement_choice,$calcul){
+		$defOpt = array(
 			'rangedValue' => 'calcul.total_items',
-			'defModif' => 'price',
+			'defModif' => 'total',
+			'ranges' => array()
 		);
+		if(!count(array_intersect_key($options,$defOpt))){
+			$options = array('ranges' =>$options);
+		}
+		if(!empty($supplementItem['ranges'])){
+			$options['ranges'] = $supplementItem['ranges'];
+		}
+		$opt = array_merge($defOpt,$options);
 		$data = compact('supplementItem', 'order', 'supplement_choice', 'calcul');
 		$rangedValue = Set::extract($opt['rangedValue'], $data);
-		if(!empty($supplementItem['ranges'])){
-			foreach($supplementItem['ranges'] as $range => $setting){
+		if(!empty($opt['ranges'])){
+			foreach($opt['ranges'] as $range => $setting){
 				$min = PHP_INT_MAX;
 				$max = 0;
 				if(preg_match('/^([0-9]+)-([0-9]+)$/', $range, $matches)){
@@ -36,6 +44,34 @@ class SupplementMethodComponent extends Object
 				}
 			}
 		}
+		return $supplementItem;
+	}
+	function multiplyByNb($options,$supplementItem,$order,$supplement_choice,$calcul){
+		return $supplementItem['total'] * $calcul['nb_total'];
+	}
+	function byCountry($options,$supplementItem,$order,$supplement_choice,$calcul){
+		$defOpt = array(
+			'keyPath' => array('order.ShopOrder.shipping_country','settings.defaultCountry'),
+			'modifProp' => 'total',
+			'list' => array()
+		);
+		if(!count(array_intersect_key($options,$defOpt))){
+			$options = array('list' =>$options);
+		}
+		$opt = array_merge($defOpt,$options);
+		
+		
+		App::import('Lib', 'Shop.ShopConfig');
+		$settings = ShopConfig::load();
+		$dataSource = array('settings'=>$settings,'order'=>$order,'calcul'=>$calcul);
+		
+		App::import('Lib', 'Shop.SetMulti');
+		$country = SetMulti::extractHierarchic($opt['keyPath'], $dataSource);
+		
+		if(array_key_exists($country,$opt['list'])){
+			$supplementItem[$opt['modifProp']] = $opt['list'][$country];
+		}
+		
 		return $supplementItem;
 	}
 	

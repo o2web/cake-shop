@@ -45,6 +45,19 @@ class ShopFunctComponent extends Object
 		
 	}
 	
+	function isInternalUrl($url){
+		if(preg_match('/https?:\/\//i',$url)){
+			if(strpos($url,Router::url('/',true)) === false){
+				return false;
+			}else{
+				$url = str_replace(Router::url('/',true),'/',$url);
+			}
+		}
+		$params = Router::parse($url);
+		//debug($params);
+		return $params['plugin'] == 'shop';
+	}
+	
 	function loadComponent($componentName){
 		$component = null;
 		$pathing = $this->componentPathing($componentName);
@@ -357,40 +370,44 @@ class ShopFunctComponent extends Object
 			}
 			
 			if(!empty($supplementItem['calculFunction'])){
-				if($supplementItem['calculFunction'] == 'multiplyByNb'){
-					$supplementItem['total'] = $supplementItem['price'] * $result['nb_total'];
-				}elseif(is_string($supplementItem['calculFunction']) && method_exists($this->SupplementMethod,$supplementItem['calculFunction']) ){
-					$res = $this->SupplementMethod->{$supplementItem['calculFunction']}($supplementItem,$order,$supplement_choice,$result);
-					if(!is_array($res)){
-						$res = array('total' => $res);
-					}
-					if(!array_key_exists('total',$res) || $res['total'] === true){
-						$res['total'] = $res['price'];
-					}elseif($res['total'] === false){
-						$res['total'] = 0;
-					}
-					$supplementItem = array_merge($supplementItem,$res);
-					unset($supplementItem['calculFunction']);
-				}else{
-					$supplementItem['calculFunction']['params'][] = $supplementItem;
-					$supplementItem['calculFunction']['params'][] = $order;
-					$supplementItem['calculFunction']['params'][] = $supplement_choice;
-					$supplementItem['calculFunction']['params'][] = $result;
-					$res = $this->callExternalfunction($supplementItem['calculFunction']);
-					if(!is_array($res)){
-						$res = array('total' => $res);
-					}
-					if(!array_key_exists('total',$res) || $res['total'] === true){
-						$res['total'] = $supplementItem['price'];
-					}elseif($res['total'] === false){
-						$res['total'] = 0;
-					}
-					$supplementItem = array_merge($supplementItem,$res);
-					unset($supplementItem['calculFunction']);
-				}
-			}else{
-				$supplementItem['total'] = $supplementItem['price'];
+				$supplementItem['calcul'] = $supplementItem['calculFunction'];
 			}
+			$supplementItem['total'] = $supplementItem['price'];
+			if(!empty($supplementItem['calcul'])){
+				if(!is_array($supplementItem['calcul']) || isset($supplementItem['calcul']['component']) ){
+					$supplementItem['calcul'] = array($supplementItem['calcul']);
+				}
+				foreach($supplementItem['calcul'] as $funct => $fopt){
+					if(is_string($fopt)){
+						$funct = $fopt;
+						$fopt = array();
+					}
+					$res = null;
+					if(method_exists($this->SupplementMethod,$funct) ){
+						$res = $this->SupplementMethod->{$funct}($fopt,$supplementItem,$order,$supplement_choice,$result);
+					}elseif(!empty($fopt['component'])){
+						$fopt['params'][] = $supplementItem;
+						$fopt['params'][] = $order;
+						$fopt['params'][] = $supplement_choice;
+						$fopt['params'][] = $result;
+						$res = $this->callExternalfunction($fopt);
+					}
+					if(!is_null($res)){
+						if(!is_array($res)){
+							$res = array('total' => $res);
+						}
+						if(!array_key_exists('total',$res) || $res['total'] === true){
+							$res['total'] = $supplementItem['total'];
+						}elseif($res['total'] === false){
+							$res['total'] = 0;
+						}
+						$supplementItem = array_merge($supplementItem,$res);
+					}
+				}
+			}
+			unset($supplementItem['calculFunction']);
+			unset($supplementItem['calcul']);
+			
 			$result['supplements'][$sName] = $supplementItem;
 			$result['total_supplements'] += $supplementItem['total'];
 		}

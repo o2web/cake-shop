@@ -39,6 +39,9 @@ class ShopConfig {
 		'plugComponent' => null,
 		'currencies' => null,
 		'enabled' => true,
+		
+		'defaultCountry' => null,
+		'defaultRegion' => null,
 	);
 	
 	//$_this =& ShopConfig::getInstance();
