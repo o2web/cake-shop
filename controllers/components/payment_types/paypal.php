@@ -66,6 +66,7 @@ class PaypalPaymentComponent extends PaymentComponent{
 		$buttonData['handling_cart'] = $shipping;
 		$buttonData['amount'] = $total;
 		$buttonData['discount_amount_cart'] = $discount;
+		$buttonData['charset'] = Configure::read('App.encoding');
 		
 		
 		$this->set('buttonData',$buttonData);
