@@ -4,7 +4,7 @@ class ShopCartController extends ShopAppController {
 	var $name = 'ShopCart';
 	var $helpers = array('Shop.Shop', 'Shop.Cart');
 	var $components = array('Shop.CartMaker','Shop.ShopFunct');
-	var $uses = array();
+	var $uses = array('Shop.ShopPromotion');
 	
 	function index() {
 		$prevUrl = null;
@@ -16,6 +16,17 @@ class ShopCartController extends ShopAppController {
 		}
 		
 		if(!empty($this->data)){
+			if(!empty($this->data['ShopOrder']['promo_codes'])){
+				$tmp = array();
+				foreach($this->data['ShopOrder']['promo_codes'] as $code){
+					if(!empty($code)){
+						$tmp[] = $code;
+					}
+				}
+				//debug($tmp);
+				unset($this->data['ShopOrder']['promo_codes']);
+				$this->CartMaker->data['order']['promo_codes'] = $tmp;
+			}
 			if(!empty($this->data['ShopCart']['redirect'])){
 				$prevUrl = $this->data['ShopCart']['redirect'];
 			}
@@ -35,6 +46,10 @@ class ShopCartController extends ShopAppController {
 			//debug($this->data);
 		}
 		$this->data = $this->CartMaker->toData();
+		if(!empty($this->data['ShopCart']['order'])){
+			$this->data['ShopOrder'] = $this->data['ShopCart']['order'];
+		}
+		//debug($this->data);
 		
 		$data = $this->CartMaker->calculate();
 		$cartItems = $data['items'];
@@ -44,6 +59,9 @@ class ShopCartController extends ShopAppController {
 		$this->set('calcul',$calcul);
 		
 		$this->Component->triggerCallback('shopCartBeforeRender', $this);
+		
+		$codePromos = $this->ShopPromotion->find('count',array('conditions'=>array('or'=>array('code_needed'=>1,'coupon_code_needed'=>1))));
+		$this->set('codeInput',$codePromos>0);
 		
 		$this->set('prevUrl',$prevUrl);
 		if(isset($this->params['named']['display']) && $this->params['named']['display'] == 'print'){

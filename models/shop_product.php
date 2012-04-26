@@ -316,7 +316,6 @@ class ShopProduct extends ShopAppModel {
 		}
 		$prods = $this->getAllRelated($prods,$opt);
 		
-		
 		foreach($prods as &$product){
 			$dynamicField = $this->getDynamicFields($product);
 			$product['DynamicField'] = $dynamicField;
@@ -372,6 +371,7 @@ class ShopProduct extends ShopAppModel {
 				$fields = array_values(Set::flatten($fields));
 				$fields = SetMulti::pregFilter('/^Related\./',$fields);
 				$fields = str_replace('Related.',$relatedModel->alias.'.',$fields);
+				$fields[] = $relatedModel->alias.'.id';
 				$cpy = $fields;
 				$fields = array();
 				foreach($cpy as $field){
@@ -412,7 +412,7 @@ class ShopProduct extends ShopAppModel {
 		return null;
 	}
 	function dynamicFieldsExtractData($product=null){
-		if(isset($product['ShopProduct'][0])){
+		if(is_array($product) && isset($product['ShopProduct'][0])){
 			$product['ShopProduct'] = $product['ShopProduct'][0];
 		}
 		if (is_object($product) && is_a($product, 'Model')) {

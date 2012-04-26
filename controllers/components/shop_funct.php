@@ -41,8 +41,9 @@ class ShopFunctComponent extends Object
 			}
 			$params = array_merge($params,$options['params']);
 		}
-		return call_user_func_array(array($component, $options['functName']),$params);
-		
+		if(!empty($component) && !empty($options['functName'])){
+			return call_user_func_array(array($component, $options['functName']),$params);
+		}
 	}
 	
 	function isInternalUrl($url){
@@ -185,7 +186,7 @@ class ShopFunctComponent extends Object
 		return $products;
 	}
 
-	function calculPromo($products){
+	function calculPromo($products,$order = null){
 		App::import('Lib', 'Shop.SetMulti');
 		if(SetMulti::isAssoc($products)){
 			$prods =  array(&$products);
@@ -205,21 +206,30 @@ class ShopFunctComponent extends Object
 				//debug($p);
 				if(!empty($p['ShopPromotion'])){
 					foreach($p['ShopPromotion'] as &$promo){
-						$newPrice = $this->ShopPromotion->applyOperator($price,$promo['operator'],$promo['val']);
-						if(!empty($promo['ShopAction'])){
-							$action = $this->ShopPromotion->ShopAction->toCallBack($promo['ShopAction'],array($p,$newPrice,$promo['action_params']));
-							$res = $this->callExternalfunction($action);
-							if($res === true){
-							}elseif($res === false){
-								$newPrice = $price;
-							}elseif(is_numeric($res)){
-								$newPrice = $res;
+						$applicable = true;
+						if($promo['code_needed']){
+							if(!empty($order['promo_codes']) && !empty($promo['code']) && in_array($promo['code'],$order['promo_codes'])){
 							}else{
-								$newPrice = $price;
+								$applicable = false;
 							}
 						}
-						$promo['rebate'] = $price - $newPrice;
-						$price = $newPrice;
+						if($applicable){
+							$newPrice = $this->ShopPromotion->applyOperator($price,$promo['operator'],$promo['val']);
+							if(!empty($promo['ShopAction']) && !empty($promo['ShopAction']['id'])){
+								$action = $this->ShopPromotion->ShopAction->toCallBack($promo['ShopAction'],array($p,$newPrice,$promo['action_params']));
+								$res = $this->callExternalfunction($action);
+								if($res === true){
+								}elseif($res === false){
+									$newPrice = $price;
+								}elseif(is_numeric($res)){
+									$newPrice = $res;
+								}else{
+									$newPrice = $price;
+								}
+							}
+							$promo['rebate'] = $price - $newPrice;
+							$price = $newPrice;
+						}
 					}
 				}
 				$p['item_rebate'] = $p['item_price'] - $price;
@@ -257,6 +267,7 @@ class ShopFunctComponent extends Object
 		if(isset($order['order'])){
 			$order['ShopOrder'] = $order['order'];
 		}
+		
 		App::import('Lib', 'Shop.SetMulti');
 		$data = SetMulti::extractHierarchicMulti($extract_data,$order,array('extractNull'=>false));
     	
@@ -284,7 +295,7 @@ class ShopFunctComponent extends Object
 		
 		
 		//============ calcul promos ============//
-		$orderItems = $this->calculPromo($orderItems);
+		$orderItems = $this->calculPromo($orderItems,isset($order['ShopOrder'])?$order['ShopOrder']:null);
 		//debug($orderItems);
 		
 		//============ total_items ============//
@@ -619,7 +630,8 @@ class ShopFunctComponent extends Object
 			'nb' => array('nb','Options.nb'),
 			'comment' => 'Options.comment',
 			'data' => 'Options.data',
-			'descr' => array('DynamicField.title','ShopProduct.DynamicField.title','ShopProduct.code'),
+			'item_title' => array('DynamicField.title','ShopProduct.DynamicField.title','ShopProduct.code'),
+			'item_descr' => array('DynamicField.descr','ShopProduct.DynamicField.descr'),
 			'item_price' => array('ShopProduct.DynamicField.price','DynamicField.price','Options.currency_prices.'.$currency,'Options.price','ShopProduct.currency_prices.'.$currency,'ShopProduct.price'),
 			'item_tax_applied' => 'ShopProduct.tax_applied',
 			'ShopPromotion' => array('ShopProduct.ShopPromotion','ShopPromotion'),

@@ -46,7 +46,7 @@
 			<tr class="item">
 				<td><?php echo str_pad($orderItem['product_id'], 6, "0", STR_PAD_LEFT); ?></td>
 				<td><?php echo $orderItem['nb']; ?></td>
-				<td><?php echo $orderItem['descr'];
+				<td><?php echo $orderItem['item_title'];
 					if(!empty($orderItem['comment'])){
 						echo "<span>".$orderItem[$orderItem['ShopProduct']['code']]."</span>"; 
 					}

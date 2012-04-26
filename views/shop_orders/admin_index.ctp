@@ -37,8 +37,8 @@
 							$lines = array();
 							foreach($shopOrder['ShopOrdersItem'] as $orderItem){ 
 								$label = '???';
-								if(!empty($orderItem['descr'])){
-									$label = $orderItem['descr']; 
+								if(!empty($orderItem['item_title'])){
+									$label = $orderItem['item_title']; 
 								}elseif(!empty($orderItem['ShopProduct']['code'])){
 									$label = $orderItem['ShopProduct']['code']; 
 								}elseif(!empty($orderItem['ShopProduct']['id'])){

@@ -6,18 +6,21 @@
 			<legend><?php printf(__('Add %s', true), __('Shop Promotion', true)); ?></legend>
 			<?php
 				echo $this->Form->input('active', array('checked' => 'checked'));
-				echo $this->Form->input('code');
 				echo $this->Form->input('title_fre');
 				echo $this->Form->input('title_eng');
 				echo $this->Form->input('desc_fre');
 				echo $this->Form->input('desc_eng');
-				echo $this->Form->input('val');
+				echo $this->Form->input('val',array('label'=>__('Price',true)));
 				App::import('Lib', 'Shop.SetMulti');
 				echo $this->Form->input('operator',array('options'=>SetMulti::extractKeepKey('label',$operators)));
-				echo $this->Form->input('action_id',array('empty'=>__('None',true)));
-			?>
-			<div id="ActionSubForm" class="ajaxContainer"><div class="loader"></div></div>
-			<?php
+				if(!empty($actions)){
+					echo $this->Form->input('action_id',array('empty'=>__('None',true)));
+					?>
+					<div id="ActionSubForm" class="ajaxContainer"><div class="loader"></div></div>
+					<?php
+				}
+				echo $this->Form->input('code');
+				echo $this->Form->input('code_needed',array('label'=>__('Buyers needs to enter the code in order to benefit from the promotion',true)));
 				echo $this->Form->input('aroProduct',array('options'=>$products,'empty'=>__('None',true)));
 			?>
 		</fieldset>

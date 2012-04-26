@@ -135,19 +135,20 @@ CREATE TABLE IF NOT EXISTS `shop_orders` (
 --
 
 CREATE TABLE IF NOT EXISTS `shop_orders_items` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `order_id` int(11) DEFAULT NULL,
-  `product_id` int(11) DEFAULT NULL,
-  `nb` int(11) DEFAULT NULL,
-  `descr` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `comment` text COLLATE utf8_unicode_ci,
-  `item_price` float DEFAULT NULL,
-  `item_tax_applied` text COLLATE utf8_unicode_ci,
-  `active` tinyint(1) DEFAULT NULL,
-  `created` datetime DEFAULT NULL,
-  `modified` datetime DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
+  `id` int(11) NOT NULL auto_increment,
+  `order_id` int(11) default NULL,
+  `product_id` int(11) default NULL,
+  `nb` int(11) default NULL,
+  `item_title` varchar(255) collate utf8_unicode_ci default NULL,
+  `item_desc` varchar(255) collate utf8_unicode_ci default NULL,
+  `comment` text collate utf8_unicode_ci,
+  `item_price` float default NULL,
+  `item_tax_applied` text collate utf8_unicode_ci,
+  `active` tinyint(1) default NULL,
+  `created` datetime default NULL,
+  `modified` datetime default NULL,
+  PRIMARY KEY  (`id`)
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=352 ;
 
 --
 -- Dumping data for table `shop_orders_items`

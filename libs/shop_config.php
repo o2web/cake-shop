@@ -40,6 +40,8 @@ class ShopConfig {
 		'currencies' => null,
 		'enabled' => true,
 		
+		'countries' => true,
+		
 		'defaultCountry' => null,
 		'defaultRegion' => null,
 	);

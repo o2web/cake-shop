@@ -35,10 +35,10 @@ class PaypalPaymentComponent extends PaymentComponent{
 		foreach($this->payment['ShopOrder'] as $o_num => $order){
 			foreach($order['ShopOrdersItem'] as $i_num => $item){
 				$buttonData['items'][] = array(
-					'item_name' => $item['descr'], 
-					 'amount' => $item['item_price'], 
-					 'quantity' => $item['nb'], 
-					 'item_number' => $item['product_id']
+					'item_name' => $item['item_title'], 
+					'amount' => $item['item_price'], 
+					'quantity' => $item['nb'], 
+					'item_number' => $item['product_id']
 				);
 			}
 			$taxes += $order['total_taxes'];

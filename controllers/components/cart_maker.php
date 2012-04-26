@@ -36,12 +36,12 @@ class CartMakerComponent extends Object{
 	}
 	
 	function getTotalQty(){
-		$items = $this->itemListData();
+		$items = $this->data['products'];
 		//pr($items);
 		$qty = 0;
 		if(!empty($items)){
 			foreach($items as $k=>$item){
-				$qty = $qty + $item['Options']['nb'];
+				$qty = $qty + $item['nb'];
 			}
 		}
 		
@@ -78,7 +78,7 @@ class CartMakerComponent extends Object{
 				$productData = $ShopProduct->getFullData($productData);
 			}
 			$productData = $this->ShopFunct->calculSubItem($productData);
-			$productData = $this->ShopFunct->calculPromo($productData);
+			$productData = $this->ShopFunct->calculPromo($productData,isset($this->data['order'])?$this->data['order']:null);
 			$data[] = $productData;
 		}
 		$this->_itemListData = $data;

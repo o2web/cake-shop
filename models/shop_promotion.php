@@ -117,5 +117,9 @@ class ShopPromotion extends ShopAppModel {
 		//debug($ref);
 		return $ref;
 	}
+	
+	function codesExists(){
+	
+	}
 }
 ?>

@@ -69,11 +69,28 @@ class ShopHelper extends AppHelper {
 	
 	function countryInput($fieldName, $options = array() ){
 		$options['type'] = 'country';
+		App::import('Lib', 'Shop.ShopConfig');
+		$countries = ShopConfig::load('countries');
+		if(is_array($countries)){
+			foreach ($countries as $key => $country) {
+				if(is_array($country)){
+					if(isset($country['label'])){
+						$countries[$country] = $country['label'];
+					}else{
+						$countries[$country] = array();
+					}
+				}
+			}
+		}
+		$options['options'] = $countries;
 		return $this->O2form->input($fieldName, $options);
 	}
 	
 	function regionInput($fieldName, $options = array() ){
 		$options['type'] = 'region';
+		App::import('Lib', 'Shop.ShopConfig');
+		$countries = ShopConfig::load('countries');
+		$options['options'] = $countries;
 		return $this->O2form->input($fieldName, $options);
 	}
 	

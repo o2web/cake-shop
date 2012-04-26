@@ -77,10 +77,16 @@ pre{
     </ol>
 </div>
 <div class="section">
-    <h1>Avant v0.1.3.2</h1>
+    <h1>v0.1.3.1 et inférieur</h1>
     <ol>
         <li>ALTER TABLE `shop_promotions` ADD `action_id` INT NULL AFTER `operator`, ADD `action_params` TEXT NULL AFTER `action_id`</li>
         <li></li>
+		<li></li>
+    </ol>
+    <h1>v0.1.4.0 et inférieur</h1>
+    <ol>
+        <li>ALTER TABLE `shop_orders_items` CHANGE `descr` `item_title` VARCHAR( 255 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL</li>
+        <li>ALTER TABLE `shop_orders_items` ADD `item_desc` VARCHAR( 255 ) NULL AFTER `item_title`</li>
 		<li></li>
     </ol>
 </div>
