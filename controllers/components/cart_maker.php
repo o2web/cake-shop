@@ -146,7 +146,8 @@ class CartMakerComponent extends Object{
 	function add($options){//séparer option et produits ?
 		$defaultOptions = array(
 			'products' => array(),
-			'redirect' => true
+			'redirect' => true,
+			'back' => null,
 		);
 		if(!is_array($options)){
 			$options = array('products'=>array($options));
@@ -177,7 +178,15 @@ class CartMakerComponent extends Object{
 		//exit();
 		$this->save();
 		if($options['redirect']){
-			$this->controller->redirect(array('plugin'=>'shop', 'controller'=>'shop_cart', 'action' => 'index'));
+			$url = array('plugin'=>'shop', 'controller'=>'shop_cart', 'action' => 'index');
+			if(!empty($options['back'])){
+				App::import('Lib', 'Shop.UrlParam');
+				//debug($options['back']);
+				$url['redirect'] = UrlParam::encode($options['back']);
+				//debug($options['back']);
+				//debug(UrlParam::decode($options['back']));
+			}
+			$this->controller->redirect($url);
 			exit();
 		}
 	}

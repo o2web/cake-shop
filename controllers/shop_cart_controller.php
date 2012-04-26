@@ -12,7 +12,8 @@ class ShopCartController extends ShopAppController {
 			$prevUrl = $_SERVER['HTTP_REFERER'];
 		}
 		if(!empty($this->params['named']['redirect'])){
-			$prevUrl = $this->params['named']['redirect'];
+			App::import('Lib', 'Shop.UrlParam');
+			$prevUrl = UrlParam::decode($this->params['named']['redirect']);
 		}
 		
 		if(!empty($this->data)){
@@ -71,34 +72,27 @@ class ShopCartController extends ShopAppController {
 	}
 	
 	function add($model=null, $id = null, $nb = 1){
-		if(!$model && isset($this->params['named']['model'])) {
-			$model = $this->params['named']['model'];
-		}
-		if(!$id && isset($this->params['named']['id']) && is_numeric($this->params['named']['id'])) {
-			$id = $this->params['named']['id'];
-		}
-		if(!$nb && isset($this->params['named']['nb']) && is_numeric($this->params['named']['nb'])) {
-			$nb = $this->params['named']['nb'];
-		}
-		if(!empty($this->data['ShopCart']['nb'])){
-			$nb = $this->data['ShopCart']['nb'];
-		}
-		if(!empty($this->data['ShopCart']['model'])){
-			$model = $this->data['ShopCart']['model'];
-		}
-		if(!empty($this->data['ShopCart']['id'])){
-			$id = $this->data['ShopCart']['id'];
-		}
-		$SubItem = array();
-		if(!empty($this->data['ShopCart']['SubItem'])){
-			$SubItem = $this->data['ShopCart']['SubItem'];
+		$extract_data = array(
+			'products.model' => array('data.ShopCart.model','params.named.model','params.model'),
+			'products.foreign_id' => array('data.ShopCart.id','params.named.id','params.id'),
+			'products.nb' => array('data.ShopCart.nb','params.named.nb','params.nb'),
+			'back_encoded' => array('params.named.back','params.back'),
+			'back' => array('data.ShopCart.back'),
+		);
+		App::import('Lib', 'Shop.SetMulti');
+		$source = array('params'=>$this->params, 'data'=>$this->data);
+		$opt = SetMulti::extractHierarchicMulti($extract_data,$source);
+		if(!empty($opt['back_encoded'])){
+			App::import('Lib', 'Shop.UrlParam');
+			$opt['back'] = UrlParam::decode($opt['back_encoded']);
+			unset($opt['back_encoded']);
 		}
 		
-		if (!$id || !$model) {
+		if (empty($opt['products']['foreign_id']) || empty($opt['products']['model'])) {
 			$this->Session->setFlash(sprintf(__('Invalid %s', true), 'product'));
 			$this->redirect(array('action' => 'index'));
 		}
-		$this->CartMaker->add(array('products'=>array('model'=>$model,'foreign_id'=>$id,'nb'=>$nb, 'lang'=>$this->lang, 'SubItem'=>$SubItem)));
+		$this->CartMaker->add($opt);
 	}
 	
 	function clear(){

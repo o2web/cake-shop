@@ -37,8 +37,16 @@ class CartHelper extends AppHelper {
 			'model' => $defmodel,
 			'nb' => 1,
 			'routed' => true,
+			'back' => null,
 		);
 		$options = array_merge($defaultOptions,$options);
+		if(!empty($options['back'])){
+			App::import('Lib', 'Shop.UrlParam');
+			//debug($options['back']);
+			$options['back'] = UrlParam::encode($options['back']);
+			//debug($options['back']);
+			//debug(UrlParam::decode($options['back']));
+		}
 		$urlOpt = array('plugin'=>'shop','controller'=>'shop_cart','action'=>'add');
 		$urlOpt = array_merge(array_diff_key($options,array_flip($localOpt)),$urlOpt);
 		if($options['routed']){
