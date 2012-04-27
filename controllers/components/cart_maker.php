@@ -163,7 +163,9 @@ class CartMakerComponent extends Object{
 			//debug($conditions);
 			//debug($this->data['products']);
 			//exit();
-			$conditions['SubItem'] = $product['SubItem'];
+			if(!empty($product['SubItem'])){
+				$conditions['SubItem'] = $product['SubItem'];
+			}
 			$pos = $this->indexOf($conditions);
 			if($pos>-1){
 				$this->data['products'][$pos]['nb']+=$product['nb'];
