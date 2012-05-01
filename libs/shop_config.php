@@ -31,6 +31,9 @@ class ShopConfig {
 			'enabled' => true,
 			'available' => array('paypal'),
 		),
+		'promo'=> array(
+			'codeLen'=>16,
+		),
 		
 		'billingAddressRequired' => true,
 		'defaultShippingRequired' => true,

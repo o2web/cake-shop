@@ -21,6 +21,19 @@ class ShopOrder extends ShopAppModel {
 			'exclusive' => '',
 			'finderQuery' => '',
 			'counterQuery' => ''
+		),
+		'ShopCoupon' => array(
+			'className' => 'Shop.ShopCoupon',
+			'foreignKey' => 'shop_order_id',
+			'dependent' => false,
+			'conditions' => '',
+			'fields' => '',
+			'order' => '',
+			'limit' => '',
+			'offset' => '',
+			'exclusive' => '',
+			'finderQuery' => '',
+			'counterQuery' => ''
 		)
 	);
 
@@ -46,6 +59,21 @@ class ShopOrder extends ShopAppModel {
 			'joinTable' => 'shop_orders_payments',
 			'foreignKey' => 'order_id',
 			'associationForeignKey' => 'payment_id',
+			'unique' => true,
+			'conditions' => '',
+			'fields' => '',
+			'order' => '',
+			'limit' => '',
+			'offset' => '',
+			'finderQuery' => '',
+			'deleteQuery' => '',
+			'insertQuery' => ''
+		),
+		'ShopPromotion' => array(
+			'className' => 'Shop.ShopPromotion',
+			'joinTable' => 'shop_coupons',
+			'foreignKey' => 'shop_order_id',
+			'associationForeignKey' => 'shop_promotion_id',
 			'unique' => true,
 			'conditions' => '',
 			'fields' => '',
@@ -101,7 +129,7 @@ class ShopOrder extends ShopAppModel {
 	function setupForFullData(){
 		$this->checkActive = false;
 		$this->Behaviors->attach('Containable');
-		$this->contain(array('ShopOrdersItem'=>array('ShopProduct','ShopOrdersSubitem'=>'ShopSubproduct'),'ShopProduct'));
+		$this->contain(array('ShopOrdersItem'=>array('ShopProduct','ShopOrdersSubitem'=>'ShopSubproduct'),'ShopProduct','ShopPromotion'));
 	}
 	
 	/*function afterFind($results,$primary){

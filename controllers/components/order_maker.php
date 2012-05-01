@@ -42,7 +42,6 @@ class OrderMakerComponent extends Object
 			$options['products'] = array($options['products']);
 		}
 		$options = array_merge($defaultOptions,$options);
-		
 		if (!empty($options['products'])) {
 			foreach((array)$options['products'] as $productOpt){
 				$productOpt = $this->ShopFunct->formatProductAddOption($productOpt);
@@ -75,7 +74,6 @@ class OrderMakerComponent extends Object
 				}
 			}
 		}
-		
 		
 		if(!$options['id']){
 			if(empty($products)){
@@ -130,11 +128,84 @@ class OrderMakerComponent extends Object
 				}
 			}
 		}
+		
+		if (!empty($order_id) && !empty($options['order']['promo_codes'])) {
+			$this->setPromo($options['order']['promo_codes'],array('ShopOrder'=>array('id'=>$order_id),'ShopProduct'=>$products));
+		}
+		
 		if($options['redirect'] && ($options['redirect'] != 'add' || !$options['id'])){
 			$this->controller->redirect(array('plugin'=>'shop', 'controller'=>'shop_orders', 'action' => 'add', $order_id, 'lang'=>$this->controller->lang));
 		}else{
 			return $order_id;
 		}
+	}
+	
+	function setPromo($codes,$order){
+		if(!is_array($order)){
+			$order = array('ShopOrder'=>array('id'=>$order));
+		}
+		$order_id = $order['ShopOrder']['id'];
+		$codeMapping = $this->ShopOrder->ShopPromotion->codesExists($codes,true,true);
+		$codeMapping = array_filter($codeMapping);
+		if(!empty($codeMapping)){
+			$promoWithCode = SetMulti::group($codeMapping,'ShopPromotion.id',array('singleArray' => false));
+		}
+		//debug($codeMapping);
+		if(!empty($order['ShopProduct'])){
+			$products = $order['ShopProduct'];
+		}else{
+			$products = $this->ShopOrder->ShopOrdersItem->find('all',array('conditions'=>array('ShopOrdersItem.order_id'=>$order_id)));
+		}
+		$coupons = array();
+		foreach($products as $product){
+			$promos = array();
+			if(!empty($product['ShopProduct']['ShopPromotion'])){
+				$promos = $product['ShopProduct']['ShopPromotion'];
+			}elseif(!empty($product['ShopPromotion'])){
+				$promos = $product['ShopPromotion'];
+			}
+			foreach($promos as $promo){
+				$mapped = null;
+				if(isset($promoWithCode[$promo['id']])){
+					$mapped = $promoWithCode[$promo['id']];
+				}
+				
+				$applicable = true;
+				if($promo['code_needed']){
+					$applicable = !empty($mapped);
+				}
+				if($promo['limited_coupons']){
+					if(!empty($mapped['ShopCoupon']['id'])){
+						$applicable = true;
+					}elseif(!$promo['coupon_code_needed']){
+						$coupon = $this->ShopOrder->ShopCoupon->find('first',array('conditions'=>array('shop_promotion_id'=>$promo['id'],'or'=>array('ShopCoupon.status not'=>array('used','reserved'),'ShopCoupon.status'=> null))));
+						$applicable = !empty($coupon);
+						$mapped['ShopCoupon'] = $coupon['ShopCoupon'];
+					}else{
+						$applicable = false;
+					}
+				}
+				if($applicable){
+					if(!empty($mapped['ShopCoupon']['id'])){
+						$coupon = $mapped['ShopCoupon'];
+					}else{
+						$coupon = array(
+							'active'=> true,
+							'shop_promotion_id'=>$promo['id'],
+						);
+					}
+					$coupon['shop_order_id'] = $order_id;
+					$coupon['status'] = 'reserved';
+					$coupons['unique-'.$promo['id']] = $coupon;
+				}
+			}
+		}
+		//debug($coupons);
+		foreach($coupons as $coupon){
+			$this->ShopOrder->ShopCoupon->create();
+			$this->ShopOrder->ShopCoupon->save($coupon);
+		}
+		//debug($products);
 	}
 	
 	function refresh($order_id){

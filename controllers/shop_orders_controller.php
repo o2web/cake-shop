@@ -49,9 +49,10 @@ class ShopOrdersController extends ShopAppController {
 		//	'test' => '1'
 		//);
 		//debug($this->ShopOrder->filterExposedfields($test));
-		$this->OrderFunct->onOrderedStatus($id);
-	}
-	*/
+		//$this->OrderFunct->onOrderedStatus($id);
+		//$this->OrderMaker->setPromo(array('test2'),$id);
+		$this->render(false);
+	}*/
 	
 	function add($id=null) {
 		

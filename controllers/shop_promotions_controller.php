@@ -11,7 +11,7 @@ class ShopPromotionsController extends ShopAppController {
 		$this->set('operators', $this->ShopPromotion->operators);
 	}
 	
-	function index() {
+	/*function index() {
 		$this->ShopPromotion->recursive = 0;
 		$this->set('shopPromotions', $this->paginate());
 	}
@@ -22,7 +22,7 @@ class ShopPromotionsController extends ShopAppController {
 			$this->redirect(array('action' => 'index'));
 		}
 		$this->set('shopPromotion', $this->ShopPromotion->read(null, $id));
-	}
+	}*/
 
 		
 	function admin_test() {
@@ -85,6 +85,7 @@ class ShopPromotionsController extends ShopAppController {
 			$this->Session->setFlash(sprintf(__('Invalid %s', true), 'shop promotion'));
 			$this->redirect(array('action' => 'index'));
 		}
+		$this->ShopPromotion->recursive = -1;
 		$promotion = $this->ShopPromotion->read(null, $id);
 		$aros = $this->ShopPromotion->productAros();
 		if(!empty($aros)){
@@ -111,7 +112,7 @@ class ShopPromotionsController extends ShopAppController {
 					$this->Acl->allow($aro, $this->ShopPromotion);
 				}
 				$this->Session->setFlash(sprintf(__('The %s has been saved', true), 'shop promotion'));
-				//$this->redirect(array('action' => 'index'));
+				$this->redirect(array('action' => 'index'));
 			} else {
 				$this->Session->setFlash(sprintf(__('The %s could not be saved. Please, try again.', true), 'shop promotion'));
 			}
@@ -120,10 +121,17 @@ class ShopPromotionsController extends ShopAppController {
 			$this->data = $promotion;
 			//debug($this->data);
 		}
+		$this->ShopPromotion->ShopCoupon->recursive = -1;
+		$coupons['all'] = $this->ShopPromotion->ShopCoupon->find('count',array('conditions'=>array('shop_promotion_id'=>$promotion['ShopPromotion']['id'])));
+		$coupons['used'] = $coupons['all']-$this->ShopPromotion->ShopCoupon->find('count',array('conditions'=>array('shop_promotion_id'=>$promotion['ShopPromotion']['id'],'or'=>array('ShopCoupon.status not'=>'used','ShopCoupon.status'=> null))));
+		$coupons['reserved'] = $coupons['all']-$this->ShopPromotion->ShopCoupon->find('count',array('conditions'=>array('shop_promotion_id'=>$promotion['ShopPromotion']['id'],'or'=>array('ShopCoupon.status not'=>array('used','reserved'),'ShopCoupon.status'=> null))));
+		$this->set('coupons', $coupons);
+		
 		$actions = $this->ShopPromotion->ShopAction->find('list',array('conditions'=>array('status'=>'checkPromo')));
 		$this->set('actions', $actions);
 		$products = $this->ShopProduct->generateAroList();
 		$this->set('products', $products);
+		$this->set('promotion', $promotion);
 	}
 
 	function admin_delete($id = null) {

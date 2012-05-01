@@ -49,6 +49,7 @@ class ShopCartController extends ShopAppController {
 		$this->data = $this->CartMaker->toData();
 		if(!empty($this->data['ShopCart']['order'])){
 			$this->data['ShopOrder'] = $this->data['ShopCart']['order'];
+			
 		}
 		//debug($this->data);
 		
@@ -61,6 +62,10 @@ class ShopCartController extends ShopAppController {
 		
 		$this->Component->triggerCallback('shopCartBeforeRender', $this);
 		
+		if(isset($this->data['ShopOrder']['promo_codes'])){
+			$codesValidation = $this->ShopPromotion->codesExists($this->data['ShopOrder']['promo_codes'],false,true);
+			$this->set('codesValidation',$codesValidation);
+		}
 		$codePromos = $this->ShopPromotion->find('count',array('conditions'=>array('or'=>array('code_needed'=>1,'coupon_code_needed'=>1))));
 		$this->set('codeInput',$codePromos>0);
 		

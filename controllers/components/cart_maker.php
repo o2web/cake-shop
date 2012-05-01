@@ -62,9 +62,10 @@ class CartMakerComponent extends Object{
 	}
 	
 	function itemListData(){
-		if(!empty($this->_itemListData)){
-			return $this->_itemListData;
+		if(!empty($this->data['cache']['itemListData'])){
+			return $this->data['cache']['itemListData'];
 		}
+		
 		$ShopProduct =& ClassRegistry::init('Shop.ShopProduct');
 		$data = array();
 		foreach($this->data['products'] as $product){
@@ -81,11 +82,18 @@ class CartMakerComponent extends Object{
 			$productData = $this->ShopFunct->calculPromo($productData,isset($this->data['order'])?$this->data['order']:null);
 			$data[] = $productData;
 		}
-		$this->_itemListData = $data;
+		
+		$this->data['cache']['itemListData'] = $data;
+		$this->save();
+		
 		return $data;
 	}
 	
 	function calculate(){
+		if(!empty($this->data['cache']['calculate'])){
+			return $this->data['cache']['calculate'];
+		}
+		
 		$items = $this->itemListData();
 		$order = array();
 		if(isset($this->data['order'])){
@@ -93,6 +101,10 @@ class CartMakerComponent extends Object{
 		}
 		$res = $this->ShopFunct->calculate(array('order'=>$order,'items'=>$items));
 		$res['items'] = $items;
+		
+		$this->data['cache']['calculate'] = $res;
+		$this->save();
+		
 		return $res;
 	}
 	
@@ -178,6 +190,7 @@ class CartMakerComponent extends Object{
 		}
 		//debug($this->data);
 		//exit();
+		$this->clearCache();
 		$this->save();
 		if($options['redirect']){
 			$url = array('plugin'=>'shop', 'controller'=>'shop_cart', 'action' => 'index');
@@ -203,6 +216,8 @@ class CartMakerComponent extends Object{
 		}else{
 			$this->data['products'][$id]['nb'] = $qty;
 		}
+		
+		$this->clearCache();
 		
 		if($this->data['products'][$id]['nb'] <= 0){
 			$this->remove($id);
@@ -232,6 +247,7 @@ class CartMakerComponent extends Object{
 				}
 			}
 		}
+		$this->clearCache();
 		$this->save();
 		return $deletedCount;
 	}
@@ -269,11 +285,18 @@ class CartMakerComponent extends Object{
 				}
 			}
 			$this->data = Set::merge($this->data,$nomalized);
+			
+			$this->clearCache();
 		}
 		
 		//debug($this->data);
 		$this->Session->write('Shop.cart', $this->data);
 		$this->_itemListData = null;
+	}
+	
+	
+	function clearCache(){
+		unset($this->data['cache']);
 	}
 	
 	

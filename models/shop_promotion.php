@@ -18,6 +18,22 @@ class ShopPromotion extends ShopAppModel {
 		)
 	);
 	
+	var $hasMany = array(
+		'ShopCoupon' => array(
+			'className' => 'Shop.ShopCoupon',
+			'foreignKey' => 'shop_promotion_id',
+			'dependent' => false,
+			'conditions' => '',
+			'fields' => '',
+			'order' => '',
+			'limit' => '',
+			'offset' => '',
+			'exclusive' => '',
+			'finderQuery' => '',
+			'counterQuery' => ''
+		)
+	);
+	
 	var $operators = array(
 		1 => array(
 			'label' => 'equal',
@@ -34,6 +50,29 @@ class ShopPromotion extends ShopAppModel {
 	);
 	
 	var $rootNodeAlias = "shopPromotions";
+	
+	function beforeSave($options){
+		if(!empty($this->data[$this->alias]['add_coupons'])){
+			$this->data[$this->alias]['limited_coupons'] = 1;
+		}
+		return true;
+	}
+	
+	function afterSave($created){
+		if(!empty($this->data[$this->alias]['add_coupons'])){
+			$codes = $this->generateCodes($this->data[$this->alias]['add_coupons']);
+			foreach($codes as $code){
+				$coupon = array(
+					'active'=> true,
+					'code' => $code,
+					'shop_promotion_id'=>$this->id,
+				);
+				
+				$this->ShopCoupon->create();
+				$this->ShopCoupon->save($coupon);
+			}
+		}
+	}
 	
 	function applyOperator($price,$operator,$val){
 		switch($operator){
@@ -118,8 +157,90 @@ class ShopPromotion extends ShopAppModel {
 		return $ref;
 	}
 	
-	function codesExists(){
 	
+	function generateCodes($nb,$exclude = array()){
+		$codes = array();
+		for ($i = 0; $i < $nb; $i++) {
+			$codes[] = $this->generateCode();
+		}
+		$codes = array_diff($codes,$exclude);
+		$existing = array_filter($this->codesExists($codes));
+		$codes = array_diff($codes,array_keys($existing));
+		if(count($codes) < $nb){
+			$codes = array_merge($codes,$this->generateCodes($nb-count($codes),$codes));
+		}
+		return $codes;
+	}
+	
+	function generateCode($validate = true){
+		$code = '';
+		App::import('Lib', 'Shop.ShopConfig');
+		$len = ShopConfig::load('promo.codeLen');
+		$chars = array(
+			'1','2','3','4','5','6','7','8','9','0',
+			'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'
+		);
+		for ($i = 0; $i < $len; $i++) {
+			$code .= $chars[rand(0,count($chars)-1)];
+		}
+		if($validate && $this->codesExists($code)){
+			return $this->generateCode();
+		}
+		return $code;
+	}
+	
+	function codesExists($codes,$full = false,$availableCoupon = false){
+		$multi = is_array($codes);
+		if(!$multi){
+			$codes = array($codes);
+		}
+		$res = array_combine($codes,array_fill(0, count($codes), false));
+		$findOpt = array('conditions'=>array('code'=>$codes),'recursive'=>-1);
+		if($full){
+			App::import('Lib', 'Shop.SetMulti');
+			$existingPromo = $this->find('all',$findOpt);
+			if(!empty($existingPromo)){
+				$existingPromo = SetMulti::group($existingPromo,'ShopPromotion.code',array('singleArray' => false));
+			}
+		}else{
+			$findOpt['fields'] = array('id','code');
+			$existingPromo = $this->find('list',$findOpt);
+			if(!empty($existingPromo)){
+				$existingPromo = array_combine($existingPromo,array_fill(0, count($existingPromo), true));
+			}
+		}
+		if(!empty($existingPromo)){
+			$res = array_merge($res,$existingPromo);
+		}
+		if(count(array_filter($res)) != count($res)){
+			$findOpt = array('fields'=>array('id','code'),'conditions'=>array('code'=>$codes));
+			if($availableCoupon){
+				$findOpt['conditions'][]=array('or'=>array('ShopCoupon.status not'=>array('used','reserved'),'ShopCoupon.status'=> null));
+			}
+			if($full){
+				App::import('Lib', 'Shop.SetMulti');
+				$findOpt['contain'] = array('ShopPromotion');
+				$existingCoupon = $this->ShopCoupon->find('all',$findOpt);
+				if(!empty($existingCoupon)){
+					$existingCoupon = SetMulti::group($existingCoupon,'ShopCoupon.code',array('singleArray' => false));
+				}
+			}else{
+				$findOpt['fields'] = array('id','code');
+				$findOpt['recursive'] = -1;
+				$existingCoupon = $this->ShopCoupon->find('list',$findOpt);
+				if(!empty($existingCoupon)){
+					$existingCoupon = array_combine($existingCoupon,array_fill(0, count($existingCoupon), true));
+				}
+			}
+			if(!empty($existingCoupon)){
+				$res = array_merge($res,$existingCoupon);
+			}
+		}
+		
+		if(!$multi){
+			return $res[0];
+		}
+		return $res;
 	}
 }
 ?>

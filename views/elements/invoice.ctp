@@ -51,7 +51,7 @@
 						echo "<span>".$orderItem[$orderItem['ShopProduct']['code']]."</span>"; 
 					}
 				?></td>
-				<td class="amount"><?php if(empty($orderItem['overwritten_price'])) echo $this->Shop->currency($orderItem['item_alone_price']); ?></td>
+				<td class="amount"><?php if(empty($orderItem['overwritten_price'])) echo $this->Shop->currency($orderItem['item_alone_price']-$orderItem['item_rebate']); ?></td>
 				<td class="amount"><?php echo $this->Shop->currency($orderItem['total']); ?></td>
 			</tr>
 			

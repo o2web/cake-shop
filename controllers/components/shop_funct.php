@@ -194,6 +194,11 @@ class ShopFunctComponent extends Object
 			$prods = &$products;
 		}
 		$this->ShopPromotion = ClassRegistry::init('Shop.ShopPromotion'); 
+		//debug($order);
+		if(!empty($order['ShopPromotion'])){
+			$applicablePromos = SetMulti::extractKeepKey('id',$order['ShopPromotion']);
+			//debug($applicablePromos);
+		}
 		foreach($prods as &$prod){
 			$orderItemMode = isset($prod['item_price']);
 			if($orderItemMode){
@@ -207,10 +212,27 @@ class ShopFunctComponent extends Object
 				if(!empty($p['ShopPromotion'])){
 					foreach($p['ShopPromotion'] as &$promo){
 						$applicable = true;
-						if($promo['code_needed']){
-							if(!empty($order['promo_codes']) && !empty($promo['code']) && in_array($promo['code'],$order['promo_codes'])){
-							}else{
-								$applicable = false;
+						if(isset($order['ShopOrder']['promo_codes'])){
+							$promoCodes = $order['ShopOrder']['promo_codes'];
+						}elseif(isset($order['promo_codes'])){
+							$promoCodes = $order['promo_codes'];
+						}
+						if(!empty($applicablePromos)){
+							$applicable = in_array($promo['id'],$applicablePromos);
+						}else{
+							if($promo['code_needed']){
+								if(!empty($promoCodes) && !empty($promo['code']) && in_array($promo['code'],$promoCodes)){
+								}else{
+									$applicable = false;
+								}
+							}
+							if($promo['limited_coupons']){
+								$findOpt = array('conditions'=>array('shop_promotion_id'=>$promo['id'],'or'=>array('ShopCoupon.status not'=>array('used','reserved'),'ShopCoupon.status'=> null)));
+								if($promo['coupon_code_needed']){
+									$findOpt['conditions']['ShopCoupon.code'] = $promoCodes;
+								}
+								$coupon = $this->ShopPromotion->ShopCoupon->find('first',$findOpt);
+								$applicable = !empty($coupon);
 							}
 						}
 						if($applicable){
@@ -295,7 +317,7 @@ class ShopFunctComponent extends Object
 		
 		
 		//============ calcul promos ============//
-		$orderItems = $this->calculPromo($orderItems,isset($order['ShopOrder'])?$order['ShopOrder']:null);
+		$orderItems = $this->calculPromo($orderItems,isset($order['ShopOrder'])?$order:null);
 		//debug($orderItems);
 		
 		//============ total_items ============//

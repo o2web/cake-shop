@@ -37,6 +37,10 @@
 						<td class="val"><?php echo $shopPromotion['ShopPromotion']['val']; ?>&nbsp;</td>
 						<td class="operator"><?php echo $shopPromotion['ShopPromotion']['operator']; ?>&nbsp;</td>
 						<td class="actions">
+							<?php 
+							if( $shopPromotion['ShopPromotion']['coupon_code_needed'] ) { 
+								echo $this->Html->link(__('View Coupons', true), array('plugin'=>'shop','controller'=>'shop_coupons','action' => 'index', $shopPromotion['ShopPromotion']['id']), array('class' => 'view'));
+							} ?>
 							<?php echo $this->Html->link(__('Edit', true), array('action' => 'edit', $shopPromotion['ShopPromotion']['id']), array('class' => 'edit')); ?>
 							<?php echo $this->Html->link(__('Delete', true), array('action' => 'delete', $shopPromotion['ShopPromotion']['id']), array('class' => 'delete'), sprintf(__('Are you sure you want to delete # %s?', true), $shopPromotion['ShopPromotion']['id'])); ?>
 						</td>

@@ -6,3 +6,6 @@
 	margin:0px;
 	padding:0px;
 }
+form div.input.disabled{
+    color: #cccccc;
+}
