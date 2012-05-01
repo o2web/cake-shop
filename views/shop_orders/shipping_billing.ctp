@@ -159,7 +159,11 @@
 		<fieldset>
 			<legend><?php __d('shop','Billing address'); ?></legend>
 			<?php
-				echo $form->input('use_shipping', array('type'=>'checkbox', 'label'=>__('Use shipping informations', true))); 
+				$opt = array('type'=>'checkbox', 'label'=>__('Use shipping informations', true));
+				if(empty($this->Form->data['ShopOrder']['billing_address'])){
+					$opt['checked'] = true;
+				}
+				echo $form->input('use_shipping', $opt); 
 			?>
 			<div class="billing_info">
 			<?php

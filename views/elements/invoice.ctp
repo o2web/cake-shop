@@ -111,6 +111,7 @@
 			$lastSub = $order['ShopOrder']['sub_total'] + $totalTaxedSupplements;
 			foreach($order['ShopOrder']['taxes'] as $taxeName => $taxeAmount){ 
 				$taxeSub = $order['ShopOrder']['taxe_subs'][$taxeName];
+				$taxePrc = $taxeAmount / $taxeSub *100;
 				if($taxeSub != $lastSub){
 		?>		
         <tr class="totals taxes_sub">
@@ -120,7 +121,7 @@
 		<?php	 } ?>
 		
         <tr class="totals taxes">
-            <td colspan="4" class="title"><?php echo $taxeName; ?></td>
+            <td colspan="4" class="title"><?php echo $taxeName; ?> <span class="prc">(<?php echo $taxePrc ?> %)</span></td>
             <td class="amount"><?php echo $this->Shop->currency($taxeAmount); ?></td>
         </tr>
         <?php 
