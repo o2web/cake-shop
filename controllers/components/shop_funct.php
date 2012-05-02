@@ -227,12 +227,16 @@ class ShopFunctComponent extends Object
 								}
 							}
 							if($promo['limited_coupons']){
-								$findOpt = array('conditions'=>array('shop_promotion_id'=>$promo['id'],'or'=>array('ShopCoupon.status not'=>array('used','reserved'),'ShopCoupon.status'=> null)));
-								if($promo['coupon_code_needed']){
-									$findOpt['conditions']['ShopCoupon.code'] = $promoCodes;
+								if($promo['coupon_code_needed'] && empty($promoCodes) ){
+									$applicable = false;
+								}else{
+									$findOpt = array('conditions'=>array('shop_promotion_id'=>$promo['id'],'or'=>array('ShopCoupon.status not'=>array('used','reserved'),'ShopCoupon.status'=> null)));
+									if($promo['coupon_code_needed']){
+										$findOpt['conditions']['ShopCoupon.code'] = $promoCodes;
+									}
+									$coupon = $this->ShopPromotion->ShopCoupon->find('first',$findOpt);
+									$applicable = !empty($coupon);
 								}
-								$coupon = $this->ShopPromotion->ShopCoupon->find('first',$findOpt);
-								$applicable = !empty($coupon);
 							}
 						}
 						if($applicable){
