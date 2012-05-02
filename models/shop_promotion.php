@@ -36,15 +36,15 @@ class ShopPromotion extends ShopAppModel {
 	
 	var $operators = array(
 		1 => array(
-			'label' => 'equal',
+			'label' => 'Equal',
 			'sign' => '=',
 		),
 		2 => array(
-			'label' => 'add',
+			'label' => 'Add',
 			'sign' => '+',
 		),
 		3 => array(
-			'label' => 'multiply',
+			'label' => 'Multiply',
 			'sign' => '*',
 		)
 	);
