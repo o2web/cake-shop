@@ -63,8 +63,8 @@
 					<?php
 				}
 				echo $this->Form->input('code');
-				echo $this->Form->input('code_needed',array('label'=>'Code needed','after'=>'<div class="note">'.__('Buyers needs to enter the code in order to benefit from the promotion',true).'</div>'));
-				$coupon_code_needed = $this->Form->input('coupon_code_needed',array('label'=>'Individal coupons','after'=>'<div class="note">'.__('Each coupon has an individual code the buyers needs to enter in order to benefit from the promotion. You will need to print or email each coupon.',true).'</div>'));
+				echo $this->Form->input('code_needed',array('label'=>__('Code needed', true),'after'=>'<div class="note">'.__('Buyers needs to enter the code in order to benefit from the promotion',true).'</div>'));
+				$coupon_code_needed = $this->Form->input('coupon_code_needed',array('label'=>__('Individal coupons', true),'after'=>'<div class="note">'.__('Each coupon has an individual code the buyers needs to enter in order to benefit from the promotion. You will need to print or email each coupon.',true).'</div>'));
 			?>
 				<div class="couponsResume">
 					<?php if( $promotion['ShopPromotion']['coupon_code_needed']) { ?>
@@ -76,7 +76,7 @@
 				</div>
 				<div class="AddCouponsBox" style="display:none">
 			<?php
-				echo $this->Form->input('add_coupons',array('label'=>'Qty Coupons'));
+				echo $this->Form->input('add_coupons',array('label'=>__('Qty Coupons', true)));
 				if(empty($coupons['all'])) echo $coupon_code_needed;
 			?>
 				</div>
@@ -85,7 +85,7 @@
 			?>
 			</fieldset>
 			<?php
-				echo $this->Form->input('aroProduct',array('label'=>'Choose Products','options'=>$products,'empty'=>__('None',true),'after'=>'<div class="note">'.__('Choisir le produit concerné par la promotion, ou tous les produits.<br>S\'il y a plus d\'un produit, il faut créer plusieurs promos.',true).'</div>'));
+				echo $this->Form->input('aroProduct',array('label'=>__('Choose Products', true),'options'=>$products,'empty'=>__('None',true),'after'=>'<div class="note">'.__('Choisir le produit concerné par la promotion, ou tous les produits.<br>S\'il y a plus d\'un produit, il faut créer plusieurs promos.',true).'</div>'));
 			?>
 		</fieldset>
 	<?php echo $this->Form->end(__('Submit', true));?>
