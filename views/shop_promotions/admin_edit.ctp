@@ -61,7 +61,7 @@
 				<div class="couponsResume">
 					<?php if( $promotion['ShopPromotion']['coupon_code_needed']) { ?>
 					<h3><?php __('Coupons'); ?></h3>
-					<p><?php __('Used'); ?> : <?php echo $coupons['used'].'/'.$coupons['all'] ?></p>
+					<!--p><?php __('Used'); ?> : <?php echo $coupons['used'].'/'.$coupons['all'] ?></p-->
 					<p><?php __('Reserved'); ?> : <?php echo $coupons['reserved'].'/'.$coupons['all'] ?></p>
 					<?php } ?>
 					<a href="#" class="BtAddCoupons"><?php __('Add Coupons'); ?></a>

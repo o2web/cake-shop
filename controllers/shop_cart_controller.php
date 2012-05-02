@@ -20,7 +20,7 @@ class ShopCartController extends ShopAppController {
 			if(!empty($this->data['ShopOrder']['promo_codes'])){
 				$tmp = array();
 				foreach($this->data['ShopOrder']['promo_codes'] as $code){
-					if(!empty($code)){
+					if(!empty($code) && !in_array($code,$tmp)){
 						$tmp[] = $code;
 					}
 				}
