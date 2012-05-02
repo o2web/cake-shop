@@ -190,6 +190,9 @@ class ShopPromotion extends ShopAppModel {
 	}
 	
 	function codesExists($codes,$full = false,$availableCoupon = false){
+		if(empty($codes)){
+			return null;
+		}
 		$multi = is_array($codes);
 		if(!$multi){
 			$codes = array($codes);
