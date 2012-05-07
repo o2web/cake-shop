@@ -3,7 +3,7 @@ class ShopOrdersController extends ShopAppController {
 
 	var $name = 'ShopOrders';
 	var $helpers = array('Shop.Shop');
-	var $components = array('Shop.OrderFunct','Shop.ShopFunct','Shop.OrderMaker','Acl','Email'/*,'Customforms.CForm'*/);
+	var $components = array('Shop.OrderFunct','Shop.ShopFunct','Shop.OrderMaker','Acl','Email','Session'/*,'Customforms.CForm'*/);
 	var $uses = array('Shop.ShopOrder','Shop.ShopTax',/*'Customforms.CustomForm'*/);
 	
 	var $aro;
@@ -320,11 +320,23 @@ class ShopOrdersController extends ShopAppController {
 			App::import('Lib', 'Shop.SetMulti');
 			$data = SetMulti::pregFilterKey($pattern,$data);
 			$this->ShopOrder->save($data);
+			
+			$remind = $data;
+			unset($remind['id']);
+			$this->Session->write('Shop.address', $remind);
+			
 			$this->redirect(array('action' => 'add', $id));
 		}else{
 			$this->ShopOrder->checkActive = false;
 			$this->ShopOrder->recursive = -1;
 			$order = $this->ShopOrder->read(null,$id);
+			
+			$remind = $this->Session->read('Shop.address');
+			if(!empty($remind)){
+				$remind = array_diff_key($remind,array_filter($order['ShopOrder']));
+				$order['ShopOrder'] = array_merge($order['ShopOrder'],$remind);
+			}
+			
 			$this->data = $order;
 		}
 	}
