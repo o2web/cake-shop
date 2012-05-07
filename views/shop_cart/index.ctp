@@ -9,6 +9,11 @@
 				$("#ShopCartIndexForm input").keyup(function(){
 					$("#ShopCartIndexForm .btUpdate").show();
 				});
+				$("#ShopCartIndexForm a.BtShowCodePromo").click(function(){
+					$("#ShopCartIndexForm a.BtShowCodePromo").hide();
+					$("#ShopCartIndexForm .promotionCodes").show();
+					return false;
+				});
 			});
 		})( jQuery );
 	',array('inline'=>false));
@@ -81,10 +86,41 @@
 			<td class="">&nbsp;</td>
 		</tr>
 	</table>
-	<?php echo $this->Form->end(null); ?>
-	<?php }else{ ?>
-	<p><?php __('Your cart is empty.'); ?></p>
-	<?php } ?>
+	<?php
+		if($codeInput){
+			$nb = 0;
+			if(!empty($this->data['ShopOrder']['promo_codes'])){
+				$nb = count($this->data['ShopOrder']['promo_codes']);
+			}
+			?>
+				<?php if(!$nb) { ?>
+					<a href="#promotionCodes" class="BtShowCodePromo"><?php __('If you have a promotional code, click here.'); ?></a>
+				<?php }?>
+				<fieldset class="promotionCodes"<?php if(!$nb)echo ' style="display:none;"';  ?>>
+				<legend><?php __('Promotion Code') ?></legend>
+			<?php
+			$nbField = $nb+1;
+			$max = ShopConfig::load('promo.max');
+			if(!empty($max)){
+				$nbField = min($max,$nbField);
+			}
+			for ($i = 0; $i < $nbField; $i++) {
+				$opt = array('label'=>false);
+				if($i < $nb && isset($codesValidation[$this->data['ShopOrder']['promo_codes'][$i]])){
+					if($codesValidation[$this->data['ShopOrder']['promo_codes'][$i]]){
+						$opt['after'] = '<span class="valid">'.__('Valid',true).'</span>';
+					}else{
+						$opt['after'] = '<span class="invalid">'.__('Invalide',true).'</span>';
+					}
+				}
+				echo $this->Form->input('ShopOrder.promo_codes.'.$i,$opt);
+			}
+			echo $this->Form->submit(__('Validate',true));
+			?>
+				</fieldset>
+			<?php
+		}
+	?>
 	<?php
 		if( !empty($prevUrl) ) { 
 			echo $this->Form->input('redirect',array('type'=>'hidden','value'=>$prevUrl));
@@ -100,5 +136,9 @@
 			<?php } ?>
 		</ul>
 	</div>
+	<?php echo $this->Form->end(null); ?>
+	<?php }else{ ?>
+	<p><?php __('Your cart is empty.'); ?></p>
+	<?php } ?>
 	
 </div>

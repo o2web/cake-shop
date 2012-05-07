@@ -19,7 +19,12 @@ class ShopCartController extends ShopAppController {
 		if(!empty($this->data)){
 			if(!empty($this->data['ShopOrder']['promo_codes'])){
 				$tmp = array();
+				App::import('Lib', 'Shop.ShopConfig');
+				$max = ShopConfig::load('promo.max');
 				foreach($this->data['ShopOrder']['promo_codes'] as $code){
+					if(!empty($max) && count($tmp) >= $max){
+						break;
+					}
 					if(!empty($code) && (empty($tmp) || !in_array($code,$tmp)) ){
 						$tmp[] = $code;
 					}

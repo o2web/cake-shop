@@ -33,6 +33,7 @@ class ShopConfig {
 		),
 		'promo'=> array(
 			'codeLen'=>16,
+			'max'=>null,
 		),
 		
 		'billingAddressRequired' => true,
