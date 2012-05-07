@@ -226,7 +226,7 @@ class ShopFunctComponent extends Object
 									$applicable = false;
 								}
 							}
-							if($promo['limited_coupons']){
+							if($applicable && $promo['limited_coupons']){
 								if($promo['coupon_code_needed'] && empty($promoCodes) ){
 									$applicable = false;
 								}else{

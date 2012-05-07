@@ -92,7 +92,6 @@
 </div>
 <div class="actions">
 	<ul>
-
 		<li><?php echo $this->Html->link(__('Delete', true), array('action' => 'delete', $this->Form->value('ShopPromotion.id')), null, sprintf(__('Are you sure you want to delete # %s?', true), $this->Form->value('ShopPromotion.id'))); ?></li>
 		<li><?php echo $this->Html->link(sprintf(__('List %s', true), __('Shop Promotions', true)), array('action' => 'index'));?></li>
 	</ul>
