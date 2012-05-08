@@ -20,6 +20,7 @@ class ShopAppController extends AppController {
 		App::import('Lib', 'Shop.ShopConfig');
 		$enabled = ShopConfig::load('enabled');
 		if(!$enabled){
+			$this->log('Shop is disabled',LOG_DEBUG);
 			$this->redirect(array('plugin' => 'auth', 'controller' => 'users', 'action' => 'permission_denied', 'admin' => false));
 		}
 	}
