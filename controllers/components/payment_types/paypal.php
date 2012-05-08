@@ -99,6 +99,7 @@ class PaypalPaymentComponent extends PaymentComponent{
 			}*/
 		}else{
 			$this->log('Invalide Paypal IPN response',LOG_DEBUG);
+			$this->log($_POST,LOG_DEBUG);
 		}
 	}
 	
