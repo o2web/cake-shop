@@ -240,7 +240,7 @@ class ShopPromotion extends ShopAppModel {
 			}
 		}
 		
-		if(!$multi){
+		if(!$multi && !empty($res)){
 			return $res[0];
 		}
 		return $res;
