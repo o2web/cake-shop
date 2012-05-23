@@ -37,7 +37,7 @@ class PaypalPaymentComponent extends PaymentComponent{
 				//debug($item);
 				$buttonData['items'][] = array(
 					'item_name' => $item['item_title'], 
-					'amount' => round($item['total'], 2), 
+					'amount' => round($item['final_price'], 2), 
 					'quantity' => $item['nb'], 
 					'item_number' => $item['product_id']
 				);

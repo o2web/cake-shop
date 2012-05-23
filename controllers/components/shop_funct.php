@@ -331,7 +331,7 @@ class ShopFunctComponent extends Object
 		if(!empty($orderItems)){
 			foreach($orderItems as &$orderItem){
 				$result['nb_total'] += $orderItem['nb'];
-				$orderItem['total'] = $orderItem['item_price']*$orderItem['nb'];
+				$orderItem['total'] = round($orderItem['item_price'], 2)*$orderItem['nb'];
 				$result['total_items'] += $orderItem['total'];
 				$result['OrderItem'][] = array_diff_key($orderItem,array_flip($excludeFromResult));
 			}

@@ -140,9 +140,9 @@ class ShopOrdersController extends ShopAppController {
 				$data = array_merge($data,$this->_calculate($order));
 				$order['ShopOrder'] = array_merge($order['ShopOrder'],$data);
 				
-				$extract = array('id','total');
+				$extract = array('id'=>'id','final_price'=>'item_price');
 				foreach($data['OrderItem'] as $item){
-					$itemdata = array_intersect_key($item,array_flip($extract));
+					$itemdata = SetMulti::extractHierarchicMulti($extract,$item);
 					$this->ShopOrder->ShopOrdersItem->save($itemdata);
 				}
 				
