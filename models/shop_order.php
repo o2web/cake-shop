@@ -214,7 +214,7 @@ class ShopOrder extends ShopAppModel {
 		App::import('lib','Shop.Alias');
 		$data = Alias::applyAliasMulti($data, $fieldsToAlias);
 		if($named){
-			$this->data[$this->name] = $data;
+			$this->data = array($this->name=>$data);
 		}else{
 			$this->data = $data;
 		}

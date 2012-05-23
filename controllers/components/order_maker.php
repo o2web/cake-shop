@@ -151,6 +151,7 @@ class OrderMakerComponent extends Object
 			$promoWithCode = SetMulti::group($codeMapping,'ShopPromotion.id',array('singleArray' => false));
 		}
 		//debug($codeMapping);
+		//debug($promoWithCode);
 		if(!empty($order['ShopProduct'])){
 			$products = $order['ShopProduct'];
 		}else{
@@ -170,11 +171,10 @@ class OrderMakerComponent extends Object
 					$mapped = $promoWithCode[$promo['id']];
 				}
 				
-				$applicable = true;
 				if($promo['code_needed']){
 					$applicable = !empty($mapped);
 				}
-				if($promo['limited_coupons']){
+				if($applicable && $promo['limited_coupons']){
 					if(!empty($mapped['ShopCoupon']['id'])){
 						$applicable = true;
 					}elseif(!$promo['coupon_code_needed']){

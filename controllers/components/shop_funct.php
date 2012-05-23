@@ -651,7 +651,9 @@ class ShopFunctComponent extends Object
 	}
 	function extractOrderItemData($productAndOptions){
 		$currency = Configure::read('Shop.currency');
+		//debug($productAndOptions);
 		$extract_data = array(
+			'id' => 'id',
 			'product_id' => 'ShopProduct.id',
 			'nb' => array('nb','Options.nb'),
 			'comment' => 'Options.comment',

@@ -140,6 +140,11 @@ class ShopOrdersController extends ShopAppController {
 				$data = array_merge($data,$this->_calculate($order));
 				$order['ShopOrder'] = array_merge($order['ShopOrder'],$data);
 				
+				$extract = array('id','total');
+				foreach($data['OrderItem'] as $item){
+					$itemdata = array_intersect_key($item,array_flip($extract));
+					$this->ShopOrder->ShopOrdersItem->save($itemdata);
+				}
 				
 				$data['status'] = 'ready';
 				$this->ShopOrder->save($data);
