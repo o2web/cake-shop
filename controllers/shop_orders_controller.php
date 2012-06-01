@@ -1,4 +1,23 @@
 <?php
+
+
+
+function handleShowMoreError($errno, $errstr, $errfile, $errline, array $errcontext)
+{
+	// error was suppressed with the @-operator
+	/*if (0 === error_reporting()) {
+		return false;
+	}*/
+	if($errno == 2048){
+		if(strpos($errstr,'Non-static') === false){
+			echo 'Warning:'.$errstr."<br/>";
+		}
+		return false;
+	}
+	throw new ErrorException($errstr, 0, $errno, $errfile, $errline);
+}
+
+
 class ShopOrdersController extends ShopAppController {
 
 	var $name = 'ShopOrders';
@@ -485,6 +504,150 @@ class ShopOrdersController extends ShopAppController {
 		//$this->autoRender = false;
 		$this->OrderMaker->refresh($order_id);
 		$this->render('/elements/sql_dump');
+	}
+	
+	function test($nb){
+		$this->_test($nb);
+	}
+	function admin_test($nb){
+		$this->_test($nb);
+	}
+	function _test($nb){
+		set_time_limit(0);
+		$this->autoRender = false;
+		$ipnData = array(
+			'mc_gross' => '81.49',
+			'protection_eligibility' => 'Eligible',
+			'address_status' => 'confirmed',
+			'item_number1' => '10',
+			'payer_id' => 'D9MGENMYN6L6Q',
+			'tax' => '10.61',
+			'address_street' => '10 chemin de l\'etang'."\n".'lac-beauport',
+			'payment_date' => '12:58:01 May 23, 2012 PDT',
+			'payment_status' => 'Completed',
+			'charset' => 'windows-1252',
+			'address_zip' => 'g3b2g7',
+			'mc_shipping' => '0.00',
+			'mc_handling' => '15.00',
+			'first_name' => 'charlotte',
+			'mc_fee' => '2.66',
+			'address_country_code' => 'CA',
+			'address_name' => 'charlotte montminy',
+			'notify_version' => '3.4',
+			'custom' => '',
+			'payer_status' => 'unverified',
+			'business' => 'dlord@immanence-dermo.com',
+			'address_country' => 'Canada',
+			'num_cart_items' => '1',
+			'mc_handling1' => '0.00',
+			'address_city' => 'quebec',
+			'verify_sign' => 'AVjPR22R5LKmxD.SuEfAW5lJEQMIARWVpgrxpjCfKxTXF8j9urWR-ru4',
+			'payer_email' => 'chafleur3333@yahoo.ca',
+			'mc_shipping1' => '0.00',
+			'tax1' => '0.00',
+			'txn_id' => '3HA59197RJ419234E',
+			'payment_type' => 'instant',
+			'last_name' => 'montminy',
+			'address_state' => 'Quebec',
+			'item_name1' => 'Image Blanc - Taches',
+			'receiver_email' => 'dlord@immanence-dermo.com',
+			'payment_fee' => '',
+			'quantity1' => '1',
+			'receiver_id' => 'GPTGZUS5PVD3N',
+			'txn_type' => 'cart',
+			'mc_gross_1' => '55.88',
+			'mc_currency' => 'CAD',
+			'residence_country' => 'CA',
+			'receipt_id' => '3459-1743-1785-7525',
+			'transaction_subject' => 'Shopping CartImage Blanc - Taches',
+			'payment_gross' => '',
+			'ipn_track_id' => 'a787d98f489d9',
+		);
+		
+		
+        App::import(array('type' => 'File', 'name' => 'PaypalIpn.PaypalIpnSource', 'file' => 'models'.DS.'datasources'.DS.'paypal_ipn_source.php'));
+        $paypal = new PaypalIpnSource();
+		
+		echo '<style type="text/css">
+			.xdebug-var-dump{
+				background-color : #dddddd;
+				height:150px;
+				overflow:auto;
+			}
+		</style>';
+		
+		$ipnData['cmd'] = '_notify-validate';
+	
+		$ipnData = array_map(array('PaypalIpnSource', 'clearSlash'), $ipnData);
+	  
+		if(isset($ipnData['test_ipn'])) {
+		  $server = 'https://www.sandbox.paypal.com/cgi-bin/webscr';
+		} else {
+		  $server = 'https://www.paypal.com/cgi-bin/webscr';
+		}
+		
+		echo $server."<br/><br/>";
+		
+		if(empty($nb)){
+			$nb = 1;
+		}
+		
+
+		set_error_handler('handleShowMoreError');
+
+		
+		
+		for ($i = 0; $i < $nb; $i++) {
+			$time_start = microtime(true);
+			echo 'time:'.$time_start."<br/>";
+			
+			$response = null;
+			try {
+				$response = $paypal->Http->post($server, $ipnData);
+			}
+			catch (ErrorException $e) {
+				echo 'ERREUR :';
+				echo '<pre class="xdebug-var-dump" dir="ltr">';
+				var_dump($e);
+				echo '</pre>';
+			}
+
+			$time_end = microtime(true);
+			echo 'time:'.$time_end."<br/>";
+			
+			$time = $time_end - $time_start;
+			
+			echo 'status:'.$paypal->Http->response['raw']['status-line']."<br/>";
+			if($response){
+				echo 'Response recieved'."<br/>";
+			}else{
+				echo 'No response recieved'."<br/>";
+				$error = $paypal->Http->lastError();
+				if($error){
+					echo 'Error message :'."<br/>";
+					echo $error."<br/>";
+				}else{
+					echo 'No error message could be found'."<br/>";
+				}
+			}
+			
+			echo '<pre class="xdebug-var-dump" dir="ltr">';
+			var_dump($paypal->Http->response);
+			echo '</pre>';
+			
+			echo 'Request took '.$time.'s'."<br/>";
+			
+			@ob_flush();
+			flush();
+				
+			usleep(500000);
+			
+			echo "<br/>";
+		}
+		
+	    //$ipn = ClassRegistry::init("PaypalIpn.InstantPaymentNotification");
+		//var_dump($ipn->isValid($ipnData));
+		//$this->render(false);
 	}
 		
 	/*function admin_add() {
