@@ -82,6 +82,15 @@ class PaypalPaymentComponent extends PaymentComponent{
 			$ipn->saveAll($notification);
 			
 			if($_POST["payment_status"]=="Completed"){
+				if(isset($_POST['test_ipn'])) {
+					$this->payment['ShopPayment']['dev_mode'] = 1;
+					$data = array(
+						'id' => $this->payment['ShopPayment']['id'],
+						'dev_mode' => $this->payment['ShopPayment']['dev_mode'],
+					);
+					$this->ShopPayment->create();
+					$this->ShopPayment->save($data);
+				}
 				$this->PaymentFunct->setStatus($this->payment,"approved");
 			}else{
 				$this->log('Incomplete payment',LOG_DEBUG);

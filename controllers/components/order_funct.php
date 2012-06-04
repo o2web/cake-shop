@@ -12,7 +12,9 @@ class OrderFunctComponent extends Object
 		config('plugins/shop');
 		
 		//$plugComponents = Configure::read('Shop.plugComponents');
-		$aroProvider = Configure::read('Shop.order.ACL.aroProvider');
+		
+		App::import('Lib', 'Shop.ShopConfig');
+		$aroProvider = ShopConfig::load('order.ACL.aroProvider');
 		
 		if(is_array($aroProvider) && !empty($aroProvider['component'])){
 			$plugComponents[] = $aroProvider['component'];
@@ -46,7 +48,8 @@ class OrderFunctComponent extends Object
 	}
 	
 	function getAro(){
-		$aroProvider = Configure::read('Shop.order.ACL.aroProvider');
+		App::import('Lib', 'Shop.ShopConfig');
+		$aroProvider = ShopConfig::load('order.ACL.aroProvider');
 		//debug($aroProvider);
 		if($aroProvider == "session"){
 			$Aro = ClassRegistry::init("Aro");
@@ -72,7 +75,7 @@ class OrderFunctComponent extends Object
 			$aro = $this->ShopFunct->callExternalfunction($aroProvider);
 		}
 		if(empty($aro)){
-			$aro = Configure::read('Shop.order.ACL.defaultAro');
+			$aro = ShopConfig::load('order.ACL.defaultAro');
 		}
 		$this->aro = $aro;
 		return $aro;
@@ -82,7 +85,8 @@ class OrderFunctComponent extends Object
 		if($id){
 			$aro = $this->getAro();
 			if(!$this->Acl->check($aro, array('model'=>'ShopOrder','foreign_key'=>$id))){
-				$redirect = Configure::read('Shop.order.ACL.deniedRedirect');
+				App::import('Lib', 'Shop.ShopConfig');
+				$redirect = ShopConfig::load('order.ACL.deniedRedirect');
 				if(empty($redirect)){
 					$redirect = array('action' => 'permission_denied');
 				}
@@ -107,13 +111,15 @@ class OrderFunctComponent extends Object
 		$calcul = $this->ShopFunct->calculate($order);
 		//debug($calcul);
 		$order['ShopOrder'] = array_merge($order['ShopOrder'],$calcul);
+		$devMode = $order['ShopOrder']['dev_mode']?true:null;
 		
-		$emailBuyer = Configure::read('Shop.emailBuyer');
+		App::import('Lib', 'Shop.ShopConfig');
+		$emailBuyer = ShopConfig::load('emailBuyer',$devMode);
 		if(!empty($emailBuyer)){
 			$this->send_email_buyer($order);
 		}
 		
-		$emailAdmin = Configure::read('Shop.emailAdmin');
+		$emailAdmin = ShopConfig::load('emailAdmin',$devMode);
 		if(!empty($emailAdmin)){
 			$this->send_email_admin($order);
 		}
@@ -138,7 +144,11 @@ class OrderFunctComponent extends Object
 			'template' => 'order_admin',
 			//'layout' => null
 		);
-		$conf = Configure::read('Shop.emailAdmin');
+		
+		
+		$devMode = $order['ShopOrder']['dev_mode']?true:null;
+		App::import('Lib', 'Shop.ShopConfig');
+		$conf = ShopConfig::load('emailAdmin',$devMode);
 		if(is_array($conf)){
 			$conf = array_merge($default_conf,$conf);
 		}else{
@@ -178,7 +188,11 @@ class OrderFunctComponent extends Object
 			'template' => 'order_admin',
 			//'layout' => null
 		);
-		$conf = Configure::read('Shop.emailBuyer');
+		
+		
+		$devMode = $order['ShopOrder']['dev_mode']?true:null;
+		App::import('Lib', 'Shop.ShopConfig');
+		$conf = ShopConfig::load('emailBuyer',$devMode);
 		if(is_array($conf)){
 			$conf = array_merge($default_conf,$conf);
 		}else{

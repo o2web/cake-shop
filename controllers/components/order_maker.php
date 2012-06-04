@@ -213,6 +213,7 @@ class OrderMakerComponent extends Object
 		$this->initShopOrder();
 		$this->ShopOrder->recursive = 1;
 		$order = $this->ShopOrder->read(null,$order_id);
+		$dev_mode = false;
 		if(!empty($order)){
 			$updateStatus = array('ready','ordered');
 			$oldStatus = $order['ShopOrder']['status'];
@@ -221,6 +222,9 @@ class OrderMakerComponent extends Object
 				foreach($order['ShopPayment'] as $shopPayment){
 					if(in_array($shopPayment['status'],$this->ShopOrder->ShopPayment->okStatus)){
 						$total_paid += $shopPayment['ShopOrdersPayment']['amount'];
+						if($shopPayment['dev_mode']){
+							$dev_mode = true;
+						}
 					}
 				}
 				$data = array();
@@ -228,6 +232,9 @@ class OrderMakerComponent extends Object
 				$data['amount_paid'] = $total_paid;
 				if($total_paid >= $order['ShopOrder']['total']){
 					$data['status'] = 'ordered';
+					if($dev_mode){
+						$data['dev_mode'] = 1;
+					}
 				}else{
 					$data['status'] = 'ready';
 				}

@@ -48,6 +48,9 @@ class ShopConfig {
 		
 		'defaultCountry' => null,
 		'defaultRegion' => null,
+		
+		'devMode' => false,
+		'dev' => array(),
 	);
 	
 	//$_this =& ShopConfig::getInstance();
@@ -59,17 +62,33 @@ class ShopConfig {
 		return $instance[0];
 	}
 	
-	function load($path = true){
+	function load($path = true, $devMode = null){
 		$_this =& ShopConfig::getInstance();
+		$config = null;
 		if(!$_this->loaded){
 			config('plugins/shop');
 			$config = Configure::read('Shop');
 			$config = Set::merge($_this->defaultConfig,$config);
 			Configure::write('Shop',$config);
 			$_this->loaded = true;
+		}else{
+			$config = Configure::read('Shop');
 		}
 		if(!empty($path)){
-			return Configure::read('Shop'.($path!==true?'.'.$path:''));
+			if(is_null($devMode)){
+				$devMode = $config['devMode'];
+			}
+			if($devMode){
+				$config = Set::merge($config,$config['dev']);
+				if(isset($config['dev']['emailAdmin']['to'])){
+					$config['emailAdmin']['to'] = $config['dev']['emailAdmin']['to'];
+				}
+			}
+			if($path===true){
+				return $config;
+			}else{
+				return Set::extract($path, $config);
+			}
 		}
 	}
 	

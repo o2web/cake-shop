@@ -281,9 +281,11 @@ class ShopFunctComponent extends Object
 	function calculate($order){
 		//============ format data ============//
 		$result = array();
+		
+		App::import('Lib', 'Shop.ShopConfig');
 		$default = array(
-			'country' => Configure::read('Shop.defaultCountry'),
-			'region' => Configure::read('Shop.defaultRegion')
+			'country' => ShopConfig::load('defaultCountry'),
+			'region' => ShopConfig::load('defaultRegion')
 		);
 		$extract_data = array(
 			'country' => array('country','ShopOrder.billing_country','ShopOrder.shipping_country'),
@@ -345,7 +347,7 @@ class ShopFunctComponent extends Object
 		//============ Supplements (Shipping, Packing, etc) ============//
 		$exportedSupplements = array('shipping');
 		$result['total_supplements'] = 0;
-		$supplements = (array)Configure::read('Shop.supplements');
+		$supplements = (array)ShopConfig::load('supplements');
 		$default_supplement_opt = array(
 			'descr'=>'',
 			'price'=>0,
@@ -360,7 +362,7 @@ class ShopFunctComponent extends Object
 		}
 		
 		foreach($exportedSupplements as $name){
-			$exportConf = Configure::read('Shop.'.$name.'Types');
+			$exportConf = ShopConfig::load($name.'Types');
 			if(!empty($exportConf)){
 				$supplements[$name] = $exportConf;
 			}
@@ -650,7 +652,8 @@ class ShopFunctComponent extends Object
 		return null;
 	}
 	function extractOrderItemData($productAndOptions){
-		$currency = Configure::read('Shop.currency');
+		App::import('Lib', 'Shop.ShopConfig');
+		$currency = ShopConfig::load('Shop.currency');
 		//debug($productAndOptions);
 		$extract_data = array(
 			'id' => 'id',

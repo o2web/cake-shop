@@ -5,6 +5,9 @@ class PaymentComponent extends Object{
 	var $controller;
 	function __construct() {
 		$this->settings = Configure::read('Shop.payment.'.$this->name);
+		if(!isset($this->ShopPayment)){
+			$this->ShopPayment = ClassRegistry::init(array('class' => 'Shop.ShopPayment', 'alias' => 'ShopPayment'));
+		}
 		//debug('Shop.payment.'.$this->name);
     }
 	
