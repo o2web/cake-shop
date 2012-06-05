@@ -493,7 +493,10 @@ class ShopOrdersController extends ShopAppController {
 														'ShopOrder.shipping_tel2 LIKE' => '%'.$q.'%',
 														'ShopOrder.shipping_email LIKE' => '%'.$q.'%');
 		}
-
+		$this->paginate['conditions'][]['or'] = array(
+			'dev_mode' => 0,
+			'dev_mode IS NULL',
+		);
 		
 		$this->ShopOrder->setupForFullData();
 		$this->paginate['order'] = 'ShopOrder.created DESC';
