@@ -9,6 +9,7 @@ class ShopConfig {
 	var $defaultConfig = array(
 		'cart' => array(
 			'inlineSubProduct' => true,
+			'clearOnCompleted' => true,
 		),
 		'order' => array(
 			'ACL' => array(

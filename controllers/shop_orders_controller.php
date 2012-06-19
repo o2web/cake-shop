@@ -22,7 +22,7 @@ class ShopOrdersController extends ShopAppController {
 
 	var $name = 'ShopOrders';
 	var $helpers = array('Shop.Shop');
-	var $components = array('Shop.OrderFunct','Shop.ShopFunct','Shop.OrderMaker','Acl','Email','Session'/*,'Customforms.CForm'*/);
+	var $components = array('Shop.OrderFunct','Shop.ShopFunct','Shop.OrderMaker','Acl','Email','Session','Shop.CartMaker'/*,'Customforms.CForm'*/);
 	var $uses = array('Shop.ShopOrder','Shop.ShopTax',/*'Customforms.CustomForm'*/);
 	
 	var $aro;
@@ -424,6 +424,12 @@ class ShopOrdersController extends ShopAppController {
 			$this->redirect(array('action' => 'index'));
 		}
 		$this->OrderFunct->tcheckAcl($id);
+		
+		
+		App::import('Lib', 'Shop.ShopConfig');
+		if(ShopConfig::load('cart.clearOnCompleted')){
+			$this->CartMaker->clear();
+		}
 		
 		$this->ShopOrder->setupForFullData();
 		$order = $this->ShopOrder->read(null,$id);
