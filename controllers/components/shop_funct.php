@@ -460,8 +460,8 @@ class ShopFunctComponent extends Object
 		//============ calcul taxes ============//
 		$result['total_taxes'] = 0;
 		$this->ShopTax = ClassRegistry::init('Shop.ShopTax');
-		$taxes = $this->ShopTax->find('all',array('conditions'=>array('active' => 1,'country'=>$data['country'],'OR'=>array('region'=>$data['region'],'region IS NULL')),'order'=>array('region'=>'ASC','code'=>'ASC')));
-		if(!empty($taxes)){
+		$rawTaxes = $this->ShopTax->find('all',array('conditions'=>array('active' => 1,'country'=>$data['country'],'OR'=>array('region'=>$data['region'],'region IS NULL')),'order'=>array('region'=>'ASC','code'=>'ASC')));
+		if(!empty($rawTaxes)){
 			/*$general_taxes = array();
 			foreach($taxes as $taxe){
 				$general_taxes[$taxe['ShopTax']['code']] = $taxe['ShopTax'];
@@ -480,6 +480,12 @@ class ShopFunctComponent extends Object
 					$result['total_taxes'] += $amount;
 				}
 			}*/
+			$taxes = array();
+			foreach($rawTaxes as $taxe){
+				$taxes[$taxe['ShopTax']['code']] = $taxe['ShopTax'];
+			}
+			//debug($taxes);
+			
 			$tcheckableItems = array_merge($orderItems,array_values($result['supplements']));
 			foreach($tcheckableItems as $item){
 				$item['tmpTotal'] = $item['total'];
@@ -488,7 +494,7 @@ class ShopFunctComponent extends Object
 				}
 				if(!empty($item['tax_applied'])){
 					foreach($taxes as $taxe){
-						$taxe = $taxe['ShopTax'];
+						//$taxe = $taxe['ShopTax'];
 						$apply = $taxe['apply'];
 						if($item['tax_applied'] === false){
 							$apply = false;
