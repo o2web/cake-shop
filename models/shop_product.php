@@ -455,9 +455,15 @@ class ShopProduct extends ShopAppModel {
 				}
 				array_splice($paths,$retatedPos,1,$relatedFields);
 			}
-			foreach($paths as &$realFieldName){
+			$finalPaths = array();
+			foreach($paths as $realFieldName){
 				$realFieldName = str_replace(array_keys($fieldNameReplace),array_values($fieldNameReplace),$realFieldName);
+				if(!$this->_startsWith($realFieldName,'ShopProduct')){
+					$finalPaths[] = 'ShopProduct.'.$realFieldName;
+				}
+				$finalPaths[] = $realFieldName;
 			}
+			$paths = $finalPaths;
 		}
 		//debug($extract_data);
 		if(!empty($relatedModel)){
@@ -465,6 +471,13 @@ class ShopProduct extends ShopAppModel {
 		}
 		return $extract_data;
 	}
+	
+	function _startsWith($haystack, $needle)
+	{
+		$length = strlen($needle);
+		return (substr($haystack, 0, $length) === $needle);
+	}
+
 	function getDynamicFields($product=null){
 		$res = SetMulti::extractHierarchicMulti($this->dynamicFieldsExtractData($product),$product);
 		return $res;

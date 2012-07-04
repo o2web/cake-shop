@@ -110,6 +110,11 @@ class ShopHelper extends AppHelper {
 	}
 	
 	function productDispo($product=null,$options=array()){
+		App::import('Lib', 'Shop.ShopConfig');
+		$enabled = ShopConfig::load('enabled');
+		if(!$enabled){
+			return false;
+		}
 		if(is_array($product) && empty($product['ShopProduct']) &&  empty($product[0]['ShopProduct'])){
 			$options = $product;
 		}else{
