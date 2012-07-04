@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS `shop_actions` (
   `created` datetime default NULL,
   `modified` datetime default NULL,
   PRIMARY KEY  (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=6 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
 
 --
 -- Dumping data for table `shop_actions`
@@ -43,28 +43,45 @@ CREATE TABLE IF NOT EXISTS `shop_actions` (
 --
 
 CREATE TABLE IF NOT EXISTS `shop_addresses` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `first_name` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `last_name` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `address` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `apt` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `city` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `region` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `postal_code` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `country` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `tel` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `tel2` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `email` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `active` tinyint(1) DEFAULT NULL,
-  `created` datetime DEFAULT NULL,
-  `modified` datetime DEFAULT NULL,
-  PRIMARY KEY (`id`)
+  `id` int(11) NOT NULL auto_increment,
+  `first_name` varchar(255) collate utf8_unicode_ci default NULL,
+  `last_name` varchar(255) collate utf8_unicode_ci default NULL,
+  `address` varchar(255) collate utf8_unicode_ci default NULL,
+  `apt` varchar(255) collate utf8_unicode_ci default NULL,
+  `city` varchar(255) collate utf8_unicode_ci default NULL,
+  `region` varchar(255) collate utf8_unicode_ci default NULL,
+  `postal_code` varchar(255) collate utf8_unicode_ci default NULL,
+  `country` varchar(255) collate utf8_unicode_ci default NULL,
+  `tel` varchar(255) collate utf8_unicode_ci default NULL,
+  `tel2` varchar(255) collate utf8_unicode_ci default NULL,
+  `email` varchar(255) collate utf8_unicode_ci default NULL,
+  `active` tinyint(1) default NULL,
+  `created` datetime default NULL,
+  `modified` datetime default NULL,
+  PRIMARY KEY  (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
 
 --
 -- Dumping data for table `shop_addresses`
 --
 
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `shop_coupons`
+--
+
+CREATE TABLE IF NOT EXISTS `shop_coupons` (
+  `id` int(11) NOT NULL auto_increment,
+  `code` varchar(255) collate utf8_unicode_ci default NULL,
+  `shop_promotion_id` int(11) default NULL,
+  `shop_order_id` int(11) default NULL,
+  `status` varchar(255) collate utf8_unicode_ci default NULL,
+  `active` tinyint(1) default NULL,
+  `created` datetime default NULL,
+  `modified` datetime default NULL,
+  PRIMARY KEY  (`id`)
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
@@ -115,7 +132,11 @@ CREATE TABLE IF NOT EXISTS `shop_orders` (
   `shipping_tel2` varchar(255) collate utf8_unicode_ci default NULL,
   `shipping_email` varchar(255) collate utf8_unicode_ci default NULL,
   `shipping_type` varchar(255) collate utf8_unicode_ci default NULL,
+  `shipping_age` varchar(255) collate utf8_unicode_ci default NULL,
+  `shipping_newsletter` tinyint(1) default NULL,
+  `shipping_lang` varchar(255) collate utf8_unicode_ci default NULL,
   `supplement_choices` text collate utf8_unicode_ci,
+  `dev_mode` tinyint(1) default NULL,
   `active` tinyint(1) default NULL,
   `lock` int(11) NOT NULL default '0',
   `created` datetime default NULL,
@@ -144,15 +165,32 @@ CREATE TABLE IF NOT EXISTS `shop_orders_items` (
   `comment` text collate utf8_unicode_ci,
   `item_price` float default NULL,
   `item_tax_applied` text collate utf8_unicode_ci,
+  `final_price` float default NULL,
   `active` tinyint(1) default NULL,
   `created` datetime default NULL,
   `modified` datetime default NULL,
   PRIMARY KEY  (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=352 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
 
 --
 -- Dumping data for table `shop_orders_items`
 --
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `shop_orders_payments`
+--
+
+CREATE TABLE IF NOT EXISTS `shop_orders_payments` (
+  `id` int(11) NOT NULL auto_increment,
+  `order_id` int(11) default NULL,
+  `payment_id` int(11) default NULL,
+  `amount` float default NULL,
+  `created` datetime default NULL,
+  `modified` datetime default NULL,
+  PRIMARY KEY  (`id`)
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
 
 
 -- --------------------------------------------------------
@@ -181,41 +219,21 @@ CREATE TABLE IF NOT EXISTS `shop_orders_subitems` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `shop_orders_payments`
---
-
-CREATE TABLE IF NOT EXISTS `shop_orders_payments` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `order_id` int(11) DEFAULT NULL,
-  `payment_id` int(11) DEFAULT NULL,
-  `amount` float DEFAULT NULL,
-  `created` datetime DEFAULT NULL,
-  `modified` datetime DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
-
---
--- Dumping data for table `shop_orders_payments`
---
-
-
--- --------------------------------------------------------
-
---
 -- Table structure for table `shop_payments`
 --
 
 CREATE TABLE IF NOT EXISTS `shop_payments` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `type` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `amount` float DEFAULT NULL,
-  `status` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `data` text COLLATE utf8_unicode_ci,
-  `active` tinyint(1) DEFAULT NULL,
-  `lock` int(11) NOT NULL DEFAULT '0',
-  `created` datetime DEFAULT NULL,
-  `modified` datetime DEFAULT NULL,
-  PRIMARY KEY (`id`)
+  `id` int(11) NOT NULL auto_increment,
+  `type` varchar(255) collate utf8_unicode_ci default NULL,
+  `amount` float default NULL,
+  `status` varchar(255) collate utf8_unicode_ci default NULL,
+  `data` text collate utf8_unicode_ci,
+  `dev_mode` tinyint(1) default NULL,
+  `active` tinyint(1) default NULL,
+  `lock` int(11) NOT NULL default '0',
+  `created` datetime default NULL,
+  `modified` datetime default NULL,
+  PRIMARY KEY  (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
 
 --
@@ -230,24 +248,42 @@ CREATE TABLE IF NOT EXISTS `shop_payments` (
 --
 
 CREATE TABLE IF NOT EXISTS `shop_products` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `code` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `model` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `foreign_id` int(11) DEFAULT NULL,
-  `price` float DEFAULT NULL,
+  `id` int(11) NOT NULL auto_increment,
+  `code` varchar(255) collate utf8_unicode_ci default NULL,
+  `model` varchar(255) collate utf8_unicode_ci default NULL,
+  `foreign_id` int(11) default NULL,
+  `price` float default NULL,
   `currency_prices` text collate utf8_unicode_ci,
-  `shipping_req` tinyint(1) DEFAULT NULL,
-  `needed_data` text COLLATE utf8_unicode_ci,
-  `tax_applied` text COLLATE utf8_unicode_ci,
-  `active` tinyint(1) DEFAULT NULL,
-  `created` datetime DEFAULT NULL,
-  `modified` datetime DEFAULT NULL,
-  PRIMARY KEY (`id`)
+  `shipping_req` tinyint(1) default NULL,
+  `needed_data` text collate utf8_unicode_ci,
+  `tax_applied` text collate utf8_unicode_ci,
+  `active` tinyint(1) default NULL,
+  `created` datetime default NULL,
+  `modified` datetime default NULL,
+  PRIMARY KEY  (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
 
 --
 -- Dumping data for table `shop_products`
 --
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `shop_product_subproducts`
+--
+
+CREATE TABLE IF NOT EXISTS `shop_product_subproducts` (
+  `id` int(11) NOT NULL auto_increment,
+  `shop_product_id` int(11) default NULL,
+  `parent_subproduct_id` int(11) default NULL,
+  `shop_subproduct_id` int(11) default NULL,
+  `default` tinyint(1) default NULL,
+  `active` tinyint(1) default NULL,
+  `created` datetime default NULL,
+  `modified` datetime default NULL,
+  PRIMARY KEY  (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
 
 
 -- --------------------------------------------------------
@@ -263,6 +299,9 @@ CREATE TABLE IF NOT EXISTS `shop_promotions` (
   `title_eng` varchar(255) collate utf8_unicode_ci default NULL,
   `desc_fre` text collate utf8_unicode_ci,
   `desc_eng` text collate utf8_unicode_ci,
+  `code_needed` tinyint(1) NOT NULL default '0',
+  `limited_coupons` tinyint(1) NOT NULL default '0',
+  `coupon_code_needed` tinyint(1) NOT NULL default '0',
   `val` float default NULL,
   `operator` int(11) NOT NULL default '1' COMMENT '1:equal, 2:add, 3:multiply',
   `action_id` int(11) default NULL,
@@ -271,78 +310,11 @@ CREATE TABLE IF NOT EXISTS `shop_promotions` (
   `created` datetime default NULL,
   `modified` datetime default NULL,
   PRIMARY KEY  (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=4 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
 
 --
 -- Dumping data for table `shop_promotions`
 --
-
-
--- --------------------------------------------------------
-
---
--- Table structure for table `shop_taxes`
---
-
-CREATE TABLE IF NOT EXISTS `shop_taxes` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `country` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `region` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `code` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `name_fre` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `name_eng` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `rate` float DEFAULT NULL,
-  `apply_prev` tinyint(1) DEFAULT NULL,
-  `apply` tinyint(1) DEFAULT '1',
-  `active` tinyint(1) DEFAULT NULL,
-  `created` datetime DEFAULT NULL,
-  `modified` datetime DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=37 ;
-
---
--- Dumping data for table `shop_taxes`
---
-
-INSERT INTO `shop_taxes` (`id`, `country`, `region`, `code`, `name_fre`, `name_eng`, `rate`, `apply_prev`, `apply`, `active`, `created`, `modified`) VALUES
-(14, 'CA', NULL, 'TPS', NULL, NULL, 0.05, 0, 1, 1, NULL, NULL),
-(17, 'CA', 'NB', 'TVH', NULL, NULL, 0.13, 0, 1, 1, NULL, NULL),
-(18, 'CA', 'NL', 'TVH', NULL, NULL, 0.13, 0, 1, 1, NULL, NULL),
-(19, 'CA', 'NS', 'TVH', NULL, NULL, 0.13, 0, 1, 1, NULL, NULL),
-(27, 'CA', 'BC', 'PST', NULL, NULL, 0.07, 0, 1, 1, NULL, NULL),
-(28, 'CA', 'MB', 'PST', NULL, NULL, 0.07, 0, 1, 1, NULL, NULL),
-(29, 'CA', 'ON', 'PST', NULL, NULL, 0.08, 0, 1, 1, NULL, NULL),
-(30, 'CA', 'PE', 'PST', NULL, NULL, 0.1, 1, 1, 1, NULL, NULL),
-(31, 'CA', 'QC', 'TVQ', NULL, NULL, 0.095, 1, 1, 1, NULL, NULL),
-(32, 'CA', 'SK', 'PST', NULL, NULL, 0.05, 0, 1, 1, NULL, NULL),
-(33, 'CA', 'NB', 'TPS', NULL, NULL, 0, 0, 0, 1, NULL, NULL),
-(34, 'CA', 'NL', 'TPS', NULL, NULL, 0, 0, 0, 1, NULL, NULL),
-(35, 'CA', 'NS', 'TPS', NULL, NULL, 0, 0, 0, 1, NULL, NULL);
-
-
-
--- --------------------------------------------------------
-
---
--- Table structure for table `shop_product_subproducts`
---
-
-CREATE TABLE IF NOT EXISTS `shop_product_subproducts` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `shop_product_id` int(11) DEFAULT NULL,
-  `parent_subproduct_id` int(11) DEFAULT NULL,
-  `shop_subproduct_id` int(11) DEFAULT NULL,
-  `default` tinyint(1) DEFAULT NULL,
-  `active` tinyint(1) DEFAULT NULL,
-  `created` datetime DEFAULT NULL,
-  `modified` datetime DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
-
---
--- Dumping data for table `shop_product_subproducts`
---
-
 
 -- --------------------------------------------------------
 
@@ -370,3 +342,50 @@ CREATE TABLE IF NOT EXISTS `shop_subproducts` (
 --
 -- Dumping data for table `shop_subproducts`
 --
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `shop_taxes`
+--
+
+CREATE TABLE IF NOT EXISTS `shop_taxes` (
+  `id` int(11) NOT NULL auto_increment,
+  `country` varchar(100) collate utf8_unicode_ci default NULL,
+  `region` varchar(100) collate utf8_unicode_ci default NULL,
+  `code` varchar(50) collate utf8_unicode_ci default NULL,
+  `name_fre` varchar(255) collate utf8_unicode_ci default NULL,
+  `name_eng` varchar(255) collate utf8_unicode_ci default NULL,
+  `rate` float default NULL,
+  `apply_prev` tinyint(1) default NULL,
+  `apply` tinyint(1) default '1',
+  `active` tinyint(1) default NULL,
+  `created` datetime default NULL,
+  `modified` datetime default NULL,
+  PRIMARY KEY  (`id`)
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=13 ;
+
+--
+-- Dumping data for table `shop_taxes`
+--
+
+INSERT INTO `shop_taxes` (`id`, `country`, `region`, `code`, `name_fre`, `name_eng`, `rate`, `apply_prev`, `apply`, `active`, `created`, `modified`) VALUES
+(1, 'CA', NULL, 'TPS', NULL, NULL, 0.05, 0, 1, 1, NULL, NULL),
+(2, 'CA', 'NB', 'TVH', NULL, NULL, 0.13, 0, 1, 1, NULL, NULL),
+(3, 'CA', 'NL', 'TVH', NULL, NULL, 0.13, 0, 1, 1, NULL, NULL),
+(4, 'CA', 'NS', 'TVH', NULL, NULL, 0.15, 0, 1, 1, NULL, NULL),
+(5, 'CA', 'BC', 'TVH', NULL, NULL, 0.12, 0, 1, 1, NULL, NULL),
+(6, 'CA', 'ON', 'TPS', NULL, NULL, 0, 0, 0, 1, NULL, NULL),
+(7, 'CA', 'ON', 'TVH', NULL, NULL, 0.13, 0, 1, 1, NULL, NULL),
+(8, 'CA', 'QC', 'TVQ', NULL, NULL, 0.095, 1, 1, 1, NULL, NULL),
+(9, 'CA', 'NB', 'TPS', NULL, NULL, 0, 0, 0, 1, NULL, NULL),
+(10, 'CA', 'NL', 'TPS', NULL, NULL, 0, 0, 0, 1, NULL, NULL),
+(11, 'CA', 'NS', 'TPS', NULL, NULL, 0, 0, 0, 1, NULL, NULL),
+(12, 'CA', 'BC', 'TPS', NULL, NULL, 0, 0, 0, 1, NULL, NULL);
+
+
+
+-- --------------------------------------------------------
+
+
+
