@@ -467,6 +467,67 @@ class ShopOrdersController extends ShopAppController {
 
 	
 	function admin_index() {
+		$this->ShopOrder->Behaviors->attach('Containable');
+		$findOpt = array(
+			'conditions' => array(
+				array('or' => array(
+					'dev_mode' => 0,
+					'dev_mode IS NULL',
+				)),
+				'ShopOrder.status'=>'input'
+			),
+			'limit'=>5,
+			'order'=>'modified DESC',
+			'contain'=>array('ShopOrdersItem'=>array('ShopProduct')),
+		);
+		$inputOrders = $this->ShopOrder->find('all',$findOpt);
+		$this->set('inputOrders',$inputOrders);
+		$findOpt = array(
+			'conditions' => array(
+				array('or' => array(
+					'dev_mode' => 0,
+					'dev_mode IS NULL',
+				)),
+				'ShopOrder.status'=>'ready'
+			),
+			'limit'=>5,
+			'order'=>'date DESC',
+			'contain'=>array('ShopOrdersItem'=>array('ShopProduct')),
+		);
+		$readyOrders = $this->ShopOrder->find('all',$findOpt);
+		$this->set('readyOrders',$readyOrders);
+		$findOpt = array(
+			'conditions' => array(
+				array('or' => array(
+					'dev_mode' => 0,
+					'dev_mode IS NULL',
+				)),
+				'ShopOrder.status'=>'ordered'
+			),
+			'limit'=>5,
+			'order'=>'date DESC',
+			'contain'=>array('ShopOrdersItem'=>array('ShopProduct')),
+		);
+		$OrderedOrders = $this->ShopOrder->find('all',$findOpt);
+		$this->set('OrderedOrders',$OrderedOrders);
+	}
+	
+	function admin_list_input() {
+		$this->paginate['conditions']['ShopOrder.status'] = 'input';
+		$this->admin_list();
+	}
+	
+	function admin_list_ready() {
+		$this->paginate['conditions']['ShopOrder.status'] = 'ready';
+		$this->admin_list();
+	}
+	
+	function admin_list_ordered() {
+		$this->paginate['conditions']['ShopOrder.status'] = 'ordered';
+		$this->admin_list();
+	}
+	
+	function admin_list() {
 		$q = null;
 		if(isset($this->params['named']['q']) && strlen(trim($this->params['named']['q'])) > 0) {
 			$q = $this->params['named']['q'];
@@ -474,7 +535,11 @@ class ShopOrdersController extends ShopAppController {
 			$q = $this->data['Artist']['q'];
 			$this->params['named']['q'] = $q;
 		}
-					
+		
+		
+		$this->ShopOrder->Behaviors->attach('Containable');
+		$this->paginate['contain'] = array('ShopOrdersItem'=>array('ShopProduct'));
+		
 		if($q !== null) {
 			$this->paginate['conditions']['OR'] = array('ShopOrder.billing_first_name LIKE' => '%'.$q.'%',
 														'ShopOrder.billing_last_name LIKE' => '%'.$q.'%',
@@ -733,6 +798,23 @@ class ShopOrdersController extends ShopAppController {
 		}
 	}
 
+	function admin_cancel($id = null) {
+		if (!$id) {
+			$this->Session->setFlash(sprintf(__('Invalid id for %s', true), 'shop order'));
+			$this->redirect(array('action'=>'index'));
+		}
+		$data = array(
+			'id' => $id,
+			'status' => 'canceled',
+		);
+		if ($this->ShopOrder->save($data)) {
+			$this->Session->setFlash(sprintf(__('%s canceled', true), 'Shop order'));
+			$this->redirect(array('action'=>'index'));
+		}
+		$this->Session->setFlash(sprintf(__('%s was not canceled', true), 'Shop order'));
+		$this->redirect(array('action' => 'index'));
+	}
+	
 	function admin_delete($id = null) {
 		if (!$id) {
 			$this->Session->setFlash(sprintf(__('Invalid id for %s', true), 'shop order'));

@@ -5,7 +5,7 @@ class ShopOrder extends ShopAppModel {
 	
 	var $actsAs = array('Acl' => array('type' => 'controlled'),'Shop.Serialized'=>array('taxes','taxe_subs','supplements','supplement_choices'));
 	
-	var $status = array('input','ready','ordered','paid','shipped');
+	var $status = array('input','ready','ordered','paid','shipped','canceled');
 	//The Associations below have been created with all possible keys, those that are not needed can be removed
 
 	var $hasMany = array(

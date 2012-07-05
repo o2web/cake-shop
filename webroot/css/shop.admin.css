@@ -1,3 +1,22 @@
+td.actions {
+    width: 86px;
+}
+.orderSummaryList {
+	width:50%;
+	margin:0px;
+	padding: 0 0 50px 0;
+	float:left;
+}
+.orderSummaryList .orderSummaryListContent{
+	margin: 0 20px 0 0;
+}
+.orderSummaryList td.actions {
+	width: 60px;
+}
+.orderSummaryReadyList td.actions {
+	width: 86px;
+}
+
 .ajaxContainer .loader{
 	display: none;
 	width: 32px;
@@ -48,4 +67,40 @@ form div.input.disabled{
 	background: none;
 	padding: 3px 5px 3px 5px;
 	margin: 0px;
+}
+
+
+
+table tr td.actions a.icon{
+	position:relative;
+	margin: 0;
+	padding: 0 6px;
+    display: block;
+    float: left;
+    height: 16px;
+    outline: 0px none;
+    text-indent: -99999px;
+    width: 16px;
+}
+
+table tr td.actions a.icon span {
+    display:none;
+	width:auto;
+	position:absolute;
+    text-indent: 0px;
+	padding: 2px 5px 8px 5px;
+	bottom: 15px;
+	right: 4px;
+	color: #ffffff;
+	background: url("../img/tool_tips.png") no-repeat scroll bottom right transparent;
+}
+
+table tr td.actions a.icon:hover span {
+    display:block;
+}
+
+table tr td.actions a.confirm {
+    background: url("../img/icon_ok.png") no-repeat scroll center center transparent;
+    height: 16px;
+    width: 17px;
 }
