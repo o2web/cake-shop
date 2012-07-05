@@ -486,7 +486,10 @@ class ShopFunctComponent extends Object
 			}
 			//debug($taxes);
 			
-			$tcheckableItems = array_merge($orderItems,array_values($result['supplements']));
+			$tcheckableItems = $orderItems;
+			if(!empty($result['supplements'])){
+				$tcheckableItems = array_merge($orderItems,array_values($result['supplements']));
+			}
 			foreach($tcheckableItems as $item){
 				$item['tmpTotal'] = $item['total'];
 				if(isset($item['item_tax_applied'])){
