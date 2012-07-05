@@ -17,6 +17,10 @@
 			});
 		})( jQuery );
 	',array('inline'=>false));
+	
+	if( !empty($prevUrl) && is_array($prevUrl)) { 
+		$prevUrl = $this->Html->url($prevUrl);
+	}
 ?>
 
 <div class="shopCart index">

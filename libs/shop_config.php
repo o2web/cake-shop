@@ -10,6 +10,8 @@ class ShopConfig {
 		'cart' => array(
 			'inlineSubProduct' => true,
 			'clearOnCompleted' => true,
+			'qtyInNbItem' => true,
+			'defaultReturn' => null,
 		),
 		'order' => array(
 			'ACL' => array(

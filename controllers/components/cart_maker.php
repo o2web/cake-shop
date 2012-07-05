@@ -24,7 +24,12 @@ class CartMakerComponent extends Object{
 	}
 	
 	function beforeRender(){
-		$this->controller->params['Shop']['nbItem'] = $this->getTotalQty();
+		App::import('Lib', 'Shop.ShopConfig');
+		if(ShopConfig::load('cart.qtyInNbItem')){
+			$this->controller->params['Shop']['nbItem'] = $this->getTotalQty();
+		}else{
+			$this->controller->params['Shop']['nbItem'] = $this->nbItem();
+		}
 	}
 	
 	function itemList(){

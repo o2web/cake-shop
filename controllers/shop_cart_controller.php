@@ -74,6 +74,10 @@ class ShopCartController extends ShopAppController {
 		$codePromos = $this->ShopPromotion->find('count',array('conditions'=>array('or'=>array('code_needed'=>1,'coupon_code_needed'=>1))));
 		$this->set('codeInput',$codePromos>0);
 		
+		$defaultReturn = ShopConfig::load('cart.defaultReturn');
+		if(empty($prevUrl) && !empty($defaultReturn)){
+			$prevUrl = $defaultReturn;
+		}
 		$this->set('prevUrl',$prevUrl);
 		if(isset($this->params['named']['display']) && $this->params['named']['display'] == 'print'){
 			$this->layout = 'print';

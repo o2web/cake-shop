@@ -91,6 +91,10 @@ class ShopHelper extends AppHelper {
 		App::import('Lib', 'Shop.ShopConfig');
 		$countries = ShopConfig::load('countries');
 		$options['options'] = $countries;
+		$def = ShopConfig::load('defaultRegion');
+		if(!empty($def)){
+			$options['default'] = $def;
+		}
 		return $this->O2form->input($fieldName, $options);
 	}
 	
