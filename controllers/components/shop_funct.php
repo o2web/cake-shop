@@ -339,7 +339,6 @@ class ShopFunctComponent extends Object
 			}
 		}
 		
-		
 		//============ sub_total ============//
 		$result['sub_total'] = 0;
 		$result['sub_total'] = $result['total_items'];
@@ -352,7 +351,13 @@ class ShopFunctComponent extends Object
 			'descr'=>'',
 			'price'=>0,
 			'calculFunction'=>null,
+			'applicable'=>null,
 			'tax_applied'=>false
+		);
+		$specific_default_sup_opt = array(
+			'shipping'=>array(
+				'applicable'=>array('checkShippingReq'=>array())
+			)
 		);
 		$defaultType = 'default';
 		
@@ -392,7 +397,11 @@ class ShopFunctComponent extends Object
 			if(!is_array($supplementItem)){
 				$supplementItem = array('price'=>$supplementItem);
 			}
-			$supplementItem = array_merge($default_supplement_opt,$supplementItem);
+			$specific_def = array();
+			if(!empty($specific_default_sup_opt[$sName])){
+				$specific_def = $specific_default_sup_opt[$sName];
+			}
+			$supplementItem = Set::merge($default_supplement_opt,$specific_def,$supplementItem);
 			
 			if(!isset($supplementItem['label']) || (empty($supplementItem['label']) && $supplementItem['label'] !== false)){
 				$supplementItem['label'] = Inflector::humanize($sName);
@@ -406,6 +415,32 @@ class ShopFunctComponent extends Object
 			}
 			if(isset($supplementItem['descr'])){
 				$supplementItem['descr'] = __($supplementItem['descr'],true);
+			}
+			
+			
+			if(!empty($supplementItem['applicable'])){
+				if(!is_array($supplementItem['applicable']) || isset($supplementItem['applicable']['component']) ){
+					$supplementItem['applicable'] = array($supplementItem['applicable']);
+				}
+				foreach($supplementItem['applicable'] as $funct => $fopt){
+					if(is_string($fopt)){
+						$funct = $fopt;
+						$fopt = array();
+					}
+					$res = null;
+					if(method_exists($this->SupplementMethod,$funct) ){
+						$res = $this->SupplementMethod->{$funct}($fopt,$supplementItem,$order,$supplement_choice,$result);
+					}elseif(!empty($fopt['component'])){
+						$fopt['params'][] = $supplementItem;
+						$fopt['params'][] = $order;
+						$fopt['params'][] = $supplement_choice;
+						$fopt['params'][] = $result;
+						$res = $this->callExternalfunction($fopt);
+					}
+					if($res === false){
+						break(2);
+					}
+				}
 			}
 			
 			if(!empty($supplementItem['calculFunction'])){
@@ -681,6 +716,7 @@ class ShopFunctComponent extends Object
 			'item_rebate' => 'DynamicField.rebate',
 			'item_original_price' => 'DynamicField.original_price',
 			'product_related_id' => array('ShopProduct.Related.id','Related.id'),
+			'shipping_req' => array('ShopProduct.shipping_req'),
 		);
 		$data = array();
 		App::import('Lib', 'Shop.SetMulti');

@@ -7,6 +7,20 @@ class SupplementMethodComponent extends Object
 		$this->controller =& $controller;
 	}
 	
+	//////////////// Applicable Function ////////////////
+	
+	function checkShippingReq($options,$supplementItem,$order,$supplement_choice,$calcul){
+		//debug($order);
+		foreach($order['ShopOrdersItem'] as $item){
+			if(!isset($item['shipping_req']) || $item['shipping_req']){
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	//////////////// Calcul Function ////////////////
+	
 	function rangesOpt($options,$supplementItem,$order,$supplement_choice,$calcul){
 		$defOpt = array(
 			'rangedValue' => 'calcul.total_items',
