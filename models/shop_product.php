@@ -62,12 +62,22 @@ class ShopProduct extends ShopAppModel {
 	}
 	
 	function afterFindAssoc($results,$fullData,$path){
-		if(count($results) == 1 && empty($results[0]['ShopProduct']['Related']) && !empty($results[0]['ShopProduct']['model'])){
+	
+		///// try to get the related entry if it was allready in the full result ///// 
+		if(count($results) == 1 && empty($results[0]['ShopProduct']['Related']) && !empty($results[0]['ShopProduct']['model']) && !empty($results[0]['ShopProduct']['foreign_id'])){
 			$relatedAlias = $results[0]['ShopProduct']['model'];
-			if(!empty($fullData[0][$relatedAlias])){
-				$results[0]['ShopProduct']['Related'] = $fullData[0][$relatedAlias];
+			$foreign_id = $results[0]['ShopProduct']['foreign_id'];
+			$fullPos = 0;
+			$pathParts = explode('.',$path);
+			if(isset($pathParts[0]) && is_numeric($pathParts[0])){
+				$fullPos = $pathParts[0];
+			}
+			if(!empty($fullData[$fullPos][$relatedAlias]) && $fullData[$fullPos][$relatedAlias]['id'] == $foreign_id){
+				$results[0]['ShopProduct']['Related'] = $fullData[$fullPos][$relatedAlias];
 			}
 		}
+		
+		
 		$results = $this->getFullData($results);
 		App::import('Lib', 'Shop.SetMulti');
 		if(!SetMulti::isAssoc($results)){

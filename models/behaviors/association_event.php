@@ -16,7 +16,7 @@ class AssociationEventBehavior extends ModelBehavior {
 		if(!$multiple){
 			$results = array($results);
 		}
-		foreach($results as &$result){
+		foreach($results as $i => &$result){
 			if(is_array($result)){
 				foreach($result as $className => $val){
 					if(!empty($val)
@@ -26,7 +26,7 @@ class AssociationEventBehavior extends ModelBehavior {
 							&& !in_array($className, (array)$exclude)
 						) {
 						$newModel = $model->{$className};
-						$newPath = (!empty($path)?$path.'.':'').$className;
+						$newPath = (!empty($path)?$path.'.':'').($multiple?$i.'.':'').$className;
 						$format = array();
 						
 						$vals = $this->unifiedResult($newModel, $val, null, null, $format);
