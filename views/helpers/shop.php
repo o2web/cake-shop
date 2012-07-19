@@ -1,7 +1,7 @@
 <?php
 class ShopHelper extends AppHelper {
 
-	var $helpers = array('Number','Form','O2form.O2form');
+	var $helpers = array('Html','Number','Form','O2form.O2form');
 	
 	var $currencyFormats = array(
 		'fre' => array('before'=>false, 'after'=>' $', 'thousands' => ' ', 'decimals'=>',', 'places'=>2),
@@ -197,6 +197,58 @@ class ShopHelper extends AppHelper {
 		}else{
 			if(!empty($data)){
 				return $view->element('qualified_price',array('plugin'=>'shop','fullPrice'=>$data));
+			}
+		}
+	}
+	
+	function analytics($order){
+		if(!empty($order) && $order['ShopOrder']['status'] == 'ordered'){
+			$gaAccount = null;
+			App::import('Lib', 'Shop.ShopConfig');
+			$gaAccountConf = ShopConfig::load('gaAccount');
+			if(preg_match('/^(\w*)::(.*)$/', $gaAccountConf, $matches)){
+				$prefix = $matches[1];
+				$varName = $matches[2];
+				if($prefix == 'var'){
+					$view =& ClassRegistry::getObject('view');
+					if(!empty($view->viewVars[$varName])){
+						$gaAccount = $view->viewVars[$varName];
+					}
+				}elseif($prefix == 'conf'){
+					$gaAccount = Configure::read($varName);
+				}
+			}else{
+				$gaAccount = $gaAccountConf;
+			}
+			if(!empty($gaAccount)){
+				$script = '
+					var _gaq = _gaq || [];
+					_gaq.push(["_setAccount", "'.$gaAccount.'"]);
+					_gaq.push(["_addTrans",
+					   "'.$order['ShopOrder']['id'].'",					// order ID - required
+					   "'.$_SERVER['SERVER_NAME'].'",					// affiliation or store name
+					   "'.$order['ShopOrder']['total'].'",				// total - required
+					   "'.$order['ShopOrder']['total_taxes'].'",		// tax
+					   "'.$order['ShopOrder']['total_shipping'].'",		// shipping
+					   "'.$order['ShopOrder']['shipping_city'].'",		// city
+					   "'.$order['ShopOrder']['shipping_region'].'",	// state or province
+					   "'.$order['ShopOrder']['shipping_country'].'"	// country
+					]);
+				';
+				foreach ($order['ShopOrdersItem'] as $item) {
+					$script .= '
+						_gaq.push(["_addItem",
+						   "'.$order['ShopOrder']['id'].'",	// order ID - necessary to associate item with transaction
+						   "'.$item['product_id'].'",		// SKU/code - required
+						   "'.$item['item_title'].'",		// product name
+						   "",								// category or variation
+						   "'.$item['final_price'].'",		// unit price - required
+						   "'.$item['nb'].'"				// quantity - required
+						]);
+					';
+				}
+				$script .= '_gaq.push(["_trackTrans"]);';
+				$this->Html->scriptBlock($script,array('inline'=>false));
 			}
 		}
 	}

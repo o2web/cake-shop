@@ -1,3 +1,7 @@
+<?php
+	$this->Shop->analytics($order);
+?>
+
 <p><?php __d('shop','Your Order is now completed'); ?></p>
 <?php
 	
