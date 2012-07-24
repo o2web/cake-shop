@@ -14,7 +14,7 @@ class OrderMakerComponent extends Object
 		}
 	}
 	function init(&$controller) {
-		debug('test');
+		//debug('test');
 		$this->controller =& $controller;
 		if(!empty($controller->ShopOrder)){
 			$this->ShopOrder = $controller->ShopOrder;
@@ -87,6 +87,10 @@ class OrderMakerComponent extends Object
 			$this->ShopOrder->create();
 			$orderData = $this->ShopOrder->filterExposedfields($options['order']);
 			$orderData['status'] = 'input';
+			App::import('Lib', 'Shop.ShopConfig');
+			if(ShopConfig::load('devMode')){
+				$orderData['dev_mode'] = 1;
+			}
 			$this->ShopOrder->save($orderData);
 			$order_id = $this->ShopOrder->id;
 			$aro = $this->OrderFunct->getAro();

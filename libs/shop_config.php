@@ -48,6 +48,7 @@ class ShopConfig {
 		'plugComponent' => null,
 		'currencies' => null,
 		'enabled' => true,
+		'defaultTaxes' => true,  //set to false to remove automatic taxes
 		
 		'countries' => true,	//list of available countries. If true, all countries are available.
 		

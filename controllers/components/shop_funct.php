@@ -722,7 +722,7 @@ class ShopFunctComponent extends Object
 		App::import('Lib', 'Shop.SetMulti');
 		$data = SetMulti::extractHierarchicMulti($extract_data,$productAndOptions);
 		if(!isset($data['item_tax_applied']) ||  $data['item_tax_applied'] === null){
-			$data['item_tax_applied'] = true;
+			$data['item_tax_applied'] = ShopConfig::load('defaultTaxes');
 		}
 		$data['active'] = 1;
 		
