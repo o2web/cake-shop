@@ -73,7 +73,7 @@
 	
 	
 	<div class="orderSummaryList"><div class="orderSummaryListContent">
-		<h3><?php __('Dernières commandes Complétés');?></h3>
+		<h3><?php __('Dernières commandes Complétées');?></h3>
 		<table cellpadding="0" cellspacing="0">
 			<tr>
 				<th><?php __('id');?></th>		
@@ -110,13 +110,13 @@
 				}
 			?>
 		</table>
-		<a href="<?php echo $this->Html->url(array('action'=>'list_ordered')); ?>"><?php __('Voir toutes les commandes complétés'); ?></a>
+		<a href="<?php echo $this->Html->url(array('action'=>'list_ordered')); ?>"><?php __('Voir toutes les commandes complétées'); ?></a>
 	</div></div>
 	
 	
 	
 	<div class="orderSummaryList"><div class="orderSummaryListContent">
-		<h3><?php __('Dernières commandes non-complétés');?></h3>
+		<h3><?php __('Dernières commandes non-complétées');?></h3>
 		<table cellpadding="0" cellspacing="0">
 			<tr>
 				<th><?php __('Id');?></th>		
@@ -183,7 +183,7 @@
 				}
 			?>
 		</table>
-		<a href="<?php echo $this->Html->url(array('action'=>'list_input')); ?>"><?php __('Voir toutes les commandes non-complétés'); ?></a>
+		<a href="<?php echo $this->Html->url(array('action'=>'list_input')); ?>"><?php __('Voir toutes les commandes non-complétées'); ?></a>
 	</div></div>
 	
 </div>

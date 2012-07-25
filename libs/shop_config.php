@@ -50,7 +50,7 @@ class ShopConfig {
 		'enabled' => true,
 		'defaultTaxes' => true,  //set to false to remove automatic taxes
 		
-		'countries' => true,	//list of available countries. If true, all countries are available.
+		'countries' => true,	//list of available countries and regions. If true, all countries are available. Example to limit to Canada and Quebec : array('CA'=>array('regions'=>'QC')))
 		
 		'defaultCountry' => null,
 		'defaultRegion' => null,

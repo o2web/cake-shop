@@ -75,9 +75,9 @@ class ShopHelper extends AppHelper {
 			foreach ($countries as $key => $country) {
 				if(is_array($country)){
 					if(isset($country['label'])){
-						$countries[$country] = $country['label'];
+						$countries[$key] = $country['label'];
 					}else{
-						$countries[$country] = array();
+						$countries[$key] = array();
 					}
 				}
 			}
