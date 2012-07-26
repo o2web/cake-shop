@@ -175,6 +175,9 @@ class OrderFunctComponent extends Object
 		App::import('Lib', 'Shop.ShopConfig');
 		$conf = ShopConfig::load('emailAdmin',$devMode);
 		if(is_array($conf)){
+			if(!empty($conf['subject'])){
+				$conf['subject'] = __($conf['subject']);
+			}
 			$conf = array_merge($default_conf,$conf);
 		}else{
 			$conf = $default_conf;
@@ -219,6 +222,9 @@ class OrderFunctComponent extends Object
 		App::import('Lib', 'Shop.ShopConfig');
 		$conf = ShopConfig::load('emailBuyer',$devMode);
 		if(is_array($conf)){
+			if(!empty($conf['subject'])){
+				$conf['subject'] = __($conf['subject'],true);
+			}
 			$conf = array_merge($default_conf,$conf);
 		}else{
 			$conf = $default_conf;
