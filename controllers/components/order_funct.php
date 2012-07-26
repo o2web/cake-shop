@@ -125,6 +125,31 @@ class OrderFunctComponent extends Object
 		}
 	}
 	
+	function _getDefaultSender($order = null){
+		App::import('Lib', 'Shop.ShopConfig');
+		
+		$devMode = null;
+		if(!empty($order)){
+			$devMode = $order['ShopOrder']['dev_mode']?true:null;
+		}
+		
+		$from = ShopConfig::load('emailAdmin.sender',$devMode);
+		if(empty($from)){
+			$from = ShopConfig::load('emailAdmin.to',$devMode);
+			if(is_array($from)){
+				if(!empty($from[0])){
+					$from = $from[0];
+				}else{
+					$from = null;
+				}
+			}
+			if(empty($from)){
+				$from = $this->EmailUtils->defaultEmail();
+			}
+		}
+		return $from;
+	}
+	
 	function send_email_admin($order){
 		$this->Email->reset();
 		if(Configure::read('Member.siteName')){
@@ -138,7 +163,7 @@ class OrderFunctComponent extends Object
 		$default_conf = array(
 			'subject' => __('New Order #{id}',true),
 			'to' => $this->EmailUtils->defaultEmail(),
-			'sender' => $this->EmailUtils->defaultEmail(),
+			'sender' => $this->_getDefaultSender($order),
 			'replyTo' => null,
 			'sendAs' => 'both', // because we like to send pretty mail
 			'template' => 'order_admin',
@@ -182,7 +207,7 @@ class OrderFunctComponent extends Object
 		$default_conf = array(
 			'subject' => str_replace('%siteName%',$siteName,__('Your order at %siteName%',true)),
 			'to' => $order['ShopOrder']['billing_email'],
-			'sender' => $this->EmailUtils->defaultEmail(),
+			'sender' => $this->_getDefaultSender($order),
 			'replyTo' => null,
 			'sendAs' => 'both', // because we like to send pretty mail
 			'template' => 'order_admin',
