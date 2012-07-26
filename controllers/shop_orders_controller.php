@@ -572,17 +572,19 @@ class ShopOrdersController extends ShopAppController {
 	
 	/*function admin_test($order_id = null){
 		if(!empty($order_id)){
+			$this->OrderFunct->initShopOrder();
+			$this->ShopOrder->setupForFullData();
 			$order = $this->ShopOrder->read(null,$order_id);
 			$calcul = $this->ShopFunct->calculate($order);
 			//debug($calcul);
 			$order['ShopOrder'] = array_merge($order['ShopOrder'],$calcul);
-			
+			//debug($order);
 			$this->OrderFunct->send_email_buyer($order);
 		}
 		$this->render(false);
 	}*/
 		
-	/*function admin_add() {
+	function admin_add() {
 		if (!empty($this->data)) {
 			$this->ShopOrder->create();
 			if ($this->ShopOrder->save($this->data)) {
@@ -595,7 +597,7 @@ class ShopOrdersController extends ShopAppController {
 		$shopProducts = $this->ShopOrder->ShopProduct->find('list');
 		$shopPayments = $this->ShopOrder->ShopPayment->find('list');
 		$this->set(compact('shopProducts', 'shopPayments'));
-	}*/
+	}
 	
 	 
 

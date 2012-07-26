@@ -26,7 +26,7 @@
 		</div>
 		<?php } ?>
     </div>
-    <table class="details" cellspacing="0" cellpadding="0">
+    <table class="details" cellspacing="<?php echo !empty($cellspacing)?$cellspacing:0 ?>" cellpadding="<?php echo !empty($cellpadding)?$cellpadding:0 ?>">
         <tr>
             <th><?php __d('shop','# ref') ?></th>
             <th><?php __d('shop','Qte') ?></th>

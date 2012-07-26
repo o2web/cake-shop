@@ -442,7 +442,7 @@ class ShopProduct extends ShopAppModel {
 		
 		
 		$fieldNameReplace = array();
-		if($relatedModel && $relatedModel->displayField){
+		if($relatedModel && $relatedModel->displayField && $relatedModel->displayField != 'id'){
 			$fieldNameReplace['(Related.displayField)'] = 'Related.'.$relatedModel->displayField;
 		}
 		if(Configure::read('Shop.currency')){
