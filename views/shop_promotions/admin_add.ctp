@@ -56,6 +56,11 @@
 					<div id="ActionSubForm" class="ajaxContainer"><div class="loader"></div></div>
 					<?php
 				}
+			?>
+			</fieldset>
+			<fieldset>
+				<legend><?php echo __('Code promo',true).' / '.__('Coupons',true); ?></legend>
+			<?php
 				echo $this->Form->input('code');
 				echo $this->Form->input('code_needed',array('label'=>__('Code needed', true),'after'=>'<div class="note">'.__('Buyers needs to enter the code in order to benefit from the promotion',true).'</div>'));
 				echo $this->Form->input('add_coupons',array('label'=>__('Qty Coupons', true),'after'=>'<div class="note">'.__('Set this to set how many buyer will be able to use this promotion',true).'</div>'));

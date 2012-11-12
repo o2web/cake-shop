@@ -302,6 +302,7 @@ CREATE TABLE IF NOT EXISTS `shop_promotions` (
   `code_needed` tinyint(1) NOT NULL default '0',
   `limited_coupons` tinyint(1) NOT NULL default '0',
   `coupon_code_needed` tinyint(1) NOT NULL default '0',
+  `method` varchar(255) collate utf8_unicode_ci default NULL,
   `val` float default NULL,
   `operator` int(11) NOT NULL default '1' COMMENT '1:equal, 2:add, 3:multiply',
   `action_id` int(11) default NULL,

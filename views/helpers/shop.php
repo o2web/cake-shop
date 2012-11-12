@@ -128,7 +128,7 @@ class ShopHelper extends AppHelper {
 		}
 		$defOpt = array(
 			'product'=>null,
-			'sources'=> array('product','viewVars.product','viewVars'),
+			'sources'=> array('product','viewVars.product','viewVars','viewVars.'.Inflector::singularize($this->params['controller'])),
 			'paths'=>array(
 				'product' => array(
 					'ShopProduct',
@@ -165,7 +165,7 @@ class ShopHelper extends AppHelper {
 		}
 		$defOpt = array(
 			'product'=>null,
-			'sources'=> array('product','viewVars.product'),
+			'sources'=> array('product','viewVars.product','viewVars.'.Inflector::singularize($this->params['controller'])),
 			'paths'=>array(
 				'original_price' => array(
 					'ShopProduct.DynamicField.original_price','DynamicField.original_price','item_original_price',
