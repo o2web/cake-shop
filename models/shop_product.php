@@ -62,36 +62,36 @@ class ShopProduct extends ShopAppModel {
 	}
 	
 	function afterFindAssoc($results,$fullData,$path){
-	
-		///// try to get the related entry if it was allready in the full result ///// 
-		if(count($results) == 1 && empty($results[0]['ShopProduct']['Related']) && !empty($results[0]['ShopProduct']['model']) && !empty($results[0]['ShopProduct']['foreign_id'])){
-			$relatedAlias = $results[0]['ShopProduct']['model'];
-			$foreign_id = $results[0]['ShopProduct']['foreign_id'];
-			$fullPos = 0;
-			$pathParts = explode('.',$path);
-			if(isset($pathParts[0]) && is_numeric($pathParts[0])){
-				$fullPos = $pathParts[0];
-			}
-			if(!empty($fullData[$fullPos][$relatedAlias]) && $fullData[$fullPos][$relatedAlias]['id'] == $foreign_id){
-				$results[0]['ShopProduct']['Related'] = $fullData[$fullPos][$relatedAlias];
-			}
-		}
-		
-		
-		$results = $this->getFullData($results);
-		App::import('Lib', 'Shop.SetMulti');
-		if(!SetMulti::isAssoc($results)){
-			foreach($results as &$result){
-				if(isset($result[$this->alias])){
-					$more = $result;
-					unset($more[$this->alias]);
-					$result = array($this->alias=>array_merge($result[$this->alias],$more));
+		if($this->fullDataEnabled){
+			///// try to get the related entry if it was allready in the full result ///// 
+			if(count($results) == 1 && empty($results[0]['ShopProduct']['Related']) && !empty($results[0]['ShopProduct']['model']) && !empty($results[0]['ShopProduct']['foreign_id'])){
+				$relatedAlias = $results[0]['ShopProduct']['model'];
+				$foreign_id = $results[0]['ShopProduct']['foreign_id'];
+				$fullPos = 0;
+				$pathParts = explode('.',$path);
+				if(isset($pathParts[0]) && is_numeric($pathParts[0])){
+					$fullPos = $pathParts[0];
+				}
+				if(!empty($fullData[$fullPos][$relatedAlias]) && $fullData[$fullPos][$relatedAlias]['id'] == $foreign_id){
+					$results[0]['ShopProduct']['Related'] = $fullData[$fullPos][$relatedAlias];
 				}
 			}
+			
+			
+			$results = $this->getFullData($results);
+			App::import('Lib', 'Shop.SetMulti');
+			if(!SetMulti::isAssoc($results)){
+				foreach($results as &$result){
+					if(isset($result[$this->alias])){
+						$more = $result;
+						unset($more[$this->alias]);
+						$result = array($this->alias=>array_merge($result[$this->alias],$more));
+					}
+				}
+			}
+			//debug($results);
 		}
-		//debug($results);
 		return $results;
-		
 		return true;
 	}
 	
