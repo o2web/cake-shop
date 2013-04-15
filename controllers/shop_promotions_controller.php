@@ -51,7 +51,34 @@ class ShopPromotionsController extends ShopAppController {
 		}
 
 		$this->ShopPromotion->recursive = 0;
-		$this->set('shopPromotions', $this->paginate());
+		$shopPromotions = $this->paginate();
+		
+		//////////// calcul use count ////////////
+		$ids = Set::extract('{n}.ShopPromotion.id',$shopPromotions);
+		$useCounts = $this->ShopPromotion->ShopCoupon->find('all',array(
+			'fields'=>array(
+				'COUNT(*) as `uses`',
+				'ShopCoupon.shop_promotion_id',
+			),
+			'conditions'=>array(
+				'ShopCoupon.shop_promotion_id'=>$ids,
+				'ShopOrder.status'=>array('ordered','paid','shipped'),
+			),
+			'group'=>'shop_promotion_id',
+			'contain'=>array('ShopOrder')
+		));
+		$useCounts = array_combine(Set::extract('{n}.ShopCoupon.shop_promotion_id',$useCounts),Set::extract('{n}.0.uses',$useCounts));
+		foreach($shopPromotions as &$promo){
+			$promo['ShopPromotion']['uses'] = 
+				!empty($useCounts[$promo['ShopPromotion']['id']])
+				? $useCounts[$promo['ShopPromotion']['id']]
+				: 0;
+		}
+		
+		
+		$this->set('shopPromotions', $shopPromotions);
+		
+		$this->set('operators', $this->ShopPromotion->operators);
 	}
 
 		

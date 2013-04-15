@@ -14,8 +14,9 @@
 			<th><?php echo $this->Paginator->sort('title_eng');?></th>			
 			<th><?php echo $this->Paginator->sort('desc_fre');?></th>			
 			<th><?php echo $this->Paginator->sort('desc_eng');?></th>			
+			<th><?php echo $this->Paginator->sort('operator');?></th>		
 			<th><?php echo $this->Paginator->sort('val');?></th>			
-			<th><?php echo $this->Paginator->sort('operator');?></th>			
+			<th><?php __('Uses');?></th>
 			<th class="actions"><?php __('Actions');?></th>
 		</tr>
 		<?php
@@ -34,8 +35,9 @@
 						<td class="title_eng"><?php echo $shopPromotion['ShopPromotion']['title_eng']; ?>&nbsp;</td>
 						<td class="desc_fre"><?php echo $text->truncate($shopPromotion['ShopPromotion']['desc_fre'], 150, array('exact' => false)); ?>&nbsp;</td>
 						<td class="desc_eng"><?php echo $text->truncate($shopPromotion['ShopPromotion']['desc_eng'], 150, array('exact' => false)); ?>&nbsp;</td>
+						<td class="operator"><?php echo $operators[$shopPromotion['ShopPromotion']['operator']]['label']; ?>&nbsp;</td>
 						<td class="val"><?php echo $shopPromotion['ShopPromotion']['val']; ?>&nbsp;</td>
-						<td class="operator"><?php echo $shopPromotion['ShopPromotion']['operator']; ?>&nbsp;</td>
+						<td class="uses"><?php echo $shopPromotion['ShopPromotion']['uses']; ?>&nbsp;</td>
 						<td class="actions">
 							<?php 
 							if( $shopPromotion['ShopPromotion']['coupon_code_needed'] ) { 
