@@ -81,10 +81,17 @@ class SupplementMethodComponent extends Object
 		
 		App::import('Lib', 'Shop.SetMulti');
 		$country = SetMulti::extractHierarchic($opt['keyPath'], $dataSource);
-		
+			
 		if(array_key_exists($country,$opt['list'])){
 			$supplementItem[$opt['modifProp']] = $opt['list'][$country];
+		}else{
+			App::import('Lib', 'O2form.Geography');
+			$continent = Geography::getContinent($country);
+			if(array_key_exists($continent,$opt['list'])){
+				$supplementItem[$opt['modifProp']] = $opt['list'][$continent];
+			}
 		}
+		
 		
 		return $supplementItem;
 	}

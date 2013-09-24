@@ -97,6 +97,28 @@ class ShopHelper extends AppHelper {
 		}
 		return $this->O2form->input($fieldName, $options);
 	}
+	function shippingTypeInput($options = array()){
+		return $this->supplementInput('shipping',$options);
+	}
+	function supplementInput($type,$options = array()){
+		if(!isset($options['options'])){
+			$options['options'] = array();
+			$choices = ShopConfig::getSupplementOpts($type);
+			foreach($choices as $name =>$opt){
+				$options['options'][$name] = $opt['title'];
+			}
+		}
+		if(!isset($options['label'])){
+			$options['label'] = __(Inflector::humanize($type).' Type',true);
+		}
+		$exportedSupplements = ShopConfig::getExportedSupplements();
+		if(in_array($type,$exportedSupplements)){
+			$fieldName = $type.'_type';
+		}else{
+			$fieldName = 'ShopOrder.supplement_choices.'.$type;
+		}
+		return $this->O2form->input($fieldName, $options);
+	}
 	
 	function currency($number){
 		$currency = Configure::read('Shop.currency');

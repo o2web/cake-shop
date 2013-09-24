@@ -344,22 +344,12 @@ class ShopFunctComponent extends Object
 		$result['sub_total'] = $result['total_items'];
 		
 		//============ Supplements (Shipping, Packing, etc) ============//
-		$exportedSupplements = array('shipping');
+		
 		$result['total_supplements'] = 0;
-		$supplements = (array)ShopConfig::load('supplements');
-		$default_supplement_opt = array(
-			'descr'=>'',
-			'price'=>0,
-			'calculFunction'=>null,
-			'applicable'=>null,
-			'tax_applied'=>false
-		);
-		$specific_default_sup_opt = array(
-			'shipping'=>array(
-				'applicable'=>array('checkShippingReq'=>array())
-			)
-		);
-		$defaultType = 'default';
+		
+		$supplements = ShopConfig::getSupplementOpts();
+		$exportedSupplements = ShopConfig::getExportedSupplements();
+		$defaultType = ShopConfig::getDefaultSupplementName();
 		
 		$supplementsData = array();
 		if(!empty($data['supplement_choices'])){
@@ -367,16 +357,10 @@ class ShopFunctComponent extends Object
 		}
 		
 		foreach($exportedSupplements as $name){
-			$exportConf = ShopConfig::load($name.'Types');
-			if(!empty($exportConf)){
-				$supplements[$name] = $exportConf;
-			}
 			if(!empty($data[$name.'_type'])){
 				$supplementsData[$name] = $data[$name.'_type'];
 			}
 		}
-		
-		
 		
 		
 		foreach($supplements as $sName => $supplement){
@@ -394,29 +378,6 @@ class ShopFunctComponent extends Object
 			}
 			
 			$supplementItem = $supplement[$supplement_choice['type']];
-			if(!is_array($supplementItem)){
-				$supplementItem = array('price'=>$supplementItem);
-			}
-			$specific_def = array();
-			if(!empty($specific_default_sup_opt[$sName])){
-				$specific_def = $specific_default_sup_opt[$sName];
-			}
-			$supplementItem = Set::merge($default_supplement_opt,$specific_def,$supplementItem);
-			
-			if(!isset($supplementItem['label']) || (empty($supplementItem['label']) && $supplementItem['label'] !== false)){
-				$supplementItem['label'] = Inflector::humanize($sName);
-			}
-			if(isset($supplementItem['label'])){
-				$supplementItem['label'] = __($supplementItem['label'],true);
-			}
-			
-			if(empty($supplementItem['descr']) && $supplementItem['descr'] !== false && $supplement_choice['type'] != $defaultType){
-				$supplementItem['descr'] = Inflector::humanize($supplement_choice['type']);
-			}
-			if(isset($supplementItem['descr'])){
-				$supplementItem['descr'] = __($supplementItem['descr'],true);
-			}
-			
 			
 			if(!empty($supplementItem['applicable'])){
 				if(!is_array($supplementItem['applicable']) || isset($supplementItem['applicable']['component']) ){
@@ -443,9 +404,6 @@ class ShopFunctComponent extends Object
 				}
 			}
 			
-			if(!empty($supplementItem['calculFunction'])){
-				$supplementItem['calcul'] = $supplementItem['calculFunction'];
-			}
 			$supplementItem['total'] = $supplementItem['price'];
 			if(!empty($supplementItem['calcul'])){
 				if(!is_array($supplementItem['calcul']) || isset($supplementItem['calcul']['component']) ){

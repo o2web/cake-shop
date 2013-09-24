@@ -126,5 +126,111 @@ class ShopConfig {
 		return $types;
 	}
 	
+	var $exportedSupplements = array('shipping');
+	var $default_supplement_opt = array(
+			'label'=>'',
+			'title'=>'',
+			'descr'=>'',
+			'price'=>0,
+			'calcul'=>null,
+			'applicable'=>null,
+			'tax_applied'=>false
+		);
+	var $specific_default_sup_opt = array(
+			'shipping'=>array(
+				'applicable'=>array('checkShippingReq'=>array())
+			)
+		);
+	var $default_supplement_name = 'default';
+	
+	
+	function getExportedSupplements(){
+		$_this =& ShopConfig::getInstance();
+		return $_this->exportedSupplements;
+	}
+	function getDefaultSupplementName(){
+		$_this =& ShopConfig::getInstance();
+		return $_this->default_supplement_name;
+	}
+	
+	function getSupplementOpts($type=null,$name=null){
+		$_this =& ShopConfig::getInstance();
+		$exportedSupplements = $_this->exportedSupplements;
+		$default_supplement_opt = $_this->default_supplement_opt;
+		$specific_default_sup_opt = $_this->specific_default_sup_opt;
+		$default_supplement_name = $_this->default_supplement_name;
+		
+		$supplements = (array)ShopConfig::load('supplements');
+		
+		foreach($exportedSupplements as $sName){
+			$exportConf = ShopConfig::load($sName.'Types');
+			if(!empty($exportConf)){
+				$supplements[$sName] = $exportConf;
+			}
+		}
+		$opts = array();
+		foreach($supplements as $tName => $supplementTypes){
+			if(is_null($type) || in_array($tName,(array)$type)){
+				$tOpts = array();
+				$specific_def = array();
+				if(!empty($specific_default_sup_opt[$tName])){
+					$specific_def = $specific_default_sup_opt[$tName];
+				}
+				if(empty($supplementTypes)){
+					$supplementTypes[$default_supplement_name] = array();
+				}
+				foreach($supplementTypes as $sName => $setting){
+					if(is_null($name) || in_array($sName,(array)$name)){
+					
+						if(!is_array($setting)){
+							$setting = array('price'=>$setting);
+						}
+						$sOpts = Set::merge($default_supplement_opt,$specific_def,$setting);
+						if(empty($sOpts['label']) && $sOpts['label'] !== false){
+							$sOpts['label'] = Inflector::humanize($tName);
+						}
+						if(isset($sOpts['label'])){
+							$sOpts['label'] = __($sOpts['label'],true);
+						}
+						if(empty($sOpts['title'])){
+							if(!empty($sOpts['descr'])){
+								$sOpts['title'] = $sOpts['descr'];
+							}else{
+								$sOpts['title'] = Inflector::humanize($sName);
+							}
+						}
+						if(isset($sOpts['title'])){
+							$sOpts['title'] = __($sOpts['title'],true);
+						}
+						if(empty($sOpts['descr']) && $sOpts['descr'] !== false && $sName != $default_supplement_name){
+							$sOpts['descr'] = Inflector::humanize($sName);
+						}
+						if(isset($sOpts['descr'])){
+							$sOpts['descr'] = __($sOpts['descr'],true);
+						}
+						
+						if(!empty($sOpts['calculFunction'])){
+							$sOpts['calcul'] = $sOpts['calculFunction'];
+						}
+						$sOpts['name'] = $sName;
+						
+						if(!is_null($name) && !is_array($name)){
+							return $sOpts;
+						}
+						
+						$tOpts[$sName] = $sOpts;
+					}
+				}
+				
+				if(!is_null($type) && !is_array($type)){
+					return $tOpts;
+				}
+				
+				$opts[$tName] = $tOpts;
+			}
+		}
+		return $opts;
+	}
+	
 }
 ?>
