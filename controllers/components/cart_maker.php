@@ -66,7 +66,7 @@ class CartMakerComponent extends Object{
 		return $subTotal;
 	}
 	
-	function itemListData(){
+	function itemListData($minCalcul=true){
 		if(!empty($this->data['cache']['itemListData'])){
 			return $this->data['cache']['itemListData'];
 		}
@@ -84,7 +84,9 @@ class CartMakerComponent extends Object{
 				$productData = $ShopProduct->getFullData($productData);
 			}
 			$productData = $this->ShopFunct->calculSubItem($productData);
-			$productData = $this->ShopFunct->calculPromo($productData,isset($this->data['order'])?$this->data['order']:null);
+			if($minCalcul){
+				$productData = $this->ShopFunct->calculPromo($productData,isset($this->data['order'])?$this->data['order']:null);
+			}
 			$data[] = $productData;
 		}
 		
@@ -99,13 +101,14 @@ class CartMakerComponent extends Object{
 			return $this->data['cache']['calculate'];
 		}
 		
-		$items = $this->itemListData();
+		$items = $this->itemListData(false);
 		$order = array();
 		if(isset($this->data['order'])){
 			$order = $this->data['order'];
 		}
 		$res = $this->ShopFunct->calculate(array('order'=>$order,'items'=>$items));
-		$res['items'] = $items;
+		$res = $this->ShopFunct->reverseOrderItem(array('order'=>$order,'items'=>$items),$res);
+		//debug($res);
 		
 		$this->data['cache']['calculate'] = $res;
 		$this->save();

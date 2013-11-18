@@ -10,10 +10,11 @@ class SupplementMethodComponent extends Object
 	//////////////// Applicable Function ////////////////
 	
 	function checkShippingReq($options,$supplementItem,$order,$supplement_choice,$calcul){
-		//debug($order);
-		foreach($order['ShopOrdersItem'] as $item){
-			if(!isset($item['shipping_req']) || $item['shipping_req']){
-				return true;
+		if(!empty($order['ShopOrdersItem'])){
+			foreach($order['ShopOrdersItem'] as $item){
+				if(!isset($item['shipping_req']) || $item['shipping_req']){
+					return true;
+				}
 			}
 		}
 		return false;

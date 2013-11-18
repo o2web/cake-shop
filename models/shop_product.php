@@ -173,7 +173,8 @@ class ShopProduct extends ShopAppModel {
 				),
 			),
 			'conditions'=>array(
-			)
+			),
+			'recursive'=>-1
 		));
 		/*$this->Aro->Aco->recursive = -1;
 		debug($this->Aro->Aco->find('all',array(

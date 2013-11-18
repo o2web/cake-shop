@@ -81,7 +81,39 @@ class ShopPromotionsController extends ShopAppController {
 		$this->set('operators', $this->ShopPromotion->operators);
 	}
 
-		
+	function _promoMethodList(){
+		$conds = array();
+		$methods = array();
+		if(ShopConfig::load('promo.complexBehavior') || ShopConfig::load('promo.complexConditions')) {
+			App::import('Lib', 'Shop.ClassCollection'); 
+			$all = ClassCollection::getList('promo','flat');
+			foreach($all as $name => $label){
+				$class = ClassCollection::getClass('promo',$name);
+				if(!method_exists($class,'isAvailable') || call_user_func(array($class, 'isAvailable')) ){
+					$obj = new $class();
+					if(method_exists($class,'beforeForm')){
+						$obj->beforeForm($this);
+					}
+					if(!empty($obj->type) && $obj->type = 'condition'){
+						$conds[$name] = $obj;
+					}else{
+						$methods[$name] = $obj;
+					}
+				}
+			}
+		}
+		if( !ShopConfig::load('promo.complexConditions') ) {
+			$conds = array();
+		}
+		if( !ShopConfig::load('promo.complexBehavior') ) {
+			App::import('Lib', 'Shop.ClassCollection'); 
+			$class = ClassCollection::getClass('promo','Shop.operation');
+			$obj = new $class();
+			$methods = array('Shop.operation'=>$obj);
+		}
+		return array('methods'=>$methods,'conds'=>$conds);
+	}
+
 	function admin_add() {
 		if (!empty($this->data)) {
 			$this->ShopPromotion->create();
@@ -101,10 +133,11 @@ class ShopPromotionsController extends ShopAppController {
 				$this->Session->setFlash(sprintf(__('The %s could not be saved. Please, try again.', true), 'shop promotion'));
 			}
 		}
-		$actions = $this->ShopPromotion->ShopAction->find('list',array('conditions'=>array('status'=>'checkPromo')));
-		$this->set('actions', $actions);
 		$products = $this->ShopProduct->generateAroList();
 		$this->set('products', $products);
+		$this->set($this->_promoMethodList());
+		$actions = $this->ShopPromotion->ShopAction->find('list',array('conditions'=>array('status'=>'checkPromo')));
+		$this->set('actions', $actions);
 	}
 
 	function admin_edit($id = null) {
@@ -154,11 +187,24 @@ class ShopPromotionsController extends ShopAppController {
 		$coupons['reserved'] = $coupons['all']-$this->ShopPromotion->ShopCoupon->find('count',array('conditions'=>array('shop_promotion_id'=>$promotion['ShopPromotion']['id'],'or'=>array('ShopCoupon.status not'=>array('used','reserved'),'ShopCoupon.status'=> null))));
 		$this->set('coupons', $coupons);
 		
-		$actions = $this->ShopPromotion->ShopAction->find('list',array('conditions'=>array('status'=>'checkPromo')));
-		$this->set('actions', $actions);
 		$products = $this->ShopProduct->generateAroList();
 		$this->set('products', $products);
+		$this->set($this->_promoMethodList());
+		$actions = $this->ShopPromotion->ShopAction->find('list',array('conditions'=>array('status'=>'checkPromo')));
+		$this->set('actions', $actions);
 		$this->set('promotion', $promotion);
+	}
+	
+	function admin_method_form($name,$prefix){
+		$this->layout = 'ajax';
+		App::import('Lib', 'Shop.ClassCollection'); 
+		$class = ClassCollection::getClass('promo',$name);
+		$method = new $class();
+		if(method_exists ($method,'beforeForm')){
+			$method->beforeForm($this);
+		}
+		$this->set('method',$method);
+		$this->set('prefix',$prefix);
 	}
 
 	function admin_delete($id = null) {

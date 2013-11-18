@@ -113,7 +113,7 @@
 				$taxeSub = $order['ShopOrder']['taxe_subs'][$taxeName];
 				$taxePrc = $taxeAmount / $taxeSub *100;
 				if($taxeSub != $lastSub){
-		?>		
+		?>
         <tr class="totals taxes_sub">
             <td colspan="4" class="title"><?php __('Taxable Amount'); ?></td>
             <td class="amount"><?php echo $this->Shop->currency($order['ShopOrder']['taxe_subs'][$taxeName]); ?></td>

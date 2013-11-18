@@ -83,14 +83,20 @@
 			<td class="price"><?php echo $this->Shop->currency($calcul['sub_total']); ?></td>
 			<td class="actions"><?php echo $this->Form->submit(__('Update',true),array('div'=>array('class'=>"submit btUpdate"))); ?></td>
 		</tr>
-		<?php if( array_key_exists('total_shipping',$calcul) ) { ?>
-		<tr class="rowtotal rowtotal_shipping">
-			<td colspan="<?php echo $nbCols-3 ?>">&nbsp;</td>
-			<td class="price_shipping"><?php __('shipping:'); ?></td>
-			<td class="price"><?php echo $this->Shop->currency($calcul['total_shipping']); ?></td>
-			<td class="">&nbsp;</td>
-		</tr>
-		<?php }?>
+		<?php 
+		if(!empty($calcul['supplements'])){
+			foreach($calcul['supplements'] as $supplementName => $supplement){  
+				?>
+					<tr class="rowtotal <?php echo $supplementName ?>">
+						<td colspan="<?php echo $nbCols-3 ?>">&nbsp;</td>
+						<td class="price_total"><?php echo $supplement['label'].(!empty($supplement['descr'])?'<br />'.$supplement['descr']:''); ?></td>
+						<td class="price"><?php echo $this->Shop->currency($supplement['total']); ?></td>
+						<td class="">&nbsp;</td>
+					</tr>
+				<?php 	
+			}
+		}
+		?>
 	</table>
 	<?php
 		if($codeInput){

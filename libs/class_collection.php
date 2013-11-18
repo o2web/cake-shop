@@ -4,14 +4,15 @@ class ClassCollection extends Object {
 	//App::import('Lib', 'ClassCollection'); 
 	
 	var $types = array(
-		'promotions'=>array(
+		'promo'=>array(
 			'classSufix'=>'Promo',
 			'fileSufix'=>'_promo',
 			'paths'=>'%app%/libs/promo/',
 			'ext'=>'php',
-			/*'parent'=>array(
-				'name'=>'Handler'
-			)*/
+			'parent'=>array(
+				'plugin'=>'Shop',
+				'name'=>'PromoMethod'
+			)
 		),
 	);
 	var $defaultOptions = array(
@@ -19,7 +20,8 @@ class ClassCollection extends Object {
 		'fileSufix'=>null,
 		'paths'=>'%app%/libs/',
 		'ext'=>'php',
-		'parent'=>null
+		'parent'=>null,
+		'pluginPassthrough'=>false,
 	);
 	var $parentInerit = array(
 		'ext','paths'
@@ -32,6 +34,16 @@ class ClassCollection extends Object {
 			$instance[0] =& new ClassCollection();
 		}
 		return $instance[0];
+	}
+	
+	function parseName($name){
+		$options['name'] = $name;
+		$parts = explode('.',$name);
+		if(count($parts) > 1){
+			$options['plugin'] = $parts[0];
+			$options['name'] = $parts[1];
+		}
+		return $options;
 	}
 	
 	function parseClassName($options){
@@ -76,14 +88,37 @@ class ClassCollection extends Object {
 		$opt = Set::Merge($_this->defaultOptions,$typeOpt);
 		return $_this->_getPaths($opt);
 	}
-	function _getPaths($typeOpt){
+	function _getPaths($typeOpt,$namedPlugin = false){
 		$paths = array();
 		if(!empty($typeOpt['paths'])){
+			if(empty($typeOpt['plugin'])){
+				if((!isset($typeOpt['plugin']) || $typeOpt['plugin'] !== false) && ($typeOpt['pluginPassthrough'] || $namedPlugin)){
+					$plugins = array_merge(array(null),App::objects('plugin'));
+				}else{
+					$plugins = array(null);
+				}
+			}elseif(!is_array($typeOpt['plugin'])){
+				$plugins = array($typeOpt['plugin']);
+			}
 			foreach((array)$typeOpt['paths'] as $path){
-				$path = str_replace('%app%',APP,$path);
-				$path = str_replace('/',DS,$path);
-				$path = str_replace(DS.DS,DS,$path);
-				$paths[] = $path;
+				foreach($plugins as $p){
+					if(empty($p)){
+						$app = APP;
+						$p = 'app';
+					}else{
+						$app = App::pluginPath($p);
+					}
+					if(!empty($app)){
+						$ppath = str_replace('%app%',$app,$path);
+						$ppath = str_replace('/',DS,$ppath);
+						$ppath = str_replace(DS.DS,DS,$ppath);
+						if($namedPlugin){
+							$paths[$p][] = $ppath;
+						}else{
+							$paths[] = $ppath;
+						}
+					}
+				}
 			}
 		}
 		return $paths;
@@ -94,11 +129,13 @@ class ClassCollection extends Object {
 		$opt = $_this->types[$type];
 		$opt = Set::Merge($_this->defaultOptions,$opt);
 		
-		$paths = $_this->_getPaths($opt);
+		$ppaths = $_this->_getPaths($opt,true);
+		//debug($ppaths);
 		
 		$endsWith = $opt['fileSufix'].'.'.$opt['ext'];
 		
 		$items = array();
+		foreach($ppaths as $plugin => $paths){
 		foreach($paths as $path){
 			$Folder =& new Folder($path);
 			$contents = $Folder->read(false, true);
@@ -106,11 +143,24 @@ class ClassCollection extends Object {
 				if (substr($item, - strlen($endsWith)) === $endsWith) {
 					$item = substr($item, 0, strlen($item) - strlen($endsWith));
 					if($named){
+							if($plugin != 'app'){
+								if($named === 'flat'){
+									$items[$plugin.'.'.$item] = Inflector::humanize($item);
+								}else{
+									$items[$plugin][$plugin.'.'.$item] = Inflector::humanize($item);
+								}
+							}else{
 						$items[$item] = Inflector::humanize($item);
+							}
+						}else{
+							if($plugin != 'app'){
+								$items[] = $plugin.'.'.$item;
 					}else{
 						$items[] = $item;
 					}
 				}
+			}
+		}
 			}
 		}
 		return $items;
@@ -118,13 +168,13 @@ class ClassCollection extends Object {
 	
 	function getObject($type,$name){
 		$_this =& ClassCollection::getInstance();
-		$options['name'] = $name;
+		$options = $_this->parseName($name);
 		$class = $_this->parseClassName($options);
 		$exitant = ClassRegistry::getObject($type.'.'.$name);
 		if($exitant){
 			return $exitant;
 		}else{
-			$class = $_this->getClass($type,$name);
+			$class = $_this->getClass($type,$options);
 		}
 		//debug($class);
 		if(!empty($class) && class_exists($class) ) {
@@ -144,7 +194,7 @@ class ClassCollection extends Object {
 		if(is_array($name)){
 			$options = $name;
 		}else{
-			$options['name'] = $name;
+			$options = $_this->parseName($name);
 		}
 		
 		if(!empty($_this->types[$type])){
@@ -162,6 +212,7 @@ class ClassCollection extends Object {
 		};
 		
 		$importOpt = $_this->parseImportOption($options);
+		//debug($importOpt);
 		
 		if(App::import($importOpt)){
 			return $importOpt['name'];

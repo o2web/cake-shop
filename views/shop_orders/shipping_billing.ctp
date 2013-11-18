@@ -147,7 +147,7 @@
 				echo $form->input('shipping_address',array('type'=>'text'));
 				echo $form->input('shipping_apt');
 				echo $form->input('shipping_city');
-				echo $this->Shop->countryInput('shipping_country');
+				echo $this->Shop->countryInput('shipping_country',array('continent'=>true));
 				echo $this->Shop->regionInput('shipping_region',array('countrySelect'=>'shipping_country'));
 				echo $form->input('shipping_postal_code');
 				echo $form->input('shipping_tel');
@@ -172,7 +172,7 @@
 				echo $form->input('billing_address',array('type'=>'text'));
 				echo $form->input('billing_apt');
 				echo $form->input('billing_city');
-				echo $this->Shop->countryInput('billing_country');
+				echo $this->Shop->countryInput('billing_country',array('continent'=>true));
 				echo $this->Shop->regionInput('billing_region',array('countrySelect'=>'billing_country'));
 				echo $form->input('billing_postal_code');
 				echo $form->input('billing_tel');

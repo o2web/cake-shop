@@ -104,3 +104,12 @@ table tr td.actions a.confirm {
     height: 16px;
     width: 17px;
 }
+
+form div.methodDef div{
+	margin-left: 0;
+}
+
+form div.methodDef div.methodParams.loading{
+	background: url('../img/ajax-loader.gif') center center no-repeat;
+	min-height: 50px;
+}

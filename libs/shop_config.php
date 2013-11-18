@@ -7,56 +7,78 @@ class ShopConfig {
 	
 	var $loaded = false;
 	var $defaultConfig = array(
-		'cart' => array(
-			'inlineSubProduct' => true, //If true, sub products can be set within the cart
-			'clearOnCompleted' => true, //If true, the cart will be clean when e transaction is complete
-			'qtyInNbItem' => true,		//If true, the number of item in the cart will include the quantity of each product
-			'defaultReturn' => null,
-		),
-		'order' => array(
-			'ACL' => array(
-				'aroProvider' => 'session',
-				'defaultAro' => 'users/guest',
-				'deniedRedirect' => array('plugin' => 'auth', 'controller' => 'users', 'action' => 'permission_denied'),
-			),
-		),
-		'address' => array(
-			'ACL' => array(
-				'aroProvider' => 'session',
-				'defaultAro' => 'users/guest',
-			),
-		),
-		'payment' => array(
-			'ACL' => array(
-				'aroProvider' => 'session',
-				'defaultAro' => 'users/guest',
-			),
+		array(
+			//--- Common ---//
+			'currencies' => null,
 			'enabled' => true,
-			'available' => array('paypal'),
+			'defaultTaxes' => true,  //set to false to remove automatic taxes
+			'countries' => true,	//list of available countries and regions. If true, all countries are available. Example to limit to Canada and Quebec : array('CA'=>array('regions'=>'QC')))
+			'defaultCountry' => null,
+			'defaultRegion' => null,
 		),
-		'promo'=> array(
-			'codeLen'=>16,	//Length of promotions codes
-			'max'=>null,	//Maximum number of promotions that can be applied to an order
+		array(
+			//--- Presentation config ---//
+			'cart' => array(
+				'inlineSubProduct' => true, //If true, sub products can be set within the cart
+				'qtyInNbItem' => true,		//If true, the number of item in the cart will include the quantity of each product
+			),
+			'groupShippingBilling' => true,
 		),
-		
-		'gaAccount' => 'var::googleAnaliticsCode',	//Google Analytics account name. "var::" and "conf::" are special prefixes allowing to retrieve the value from view variables or Configure::read
-		
-		'billingAddressRequired' => true,
-		'defaultShippingRequired' => true,
-		'groupShippingBilling' => true,
-		'emailBuyer' => true,
-		'plugComponent' => null,
-		'currencies' => null,
-		'enabled' => true,
-		'defaultTaxes' => true,  //set to false to remove automatic taxes
-		
-		'countries' => true,	//list of available countries and regions. If true, all countries are available. Example to limit to Canada and Quebec : array('CA'=>array('regions'=>'QC')))
-		
-		'defaultCountry' => null,
-		'defaultRegion' => null,
-		
-		'devMode' => false,
-		'dev' => array(),	//If devMode is true or a response is sent from sandbox.paypal, anysetting defined here will override other settings
+		array(
+			//--- Feature activation ---//
+			'promo' => array(
+				'coupons' => false,
+				'complexConditions' => false,
+				'complexBehavior' => false,
+			),
+		),
+		array(
+			//--- Behavior config ---//
+			'cart' => array(
+				'clearOnCompleted' => true, //If true, the cart will be clean when e transaction is complete
+				'defaultReturn' => null,
+			),
+			'payment' => array(
+				'ACL' => array(
+					'aroProvider' => 'session',
+					'defaultAro' => 'users/guest',
+				),
+				'enabled' => true,
+				'available' => array('paypal'),
+			),
+			'promo'=> array(
+				'codeLen'=>16,	//Length of promotions codes
+				'max'=>null,	//Maximum number of promotions that can be applied to an order
+			),
+			'billingAddressRequired' => true,
+			'defaultShippingRequired' => true,
+			'emailBuyer' => true,
+			),
+		array(
+			//--- Connections / data providers ---//
+			'order' => array(
+				'ACL' => array(
+					'aroProvider' => 'session',
+					'defaultAro' => 'users/guest',
+					'deniedRedirect' => array('plugin' => 'auth', 'controller' => 'users', 'action' => 'permission_denied'),
+				),
+			),
+			'address' => array(
+				'ACL' => array(
+					'aroProvider' => 'session',
+					'defaultAro' => 'users/guest',
+				),
+			),
+			'gaAccount' => 'var::googleAnaliticsCode',	//Google Analytics account name. "var::" and "conf::" are special prefixes allowing to retrieve the value from view variables or Configure::read
+		),
+		array(
+			//--- Extensions ---//
+			'plugComponent' => array(),
+			
+			//--- Dev ---//
+			'devMode' => false,
+			'dev' => array(),	//If devMode is true or a response is sent from sandbox.paypal, anysetting defined here will override other settings
+		)
 	);
 	
 	//$_this =& ShopConfig::getInstance();
@@ -74,7 +96,11 @@ class ShopConfig {
 		if(!$_this->loaded){
 			config('plugins/shop');
 			$config = Configure::read('Shop');
-			$config = Set::merge($_this->defaultConfig,$config);
+			$def = array();
+			foreach($_this->defaultConfig as $group){
+				$def = Set::merge($def,$group);
+			}
+			$config = Set::merge($def,$config);
 			Configure::write('Shop',$config);
 			$_this->loaded = true;
 		}else{

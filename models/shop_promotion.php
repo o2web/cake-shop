@@ -4,7 +4,7 @@ class ShopPromotion extends ShopAppModel {
 	var $actsAs = array(
 		'Acl' => array('type' => 'controlled'),
 		'Locale',
-		'Shop.Serialized'=>array('action_params'),
+		'Shop.Serialized'=>array('action_params','method_params','cond','cond_params'),
 	);
 	var $displayField = 'code';
 	
@@ -244,6 +244,37 @@ class ShopPromotion extends ShopAppModel {
 			return $res[0];
 		}
 		return $res;
+	}
+	
+	function getMethods($data = null){
+		$methods = array();
+		$methodsOpts = array();
+		if(empty($data)){
+			$data = $this->data;
+		}
+		if(!isset($data['ShopPromo'])){
+			$data = array('ShopPromo'=>$data);
+		}
+		if(!empty($data['ShopPromo']['cond'])){
+			foreach($data['ShopPromo']['cond'] as $pos => $name){
+				$opt = array('name'=>$name,'params'=>array());
+				if(!empty($data['ShopPromo']['cond_params'][$pos])){
+					$opt['params'] = $data['ShopPromo']['cond_params'][$pos];
+				}
+				$methodsOpts[] = $opt;
+			}
+		}
+		if(!empty($data['ShopPromo']['method'])){
+			$methodsOpts[] = array('name'=>$data['ShopPromo']['method'],'params'=>$data['ShopPromo']['method_params']);
+		}
+		App::import('Lib', 'Shop.ClassCollection'); 
+		
+		foreach($methodsOpts as $opt){
+			$class = ClassCollection::getClass('promo',$opt['name']);
+			$method = new $class($data,$opt['params']);
+			$methods[] = $method;
+		}
+		return $methods;
 	}
 }
 ?>

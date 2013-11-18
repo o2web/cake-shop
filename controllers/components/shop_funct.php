@@ -186,39 +186,48 @@ class ShopFunctComponent extends Object
 		return $products;
 	}
 
-	function calculPromo($products,$order = null){
+	function calculPromo(&$order){
 		App::import('Lib', 'Shop.SetMulti');
-		if(SetMulti::isAssoc($products)){
-			$prods =  array(&$products);
+		if(SetMulti::isAssoc($order['ShopOrdersItem'])){
+			$prods =  array(&$order['ShopOrdersItem']);
 		}else{
-			$prods = &$products;
+			$prods = &$order['ShopOrdersItem'];
 		}
-		$this->ShopPromotion = ClassRegistry::init('Shop.ShopPromotion'); 
 		//debug($order);
-		if(!empty($order['ShopPromotion'])){
-			$applicablePromos = SetMulti::extractKeepKey('id',$order['ShopPromotion']);
-			//debug($applicablePromos);
+		$this->ShopPromotion = ClassRegistry::init('Shop.ShopPromotion'); 
+		$applicablePromos = array();
+		if(!empty($order['ShopPromotion']) && !empty($order['ShopOrder'])){
+			foreach($order['ShopPromotion'] as $promo){
+				$applicablePromos[$promo['id']] = array('ShopPromotion'=>$promo);
+			}
 		}
-		foreach($prods as &$prod){
+		$calculatedProd = array();
+		foreach($prods as $key => &$prod){
 			$orderItemMode = isset($prod['item_price']);
 			if($orderItemMode){
 				$p = &$prod;
 			}else{
 				$p = $this->extractOrderItemData($p2 = $prod);
 			}
+			$calculatedProd[$key] = &$p;
 			if(empty($p['item_original_price'])){
 				$price = $p['item_price'];
 				//debug($p);
 				if(!empty($p['ShopPromotion'])){
+					$promoCodes = array();
+					if(isset($order['ShopOrder']['promo_codes'])){
+						$promoCodes = $order['ShopOrder']['promo_codes'];
+					}elseif(isset($order['promo_codes']) && !empty($order['ShopOrder'])){
+						$promoCodes = $order['promo_codes'];
+					}
+					//debug($order);
 					foreach($p['ShopPromotion'] as &$promo){
+						$exists = (!empty($applicablePromos[$promo['id']]));
+						$promoData = $exists?$applicablePromos[$promo['id']]:array('ShopPromotion'=>&$promo);
+						
 						$applicable = true;
-						if(isset($order['ShopOrder']['promo_codes'])){
-							$promoCodes = $order['ShopOrder']['promo_codes'];
-						}elseif(isset($order['promo_codes'])){
-							$promoCodes = $order['promo_codes'];
-						}
-						if(!empty($applicablePromos)){
-							$applicable = in_array($promo['id'],$applicablePromos);
+						if($exists || !empty($order['ShopPromotion'])){
+							$applicable = $exists;
 						}else{
 							if($promo['code_needed']){
 								if(!empty($promoCodes) && !empty($promo['code']) && in_array($promo['code'],$promoCodes)){
@@ -239,43 +248,97 @@ class ShopFunctComponent extends Object
 								}
 							}
 						}
+						$methods = array();
 						if($applicable){
-							$newPrice = $this->ShopPromotion->applyOperator($price,$promo['operator'],$promo['val']);
-							if(!empty($promo['ShopAction']) && !empty($promo['ShopAction']['id'])){
-								$action = $this->ShopPromotion->ShopAction->toCallBack($promo['ShopAction'],array($p,$newPrice,$promo['action_params']));
-								$res = $this->callExternalfunction($action);
-								if($res === true){
-								}elseif($res === false){
-									$newPrice = $price;
-								}elseif(is_numeric($res)){
-									$newPrice = $res;
-								}else{
-									$newPrice = $price;
+							if(empty($promoData['Method'])){
+								$methods = $this->ShopPromotion->getMethods($promo);
+								$promoData['Method'] = $methods;
+							}
+							foreach($methods as $method){
+								if(method_exists($method,'validate')){
+									$res = $method->validate($prod,$order);
+									if($res === false){
+										$applicable = false;
+										break;
+									}
 								}
 							}
-							$promo['rebate'] = $price - $newPrice;
-							$price = $newPrice;
+						}
+						$promoData['ShopProduct'][] = &$p;
+						if($applicable){
+							$applicablePromos[$promo['id']] = $promoData;
+						}
+						unset($promo);
+						unset($promoData);
+					}
+				}
+				
+				$p['item_original_price'] = $p['item_price'];
+				
+				
+			}
+			unset($p);
+			unset($prod);
+		}
+		//debug($applicablePromos);
+		foreach($applicablePromos as $promo){
+			$methodCalcul = false;
+			if(!empty($promo['Method'])){
+				foreach($promo['Method'] as $method){
+					if(method_exists($method,'apply')){
+						$res = $method->apply($promo,$order);
+						if($res !== false){
+							$methodCalcul = true;
 						}
 					}
 				}
-				$p['item_rebate'] = $p['item_price'] - $price;
-				$p['item_original_price'] = $p['item_price'];
-				$p['item_price'] = $price;
-				if(!$orderItemMode){
-					if(isset($prod['ShopProduct']['DynamicField'])){
-						$dprod = &$prod['ShopProduct'];
-					}else{
-						$dprod = &$prod;
-					}
-					$dprod['DynamicField']['rebate'] = $p['item_rebate'];
-					$dprod['DynamicField']['original_price'] = $p['item_original_price'];
-					$dprod['DynamicField']['price'] = $p['item_price'];
+			}
+			if(!$methodCalcul){
+				$this->_oldPromoCalcul($promo,$order);
+			}
+		}
+		
+		//debug($prods);
+		//debug($calculatedProd);
+		foreach($calculatedProd as $key => &$p){
+			$p['item_rebate'] = $p['item_original_price'] - $p['item_price'];
+			if(!$orderItemMode){
+				$prod = &$prods[$key];
+				if(isset($prod['ShopProduct']['DynamicField'])){
+					$dprod = &$prod['ShopProduct'];
+				}else{
+					$dprod = &$prod;
 				}
+				$dprod['DynamicField']['rebate'] = $p['item_rebate'];
+				$dprod['DynamicField']['original_price'] = $p['item_original_price'];
+				$dprod['DynamicField']['price'] = $p['item_price'];
+				unset($prod);
+				unset($dprod);
 			}
 			unset($p);
 		}
-		
-		return $products;
+	}
+	
+	function _oldPromoCalcul(&$promo,&$order){
+		foreach($promo['ShopProduct'] as &$p){
+			$price = $p['item_price'];
+			
+			$newPrice = $this->ShopPromotion->applyOperator($price,$promo['ShopPromotion']['operator'],$promo['ShopPromotion']['val']);
+			if(!empty($promo['ShopPromotion']['ShopAction']) && !empty($promo['ShopPromotion']['ShopAction']['id'])){
+				$action = $this->ShopPromotion->ShopAction->toCallBack($promo['ShopPromotion']['ShopAction'],array($p,$newPrice,$promo['action_params']));
+				$res = $this->callExternalfunction($action);
+				if($res === true){
+				}elseif($res === false){
+					$newPrice = $price;
+				}elseif(is_numeric($res)){
+					$newPrice = $res;
+				}else{
+					$newPrice = $price;
+				}
+			}
+			$promo['rebate'] = $price - $newPrice;
+			$p['item_price'] = $newPrice;
+		}
 	}
 	
 	function calculate($order){
@@ -317,13 +380,20 @@ class ShopFunctComponent extends Object
 			$orderItems[] = $this->extractOrderItemData($orderItem);
 		}
 		
+		$order['ShopOrdersItem'] = &$orderItems;
+		
+		
+		$supplements = ShopConfig::getSupplementOpts();
+		//debug($supplements);
+		$order['Supplements'] = &$supplements;
+		
 		//============ calcul subItems ============//
 		$orderItems = $this->calculSubItem($orderItems);
 		//debug($orderItems);
 		
 		
 		//============ calcul promos ============//
-		$orderItems = $this->calculPromo($orderItems,isset($order['ShopOrder'])?$order:null);
+		$this->calculPromo($order);
 		//debug($orderItems);
 		
 		//============ total_items ============//
@@ -347,7 +417,6 @@ class ShopFunctComponent extends Object
 		
 		$result['total_supplements'] = 0;
 		
-		$supplements = ShopConfig::getSupplementOpts();
 		$exportedSupplements = ShopConfig::getExportedSupplements();
 		$defaultType = ShopConfig::getDefaultSupplementName();
 		
@@ -384,6 +453,7 @@ class ShopFunctComponent extends Object
 					$supplementItem['applicable'] = array($supplementItem['applicable']);
 				}
 				foreach($supplementItem['applicable'] as $funct => $fopt){
+					//debug($supplementItem);
 					if(is_string($fopt)){
 						$funct = $fopt;
 						$fopt = array();
@@ -443,7 +513,8 @@ class ShopFunctComponent extends Object
 			$result['supplements'][$sName] = $supplementItem;
 			$result['total_supplements'] += $supplementItem['total'];
 		}
-		
+		//debug($exportedSupplements);
+		//debug($result['supplements']);
 		foreach($exportedSupplements as $name){
 			if(isset($result['supplements'][$name]['total'])){
 				$result['total_'.$name] = $result['supplements'][$name]['total'];
@@ -685,6 +756,22 @@ class ShopFunctComponent extends Object
 		$data['active'] = 1;
 		
 		return $data;
+	}
+	
+	function reverseOrderItem($originalOpt,$calculResult){
+		if(empty($calculResult)) return $calculResult;
+		$extract_data = array(
+			'Options.nb' => 'nb',
+			'Options.data' => 'data',
+			'DynamicField.price' => 'item_price',
+			'DynamicField.rebate' => 'item_rebate',
+			'DynamicField.original_price' => 'item_original_price',
+		);
+		foreach($calculResult['OrderItem'] as $pos => $item){
+			$newData = SetMulti::extractHierarchicMulti($extract_data,$item);
+			$calculResult['items'][$pos] = Set::merge($originalOpt['items'][$pos],$newData);
+		}
+		return $calculResult;
 	}
 	
 

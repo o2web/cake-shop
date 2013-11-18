@@ -82,6 +82,10 @@ class ShopHelper extends AppHelper {
 				}
 			}
 		}
+		$def = ShopConfig::load('defaultCountry');
+		if(!empty($def)){
+			$options['default'] = $def;
+		}
 		$options['options'] = $countries;
 		return $this->O2form->input($fieldName, $options);
 	}
