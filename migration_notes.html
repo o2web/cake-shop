@@ -93,8 +93,8 @@ pre{
 <div class="section">
     <h1>De vX.X.X.X à vX.X.X.X</h1>
     <ol>
-        <li></li>
-        <li></li>
+        <li>ALTER TABLE `shop_orders` ADD `currency` VARCHAR( 255 ) NULL AFTER `sub_total`;</li>
+        <li>ALTER TABLE `shop_payments` ADD `currency` VARCHAR( 255 ) NULL AFTER `amount` ;</li>
 		<li></li>
     </ol>
 </div>

@@ -1,4 +1,5 @@
 <?php 
+$currency = !empty($order['ShopOrder']['currency'])?$order['ShopOrder']['currency']:null;
 if(!isset($taxed)) 			$taxed = null;
 if(!isset($indent)) 		$indent = 3;
 if(!isset($titleClass)) 	$titleClass = 'title';
@@ -12,7 +13,7 @@ if(!empty($supplements)){
 ?>
 		<tr class="<?php echo $rowClass.' '.$supplementName ?>">
             <td colspan="<?php echo $indent+1 ?>" class="<?php echo $titleClass ?>"><?php echo $supplement['label'].(!empty($supplement['descr'])?'<br />'.$supplement['descr']:''); ?></td>
-            <td class="<?php echo $amountClass ?>"><?php echo $this->Shop->currency($supplement['total']); ?></td>
+            <td class="<?php echo $amountClass ?>"><?php echo $this->Shop->currency($supplement['total'],$currency); ?></td>
         </tr>
 <?php 	
 		}

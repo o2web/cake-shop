@@ -1,5 +1,6 @@
-<?php if(isset($order)){ ?>
-<?php //debug($order); ?>
+<?php if(isset($order)){
+	$currency = !empty($order['ShopOrder']['currency'])?$order['ShopOrder']['currency']:null;
+?>
 <div class="invoice">
     <div class="general">
         <div><span class="label"><?php __('# Order : ') ?></span><?php echo str_pad($order['ShopOrder']['id'], 6, "0", STR_PAD_LEFT); ?></div>
@@ -51,8 +52,8 @@
 						echo "<span>".$orderItem[$orderItem['ShopProduct']['code']]."</span>"; 
 					}
 				?></td>
-				<td class="amount"><?php if(empty($orderItem['overwritten_price'])) echo $this->Shop->currency($orderItem['item_alone_price']-$orderItem['item_rebate']); ?></td>
-				<td class="amount"><?php echo $this->Shop->currency($orderItem['total']); ?></td>
+				<td class="amount"><?php if(empty($orderItem['overwritten_price'])) echo $this->Shop->currency($orderItem['item_alone_price']-$orderItem['item_rebate'],$currency); ?></td>
+				<td class="amount"><?php echo $this->Shop->currency($orderItem['total'],$currency); ?></td>
 			</tr>
 			
 			<?php if(!empty($orderItem['SubItem'])){ ?>
@@ -77,7 +78,7 @@
 								$orderSubItem['item_price']
 							:
 								$orderSubItem['modif']
-						); ?></td>
+						,$currency); ?></td>
 						<td class="amount">&nbsp;</td>
 					</tr>
 				<?php } ?>
@@ -87,13 +88,13 @@
 		<?php if(!empty($order['ShopOrder']['discount']) || !empty($order['ShopOrder']['taxes']) || !empty($order['ShopOrder']['total_shipping'])){ ?>
         <tr class="totals sub_total">
             <td colspan="4" class="title"><?php __d('shop','Sub total') ?></td>
-            <td class="amount"><?php echo $this->Shop->currency($order['ShopOrder']['sub_total']); ?></td>
+            <td class="amount"><?php echo $this->Shop->currency($order['ShopOrder']['sub_total'],$currency); ?></td>
         </tr>
 		<?php } ?>
         <?php if(!empty($order['ShopOrder']['discount'])){ ?>
         <tr class="totals discount">
             <td colspan="4" class="title"><?php __('Discount') ?></td>
-            <td class="amount"><?php echo $this->Shop->currency($order['ShopOrder']['discount']); ?></td>
+            <td class="amount"><?php echo $this->Shop->currency($order['ShopOrder']['discount'],$currency); ?></td>
         </tr>
         <?php } ?>
 		
@@ -113,16 +114,16 @@
 				$taxeSub = $order['ShopOrder']['taxe_subs'][$taxeName];
 				$taxePrc = $taxeAmount / $taxeSub *100;
 				if($taxeSub != $lastSub){
-		?>
+		?>		
         <tr class="totals taxes_sub">
             <td colspan="4" class="title"><?php __('Taxable Amount'); ?></td>
-            <td class="amount"><?php echo $this->Shop->currency($order['ShopOrder']['taxe_subs'][$taxeName]); ?></td>
+            <td class="amount"><?php echo $this->Shop->currency($order['ShopOrder']['taxe_subs'][$taxeName],$currency); ?></td>
         </tr>
 		<?php	 } ?>
 		
         <tr class="totals taxes">
             <td colspan="4" class="title"><?php echo $taxeName; ?> <span class="prc">(<?php echo $taxePrc ?> %)</span></td>
-            <td class="amount"><?php echo $this->Shop->currency($taxeAmount); ?></td>
+            <td class="amount"><?php echo $this->Shop->currency($taxeAmount,$currency); ?></td>
         </tr>
         <?php 
 				$lastSub = $taxeSub + $taxeAmount;
@@ -135,7 +136,7 @@
 		?>
         <tr class="totals total">
             <td colspan="4" class="title"><?php __d('shop','Total') ?></td>
-            <td class="amount"><?php echo $this->Shop->currency($order['ShopOrder']['total']); ?></td>
+            <td class="amount"><?php echo $this->Shop->currency($order['ShopOrder']['total'],$currency); ?></td>
         </tr>
     </table>
 </div>

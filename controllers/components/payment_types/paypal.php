@@ -14,7 +14,7 @@ class PaypalPaymentComponent extends PaymentComponent{
 		if(empty($this->controller->helpers['PaypalIpn.Paypal'])){
 			$this->controller->helpers['PaypalIpn.Paypal'] = array(
 				'business' => $this->settings['business'],
-				'currency_code' => strtoupper(Configure::read('Shop.currency'))
+				'currency_code' => strtoupper(!empty($this->payment['ShopPayment']['currency'])?$this->payment['ShopPayment']['currency']:Configure::read('Shop.currency'))
 			);
 			if(!empty($this->settings['devMode'])){
 				$this->controller->helpers['PaypalIpn.Paypal']['test'] = true;

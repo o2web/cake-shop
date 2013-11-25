@@ -133,7 +133,7 @@ class ShopFunctComponent extends Object
 		return !empty($data['country']) && !empty($data['region']);
 	}
 	
-	function calculSubItem($products){
+	function calculSubItem($products,$order=null){
 		App::import('Lib', 'Shop.SetMulti');
 		if(SetMulti::isAssoc($products)){
 			$prods =  array(&$products);
@@ -145,12 +145,12 @@ class ShopFunctComponent extends Object
 			if($orderItemMode){
 				$p = &$prod;
 			}else{
-				$p = $this->extractOrderItemData($p2 = $prod);
+				$p = $this->extractOrderItemData($p2 = $prod,$order);
 			}
 			$cur_price = $p['item_price'];
 			$p['item_alone_price'] = $cur_price;
 			$p['overwritten_price'] = false;
-			$subItems = $this->extractSubItemData($prod);
+			$subItems = $this->extractSubItemData($prod,$order);
 			if(!empty($subItems)) { 
 				//============ calculate ============//
 				App::import('Lib', 'Shop.Operations');
@@ -207,7 +207,7 @@ class ShopFunctComponent extends Object
 			if($orderItemMode){
 				$p = &$prod;
 			}else{
-				$p = $this->extractOrderItemData($p2 = $prod);
+				$p = $this->extractOrderItemData($p2 = $prod,$order);
 			}
 			$calculatedProd[$key] = &$p;
 			if(empty($p['item_original_price'])){
@@ -377,7 +377,7 @@ class ShopFunctComponent extends Object
 		}
 		
 		foreach($rawItems as $orderItem){
-			$orderItems[] = $this->extractOrderItemData($orderItem);
+			$orderItems[] = $this->extractOrderItemData($orderItem,$order);
 		}
 		
 		$order['ShopOrdersItem'] = &$orderItems;
@@ -388,7 +388,7 @@ class ShopFunctComponent extends Object
 		$order['Supplements'] = &$supplements;
 		
 		//============ calcul subItems ============//
-		$orderItems = $this->calculSubItem($orderItems);
+		$orderItems = $this->calculSubItem($orderItems,$order);
 		//debug($orderItems);
 		
 		
@@ -647,7 +647,7 @@ class ShopFunctComponent extends Object
 		return $conditions;
 	}
 	
-	function extractSubItemData($productAndOptions){
+	function extractSubItemData($productAndOptions,$order){
 		if(!empty($productAndOptions['ShopOrdersSubitem'])){
 			return $productAndOptions['ShopOrdersSubitem'];
 		}
@@ -660,7 +660,7 @@ class ShopFunctComponent extends Object
 		if($orderItemMode){
 			$p = &$productAndOptions;
 		}else{
-			$p = $this->extractOrderItemData($p2 = $productAndOptions);
+			$p = $this->extractOrderItemData($p2 = $productAndOptions,$order);
 		}
 		$cur_price = $p['item_price'];
 		$p['item_alone_price'] = $cur_price;
@@ -724,10 +724,9 @@ class ShopFunctComponent extends Object
 		}
 		return null;
 	}
-	function extractOrderItemData($productAndOptions){
+	function extractOrderItemData($productAndOptions,$order=null){
 		App::import('Lib', 'Shop.ShopConfig');
-		$currency = ShopConfig::load('Shop.currency');
-		//debug($productAndOptions);
++		$currency = !empty($order['ShopOrder']['currency'])?$order['ShopOrder']['currency']:ShopConfig::load('currency');
 		$extract_data = array(
 			'id' => 'id',
 			'product_id' => 'ShopProduct.id',

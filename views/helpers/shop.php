@@ -127,12 +127,13 @@ class ShopHelper extends AppHelper {
 		return $this->O2form->input($fieldName, $options);
 	}
 	
-	function currency($number){
-		$currency = Configure::read('Shop.currency');
+	function currency($number,$currency=null){
+		if(is_null($currency)){
+			$currency = Configure::read('Shop.currency');
+		}
 		$lang = Configure::read('Config.language');
 		$find = array();
-		if(!empty($currency)){
-			$find[] = $currency.'-'.$lang;
+		if(!empty($currency)){			$find[] = $currency.'-'.$lang;
 			$find[] = $currency;
 		}
 		$find[] = $lang;

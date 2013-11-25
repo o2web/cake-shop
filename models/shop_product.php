@@ -63,6 +63,7 @@ class ShopProduct extends ShopAppModel {
 	
 	function afterFindAssoc($results,$fullData,$path){
 		if($this->fullDataEnabled){
+			$order = null;
 			///// try to get the related entry if it was allready in the full result ///// 
 			if(count($results) == 1 && empty($results[0]['ShopProduct']['Related']) && !empty($results[0]['ShopProduct']['model']) && !empty($results[0]['ShopProduct']['foreign_id'])){
 				$relatedAlias = $results[0]['ShopProduct']['model'];
@@ -75,10 +76,13 @@ class ShopProduct extends ShopAppModel {
 				if(!empty($fullData[$fullPos][$relatedAlias]) && $fullData[$fullPos][$relatedAlias]['id'] == $foreign_id){
 					$results[0]['ShopProduct']['Related'] = $fullData[$fullPos][$relatedAlias];
 				}
+				
+				if(!empty($fullData[$fullPos]['ShopOrder'])){
+					$order = $fullData[$fullPos]['ShopOrder'];
+				}
 			}
 			
-			
-			$results = $this->getFullData($results);
+			$results = $this->getFullData($results,array('order'=>$order));
 			App::import('Lib', 'Shop.SetMulti');
 			if(!SetMulti::isAssoc($results)){
 				foreach($results as &$result){
@@ -328,7 +332,7 @@ class ShopProduct extends ShopAppModel {
 		$prods = $this->getAllRelated($prods,$opt);
 		
 		foreach($prods as &$product){
-			$dynamicField = $this->getDynamicFields($product);
+			$dynamicField = $this->getDynamicFields($product,$opt);
 			$product['DynamicField'] = $dynamicField;
 			if($this->getPromos){
 				$product['ShopPromotion'] = $this->possiblePromo($product);
@@ -378,7 +382,7 @@ class ShopProduct extends ShopAppModel {
 			$ids = Set::extract('/foreign_id',$refs);
 			$findOpt = array('conditions'=>array('id'=>$ids));
 			if($opt['minField']){
-				$fields = $this->dynamicFieldsExtractData($relatedModel);
+				$fields = $this->dynamicFieldsExtractData($relatedModel,$opt);
 				$fields = array_values(Set::flatten($fields));
 				$fields = SetMulti::pregFilter('/^Related\./',$fields);
 				$fields = str_replace('Related.',$relatedModel->alias.'.',$fields);
@@ -422,7 +426,7 @@ class ShopProduct extends ShopAppModel {
 		}
 		return null;
 	}
-	function dynamicFieldsExtractData($product=null){
+	function dynamicFieldsExtractData($product=null,$opt=array()){
 		if(is_array($product) && isset($product['ShopProduct'][0])){
 			$product['ShopProduct'] = $product['ShopProduct'][0];
 		}
@@ -446,8 +450,11 @@ class ShopProduct extends ShopAppModel {
 		if($relatedModel && $relatedModel->displayField && $relatedModel->displayField != 'id'){
 			$fieldNameReplace['(Related.displayField)'] = 'Related.'.$relatedModel->displayField;
 		}
-		if(Configure::read('Shop.currency')){
-			$fieldNameReplace['(currency)'] = strtolower(Configure::read('Shop.currency'));
+		
+		App::import('Lib', 'Shop.ShopConfig');
+		$currency = !empty($opt['order']['currency'])?$opt['order']['currency']:ShopConfig::load('currency');
+		if($currency){
+			$fieldNameReplace['(currency)'] = strtolower($currency);
 		}
 		
 		foreach($extract_data as $fieldName => &$paths){
@@ -489,8 +496,8 @@ class ShopProduct extends ShopAppModel {
 		return (substr($haystack, 0, $length) === $needle);
 	}
 
-	function getDynamicFields($product=null){
-		$res = SetMulti::extractHierarchicMulti($this->dynamicFieldsExtractData($product),$product);
+	function getDynamicFields($product=null,$opt=array()){
+		$res = SetMulti::extractHierarchicMulti($this->dynamicFieldsExtractData($product,$opt),$product);
 		return $res;
 	}
 	function getRelatedClass($product=null){

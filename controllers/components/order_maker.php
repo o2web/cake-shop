@@ -87,6 +87,7 @@ class OrderMakerComponent extends Object
 			$this->ShopOrder->create();
 			$orderData = $this->ShopOrder->filterExposedfields($options['order']);
 			$orderData['status'] = 'input';
+			$orderData['currency'] = ShopConfig::load('currency');
 			App::import('Lib', 'Shop.ShopConfig');
 			if(ShopConfig::load('devMode')){
 				$orderData['dev_mode'] = 1;

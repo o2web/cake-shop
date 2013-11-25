@@ -128,7 +128,7 @@ class SupplementMethodComponent extends Object
 		}
 		$opt = array_merge($defOpt,$options);
 		
-		$currency = ShopConfig::load('currency');
+		$currency = !empty($order['ShopOrder']['currency'])?$order['ShopOrder']['currency']:ShopConfig::load('currency');
 		
 		$val = null;
 		if(array_key_exists($currency,$opt['list'])){

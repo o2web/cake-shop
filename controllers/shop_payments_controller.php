@@ -104,6 +104,8 @@ class ShopPaymentsController extends ShopAppController {
 			$this->ShopPayment->create();
 			$data['status'] = 'input';
 			$data['active'] = 1;
+			App::import('Lib', 'Shop.ShopConfig');
+			$data['currency'] = !empty($orders[0]['ShopOrder']['currency'])?$orders[0]['ShopOrder']['currency']:ShopConfig::load('currency');
 			$this->ShopPayment->save($data);
 			$payment_id = $this->ShopPayment->id;
 			$aro = $this->__getAro();
