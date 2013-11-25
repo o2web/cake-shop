@@ -647,7 +647,7 @@ class ShopFunctComponent extends Object
 		return $conditions;
 	}
 	
-	function extractSubItemData($productAndOptions,$order){
+	function extractSubItemData($productAndOptions,$order=null){
 		if(!empty($productAndOptions['ShopOrdersSubitem'])){
 			return $productAndOptions['ShopOrdersSubitem'];
 		}

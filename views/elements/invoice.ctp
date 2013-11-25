@@ -1,5 +1,6 @@
 <?php if(isset($order)){
 	$currency = !empty($order['ShopOrder']['currency'])?$order['ShopOrder']['currency']:null;
+	if(!isset($edit)) $edit = true;
 ?>
 <div class="invoice">
     <div class="general">
@@ -17,12 +18,12 @@
 		?>
         <?php /*?><div><span class="label"><?php __('Confirmation Number : ') ?></span><?php echo $cleConfirmation; ?></div><?php */?>
 		<div class="address billing">
-			<h4><?php __d('shop','Billing address') ?> (<a href="<?php echo $html->url(array('action'=>'billing',$order['ShopOrder']['id'])) ?>"><?php __d('shop','edit') ?></a>) :</h4>
+			<h4><?php __d('shop','Billing address') ?> <?php if( $edit ) { ?>(<a href="<?php echo $html->url(array('action'=>'billing',$order['ShopOrder']['id'])) ?>"><?php __d('shop','edit') ?></a>)<?php }?> :</h4>
 			<p><?php echo $this->element('address',array('plugin'=>'shop','address'=>$order['ShopOrder'],'prefix'=>'billing_'))?></p>
 		</div>
 		<?php if(!empty($order['ShopOrder']['shipping_address'])){ ?>
 		<div class="address shipping">
-			<h4><?php __d('shop','Shipping address') ?> (<a href="<?php echo $html->url(array('action'=>'shipping',$order['ShopOrder']['id'])) ?>"><?php __d('shop','edit') ?></a>) :</h4>
+			<h4><?php __d('shop','Shipping address') ?> <?php if( $edit ) { ?>(<a href="<?php echo $html->url(array('action'=>'shipping',$order['ShopOrder']['id'])) ?>"><?php __d('shop','edit') ?></a>)<?php }?> :</h4>
 			<p><?php echo $this->element('address',array('plugin'=>'shop','address'=>$order['ShopOrder'],'prefix'=>'shipping_'))?></p>
 		</div>
 		<?php } ?>
