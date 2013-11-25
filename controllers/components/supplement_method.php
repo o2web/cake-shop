@@ -7,6 +7,14 @@ class SupplementMethodComponent extends Object
 		$this->controller =& $controller;
 	}
 	
+	function calculFunct($funct,$fopt,$supplementItem,$order,$supplement_choice,$result){
+		$res = null;
+		if(method_exists($this,$funct) ){
+			$res = $this->{$funct}($fopt,$supplementItem,$order,$supplement_choice,$result);
+		}
+		return $res;
+	}
+	
 	//////////////// Applicable Function ////////////////
 	
 	function checkShippingReq($options,$supplementItem,$order,$supplement_choice,$calcul){
@@ -25,6 +33,7 @@ class SupplementMethodComponent extends Object
 	function rangesOpt($options,$supplementItem,$order,$supplement_choice,$calcul){
 		$defOpt = array(
 			'rangedValue' => 'calcul.total_items',
+			'subMethod' => null,
 			'defModif' => 'total',
 			'ranges' => array()
 		);
@@ -52,6 +61,9 @@ class SupplementMethodComponent extends Object
 					$max = PHP_INT_MAX;
 				}
 				if($rangedValue >= $min && $rangedValue <= $max){
+					if(!empty($opt['subMethod'])){
+						return $this->calculFunct($opt['subMethod'],$setting,$supplementItem,$order,$supplement_choice,$result);
+					}
 					if(!is_array($setting)){
 						$setting = array($opt['defModif']=>$setting);
 					}
@@ -67,6 +79,7 @@ class SupplementMethodComponent extends Object
 	function byCountry($options,$supplementItem,$order,$supplement_choice,$calcul){
 		$defOpt = array(
 			'keyPath' => array('order.ShopOrder.shipping_country','settings.defaultCountry'),
+			'subMethod' => null,
 			'modifProp' => 'total',
 			'list' => array()
 		);
@@ -75,7 +88,6 @@ class SupplementMethodComponent extends Object
 		}
 		$opt = array_merge($defOpt,$options);
 		
-		
 		App::import('Lib', 'Shop.ShopConfig');
 		$settings = ShopConfig::load();
 		$dataSource = array('settings'=>$settings,'order'=>$order,'calcul'=>$calcul);
@@ -83,16 +95,53 @@ class SupplementMethodComponent extends Object
 		App::import('Lib', 'Shop.SetMulti');
 		$country = SetMulti::extractHierarchic($opt['keyPath'], $dataSource);
 			
+		$val = null;
 		if(array_key_exists($country,$opt['list'])){
-			$supplementItem[$opt['modifProp']] = $opt['list'][$country];
+			$val = $opt['list'][$country];
 		}else{
 			App::import('Lib', 'O2form.Geography');
 			$continent = Geography::getContinent($country);
 			if(array_key_exists($continent,$opt['list'])){
-				$supplementItem[$opt['modifProp']] = $opt['list'][$continent];
+				$val = $opt['list'][$continent];
+			}elseif(array_key_exists('default',$opt['list'])){
+				$val = $opt['list']['default'];
 			}
 		}
+		if(!is_null($val)){
+			if(!empty($opt['subMethod'])){
+				return $this->calculFunct($opt['subMethod'],$val,$supplementItem,$order,$supplement_choice,$calcul);
+			}
+			$supplementItem[$opt['modifProp']] = $val;
+		}
 		
+		return $supplementItem;
+	}
+	
+	function byCurrency($options,$supplementItem,$order,$supplement_choice,$calcul){
+		$defOpt = array(
+			'modifProp' => 'total',
+			'subMethod' => null,
+			'list' => array()
+		);
+		if(!count(array_intersect_key($options,$defOpt))){
+			$options = array('list' =>$options);
+		}
+		$opt = array_merge($defOpt,$options);
+		
+		$currency = ShopConfig::load('currency');
+		
+		$val = null;
+		if(array_key_exists($currency,$opt['list'])){
+			$val = $opt['list'][$currency];
+		}elseif(array_key_exists('default',$opt['list'])){
+			$val = $opt['list']['default'];
+		}
+		if(!is_null($val)){
+			if(!empty($opt['subMethod'])){
+				return $this->calculFunct($opt['subMethod'],$val,$supplementItem,$order,$supplement_choice,$calcul);
+			}
+			$supplementItem[$opt['modifProp']] = $val;
+		}
 		
 		return $supplementItem;
 	}

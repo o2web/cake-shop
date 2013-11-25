@@ -9,6 +9,7 @@ class ShopConfig {
 	var $defaultConfig = array(
 		array(
 			//--- Common ---//
+			'currency' => null,
 			'currencies' => null,
 			'enabled' => true,
 			'defaultTaxes' => true,  //set to false to remove automatic taxes
@@ -23,6 +24,10 @@ class ShopConfig {
 				'qtyInNbItem' => true,		//If true, the number of item in the cart will include the quantity of each product
 			),
 			'groupShippingBilling' => true,
+			'currencyFormats' => array(
+				'fre' => array('before'=>false, 'after'=>' $', 'thousands' => ' ', 'decimals'=>',', 'places'=>2),
+				'eng'=> array('before'=>'$', 'thousands' => ',', 'decimals'=>'.', 'places'=>2),
+			),
 		),
 		array(
 			//--- Feature activation ---//

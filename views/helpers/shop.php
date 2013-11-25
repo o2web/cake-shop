@@ -4,14 +4,17 @@ class ShopHelper extends AppHelper {
 	var $helpers = array('Html','Number','Form','O2form.O2form');
 	
 	var $currencyFormats = array(
+		'default'=> array('before'=>'$', 'thousands' => ',', 'decimals'=>'.', 'places'=>2),
 		'fre' => array('before'=>false, 'after'=>' $', 'thousands' => ' ', 'decimals'=>',', 'places'=>2),
-		'eng'=> array('before'=>'$', 'thousands' => ',', 'decimals'=>'.', 'places'=>2)
+		'eng'=> array('before'=>'$', 'thousands' => ',', 'decimals'=>'.', 'places'=>2),
 	);
 	
 	function beforeRender(){
-		/*foreach( $this->currencyFormats as $formatName => $options ){
-			$this->Number->addFormat($formatName, $options);
-		}*/
+		App::import('Lib', 'Shop.ShopConfig');
+		$currencyFormats = ShopConfig::load('currencyFormats');
+		foreach( $currencyFormats as $formatName => $options ){
+			$this->addFormat($formatName, $options);
+		}
 		
 		parent::beforeRender();
 	}
@@ -133,10 +136,12 @@ class ShopHelper extends AppHelper {
 			$find[] = $currency;
 		}
 		$find[] = $lang;
+		$find[] = 'default';
 		
 		App::import('Lib', 'Shop.SetMulti');
-		$cur = SetMulti::extractHierarchic($find,array_combine(array_keys($this->currencyFormats),array_keys($this->currencyFormats)));
-		return $this->Number->format($number,$this->currencyFormats[$cur]);
+		
+		$format = SetMulti::extractHierarchic($find,$this->currencyFormats);
+		return $this->Number->format($number,$format);
 	}
 	
 	function productDispo($product=null,$options=array()){
