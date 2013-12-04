@@ -16,12 +16,17 @@ class ClassCollection extends Object {
 		),
 	);
 	var $defaultOptions = array(
+		'plugin'=>null,
 		'classSufix'=>null,
 		'fileSufix'=>null,
 		'paths'=>'%app%/libs/',
 		'ext'=>'php',
 		'parent'=>null,
 		'pluginPassthrough'=>false,
+		'defaultByParent'=>false,
+		'throwException'=>true,
+		'setName'=>false,
+		'setPlugin'=>false,
 	);
 	var $parentInerit = array(
 		'ext','paths'
@@ -34,16 +39,6 @@ class ClassCollection extends Object {
 			$instance[0] =& new ClassCollection();
 		}
 		return $instance[0];
-	}
-	
-	function parseName($name){
-		$options['name'] = $name;
-		$parts = explode('.',$name);
-		if(count($parts) > 1){
-			$options['plugin'] = $parts[0];
-			$options['name'] = $parts[1];
-		}
-		return $options;
 	}
 	
 	function parseClassName($options){
@@ -64,14 +59,15 @@ class ClassCollection extends Object {
 	function parseImportOption($options){
 		$_this =& ClassCollection::getInstance();
 		$options = Set::Merge($_this->defaultOptions,$options);
+		
+		if(strpos($options['name'],'.') !== false){
+			list($options['plugin'],$options['name']) = explode('.',$options['name'],2);
+		}
 		$importOpt = array(
 			'type'=>null,
-			'name'=>Inflector::camelize($options['name']),
+			'name'=>$_this->parseClassName($options),
 			'file'=>Inflector::underscore($options['name'])
 		);
-		if(!empty($options['classSufix'])){
-			$importOpt['name'] .= $options['classSufix'];
-		}
 		if(!empty($options['fileSufix'])){
 			$importOpt['file'] .= $options['fileSufix'];
 		}
@@ -79,6 +75,7 @@ class ClassCollection extends Object {
 		if(!empty($options['paths'])){
 			$importOpt['search'] = $_this->_getPaths($options);
 		}
+		//debug($importOpt);
 		
 		return $importOpt;
 	}
@@ -99,6 +96,8 @@ class ClassCollection extends Object {
 				}
 			}elseif(!is_array($typeOpt['plugin'])){
 				$plugins = array($typeOpt['plugin']);
+			}else{
+				$plugins = $typeOpt['plugin'];
 			}
 			foreach((array)$typeOpt['paths'] as $path){
 				foreach($plugins as $p){
@@ -166,20 +165,50 @@ class ClassCollection extends Object {
 		return $items;
 	}
 	
+	function getOption($type,$name){
+		$_this =& ClassCollection::getInstance();
+		$options = array();
+		if(is_array($name)){
+			$options = $name;
+		}else{
+			$options['name'] = $name;
+		}
+		
+		if(!empty($_this->types[$type])){
+			$options = Set::Merge($_this->types[$type],$options);
+		}
+		$options = Set::Merge($_this->defaultOptions,$options);
+		
+		if(is_null($options['plugin']) && strpos($options['name'],'.') !== false){
+			list($options['plugin'],$options['name']) = explode('.',$options['name'],2);
+		}
+		
+		$options['name'] = Inflector::camelize($options['name']);
+		
+		return $options;
+	}
+	
 	function getObject($type,$name){
 		$_this =& ClassCollection::getInstance();
-		$options = $_this->parseName($name);
-		$class = $_this->parseClassName($options);
+		
+		$options = $_this->getOption($type,$name);
+		
 		$exitant = ClassRegistry::getObject($type.'.'.$name);
 		if($exitant){
 			return $exitant;
-		}else{
-			$class = $_this->getClass($type,$options);
 		}
+		$isParent = false;
+		$class = $_this->getClass($type,$options,$isParent);
 		//debug($class);
 		if(!empty($class) && class_exists($class) ) {
 			$created = new $class();
-			if($created){
+			if($options['setName'] && empty($created->name)){
+				$created->name = $options['name'];
+			}
+			if($options['setPlugin'] && !isset($created->plugin)){
+				$created->plugin = $options['plugin'];
+			}
+			if($created && !$isParent){
 				$success = ClassRegistry::addObject($type.'.'.$name, $created);
 			}
 			return $created;
@@ -188,19 +217,9 @@ class ClassCollection extends Object {
 	}
 	
 	
-	function getClass($type,$name){
+	function getClass($type,$name,&$isParent = false){
 		$_this =& ClassCollection::getInstance();
-		$options = array();
-		if(is_array($name)){
-			$options = $name;
-		}else{
-			$options = $_this->parseName($name);
-		}
-		
-		if(!empty($_this->types[$type])){
-			$options = Set::Merge($_this->types[$type],$options);
-		}
-		
+		$options = $_this->getOption($type,$name);
 		
 		if(!empty($options['parent'])){
 			$inerit = array_intersect_key($options,array_flip($_this->parentInerit));
@@ -217,7 +236,13 @@ class ClassCollection extends Object {
 		if(App::import($importOpt)){
 			return $importOpt['name'];
 		}else{
+			if(!empty($parent) && $options['defaultByParent']){
+				$isParent = true;
+				return $parent;
+			}
+			if($options['throwException']){
 			debug($importOpt['name']. ' not found.');
+			}
 			return null;
 		}
 		
