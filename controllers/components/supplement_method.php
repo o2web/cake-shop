@@ -146,5 +146,38 @@ class SupplementMethodComponent extends Object
 		return $supplementItem;
 	}
 	
+	function mathOperation($options,$supplementItem,$order,$supplement_choice,$calcul){
+		$defOpt = array(
+			'operator' => '+',
+			'left' => null,
+			'right' => null,
+			'leftMethods' => null,
+			'rightMethods' => null,
+			'modifProp' => 'total',
+		);
+		$opt = array_merge($defOpt,$options);
+		
+		if(!is_null($opt['leftMethods'])){
+			$leftOpt = $this->calculFunct(key($opt['leftMethods']),reset($opt['leftMethods']),$supplementItem,$order,$supplement_choice,$calcul);
+			$left = $leftOpt[$opt['modifProp']];
+		}elseif(!is_null($opt['left'])){
+			$left = $opt['left'];
+		}else{
+			$left = $supplementItem[$opt['modifProp']];
+		}
+		
+		if(!is_null($opt['rightMethods'])){
+			$rigthOpt = $this->calculFunct(key($opt['rightMethods']),reset($opt['rightMethods']),$supplementItem,$order,$supplement_choice,$calcul);
+			$right = $rigthOpt[$opt['modifProp']];
+		}elseif(!is_null($opt['right'])){
+			$right = $opt['right'];
+		}else{
+			$right = 0;
+		}
+		
+		App::import('Lib', 'Shop.Operations');
+		$supplementItem[$opt['modifProp']] = Operations::simpleOperation($left,$opt['operator'],$right);
+		return $supplementItem;
+	}
 }
 ?>

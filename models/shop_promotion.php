@@ -265,7 +265,10 @@ class ShopPromotion extends ShopAppModel {
 			}
 		}
 		if(!empty($data['ShopPromo']['method'])){
-			$methodsOpts[] = array('name'=>$data['ShopPromo']['method'],'params'=>$data['ShopPromo']['method_params']);
+			$methodsOpts[] = array(
+				'name'=>$data['ShopPromo']['method'],
+				'params'=>!empty($data['ShopPromo']['method_params']) ? $data['ShopPromo']['method_params'] : array()
+			);
 		}
 		App::import('Lib', 'Shop.ClassCollection'); 
 		

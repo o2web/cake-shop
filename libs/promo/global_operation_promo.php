@@ -4,13 +4,14 @@ class GlobalOperationPromo extends PromoMethod {
 
 	function editForm($prefix,$view){
 		$out = '';
-		$rebateHelp = $view->element('admin_promo_rebate_help',array());
+		//$rebateHelp = $view->element('admin_promo_rebate_help',array());
+		$rebateHelp = '<div>'.__('Ex : Type -5 to reduce the total by 5$',true).'</div>';
 		$out .= $view->Form->input('val',array('label'=>__('Rebate',true),'after'=>$rebateHelp));
 		App::import('Lib', 'Shop.SetMulti');
 		$this->ShopPromotion = ClassRegistry::init('Shop.ShopPromotion'); 
-		$operators = $this->ShopPromotion->operators;
-		unset($operators[1]);
-		$out .= $view->Form->input('operator',array('options'=>SetMulti::extractKeepKey('label',$operators)));
+		//$operators = $this->ShopPromotion->operators;
+		//unset($operators[1]);
+		//$out .= $view->Form->input('operator',array('options'=>SetMulti::extractKeepKey('label',$operators)));
 		return $out;
 	}
 		
