@@ -41,6 +41,7 @@ class ShopHelper extends AppHelper {
 		$opt = array_merge($defOpt,$options);
 		
 		$types = ShopConfig::getSubProductTypes();
+		
 		if(empty($this->data['ShopSubproduct']) && !empty($this->data['ShopProduct']['ShopSubproduct'])){
 			App::import('Lib', 'SetMulti');
 			$this->data['ShopSubproduct'] = $this->data['ShopProduct']['ShopSubproduct'];
@@ -51,6 +52,19 @@ class ShopHelper extends AppHelper {
 		if(!empty($types)){
 			foreach($types as $key =>$type){
 				$fields = set::normalize(array('id','code','label_fre','label_eng', 'operator','price'));
+				
+				if(!empty($config['currencies'])){
+					//$fields['price']['label'] = __('Default Price',true);
+					unset($fields['price']);
+					foreach($config['currencies'] as $currency){
+						$fOpt = array(
+							'label' => str_replace('%currency%',$currency,__('Price %currency%',true)),
+							'type' => 'text',
+						);
+						$fields['currency_prices.'.$currency] = $fOpt;
+					}
+				}
+
 				if(count($type['operators']==1)){
 					$fields['operator']['type'] = 'hidden';
 					$fields['operator']['value'] = $type['operators'][0];

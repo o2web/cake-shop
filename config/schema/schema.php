@@ -1,0 +1,275 @@
+<?php 
+/* SVN FILE: $Id$ */
+/* App schema generated on: 2014-07-04 14:07:44 : 1404485144*/
+class ShopSchema extends CakeSchema {
+	var $name = 'Shop';
+
+	function before($event = array()) {
+		return true;
+	}
+
+	function after($event = array()) {
+	}
+
+	var $shop_actions = array(
+		'id' => array('type' => 'integer', 'null' => false, 'default' => NULL, 'key' => 'primary'),
+		'code' => array('type' => 'string', 'null' => true, 'default' => NULL),
+		'status' => array('type' => 'string', 'null' => true, 'default' => NULL),
+		'component' => array('type' => 'string', 'null' => true, 'default' => NULL),
+		'function' => array('type' => 'string', 'null' => true, 'default' => NULL),
+		'params' => array('type' => 'string', 'null' => true, 'default' => NULL),
+		'form_element' => array('type' => 'string', 'null' => true, 'default' => NULL),
+		'ui' => array('type' => 'text', 'null' => true, 'default' => NULL),
+		'active' => array('type' => 'boolean', 'null' => true, 'default' => NULL),
+		'created' => array('type' => 'datetime', 'null' => true, 'default' => NULL),
+		'modified' => array('type' => 'datetime', 'null' => true, 'default' => NULL),
+		'indexes' => array('PRIMARY' => array('column' => 'id', 'unique' => 1)),
+		'tableParameters' => array('charset' => 'utf8', 'collate' => 'utf8_unicode_ci', 'engine' => 'MyISAM')
+	);
+	var $shop_addresses = array(
+		'id' => array('type' => 'integer', 'null' => false, 'default' => NULL, 'key' => 'primary'),
+		'first_name' => array('type' => 'string', 'null' => true, 'default' => NULL),
+		'last_name' => array('type' => 'string', 'null' => true, 'default' => NULL),
+		'address' => array('type' => 'string', 'null' => true, 'default' => NULL),
+		'company' => array('type' => 'string', 'null' => true, 'default' => NULL),
+		'apt' => array('type' => 'string', 'null' => true, 'default' => NULL),
+		'city' => array('type' => 'string', 'null' => true, 'default' => NULL),
+		'region' => array('type' => 'string', 'null' => true, 'default' => NULL),
+		'postal_code' => array('type' => 'string', 'null' => true, 'default' => NULL),
+		'country' => array('type' => 'string', 'null' => true, 'default' => NULL),
+		'tel' => array('type' => 'string', 'null' => true, 'default' => NULL),
+		'tel2' => array('type' => 'string', 'null' => true, 'default' => NULL),
+		'email' => array('type' => 'string', 'null' => true, 'default' => NULL),
+		'newsletter' => array('type' => 'boolean', 'null' => false, 'default' => NULL),
+		'active' => array('type' => 'boolean', 'null' => true, 'default' => NULL),
+		'created' => array('type' => 'datetime', 'null' => true, 'default' => NULL),
+		'modified' => array('type' => 'datetime', 'null' => true, 'default' => NULL),
+		'indexes' => array('PRIMARY' => array('column' => 'id', 'unique' => 1)),
+		'tableParameters' => array('charset' => 'utf8', 'collate' => 'utf8_unicode_ci', 'engine' => 'MyISAM')
+	);
+	var $shop_coupons = array(
+		'id' => array('type' => 'integer', 'null' => false, 'default' => NULL, 'key' => 'primary'),
+		'code' => array('type' => 'string', 'null' => true, 'default' => NULL),
+		'shop_promotion_id' => array('type' => 'integer', 'null' => true, 'default' => NULL),
+		'shop_order_id' => array('type' => 'integer', 'null' => true, 'default' => NULL),
+		'status' => array('type' => 'string', 'null' => true, 'default' => NULL),
+		'active' => array('type' => 'boolean', 'null' => true, 'default' => NULL),
+		'created' => array('type' => 'datetime', 'null' => true, 'default' => NULL),
+		'modified' => array('type' => 'datetime', 'null' => true, 'default' => NULL),
+		'indexes' => array('PRIMARY' => array('column' => 'id', 'unique' => 1)),
+		'tableParameters' => array('charset' => 'utf8', 'collate' => 'utf8_unicode_ci', 'engine' => 'MyISAM')
+	);
+	var $shop_orders = array(
+		'id' => array('type' => 'integer', 'null' => false, 'default' => NULL, 'key' => 'primary'),
+		'discount' => array('type' => 'float', 'null' => true, 'default' => NULL),
+		'discount_prc' => array('type' => 'float', 'null' => true, 'default' => NULL),
+		'sub_total' => array('type' => 'float', 'null' => true, 'default' => NULL),
+		'currency' => array('type' => 'string', 'null' => true, 'default' => NULL),
+		'taxe_subs' => array('type' => 'text', 'null' => true, 'default' => NULL),
+		'taxes' => array('type' => 'text', 'null' => true, 'default' => NULL),
+		'total_taxes' => array('type' => 'float', 'null' => true, 'default' => NULL),
+		'total_shipping' => array('type' => 'float', 'null' => true, 'default' => NULL),
+		'supplements' => array('type' => 'text', 'null' => true, 'default' => NULL),
+		'total_supplements' => array('type' => 'float', 'null' => true, 'default' => NULL),
+		'total' => array('type' => 'float', 'null' => true, 'default' => NULL),
+		'confirm' => array('type' => 'integer', 'null' => true, 'default' => NULL, 'length' => 1),
+		'amount_paid' => array('type' => 'float', 'null' => true, 'default' => NULL),
+		'status' => array('type' => 'string', 'null' => true, 'default' => NULL),
+		'date' => array('type' => 'datetime', 'null' => true, 'default' => NULL),
+		'billing_first_name' => array('type' => 'string', 'null' => true, 'default' => NULL),
+		'billing_last_name' => array('type' => 'string', 'null' => true, 'default' => NULL),
+		'billing_title' => array('type' => 'string', 'null' => true, 'default' => NULL),
+		'billing_enterprise' => array('type' => 'string', 'null' => true, 'default' => NULL),
+		'billing_company' => array('type' => 'string', 'null' => true, 'default' => NULL),
+		'billing_address' => array('type' => 'text', 'null' => true, 'default' => NULL),
+		'billing_apt' => array('type' => 'string', 'null' => true, 'default' => NULL),
+		'billing_city' => array('type' => 'string', 'null' => true, 'default' => NULL),
+		'billing_region' => array('type' => 'string', 'null' => true, 'default' => NULL),
+		'billing_country' => array('type' => 'string', 'null' => true, 'default' => NULL),
+		'billing_postal_code' => array('type' => 'string', 'null' => true, 'default' => NULL),
+		'billing_tel' => array('type' => 'string', 'null' => true, 'default' => NULL),
+		'billing_tel2' => array('type' => 'string', 'null' => true, 'default' => NULL),
+		'billing_email' => array('type' => 'string', 'null' => true, 'default' => NULL),
+		'shipping_first_name' => array('type' => 'string', 'null' => true, 'default' => NULL),
+		'shipping_last_name' => array('type' => 'string', 'null' => true, 'default' => NULL),
+		'shipping_title' => array('type' => 'string', 'null' => true, 'default' => NULL),
+		'shipping_enterprise' => array('type' => 'string', 'null' => true, 'default' => NULL),
+		'shipping_address' => array('type' => 'text', 'null' => true, 'default' => NULL),
+		'shipping_apt' => array('type' => 'string', 'null' => true, 'default' => NULL),
+		'shipping_city' => array('type' => 'string', 'null' => true, 'default' => NULL),
+		'shipping_region' => array('type' => 'string', 'null' => true, 'default' => NULL),
+		'shipping_country' => array('type' => 'string', 'null' => true, 'default' => NULL),
+		'shipping_postal_code' => array('type' => 'string', 'null' => true, 'default' => NULL),
+		'shipping_tel' => array('type' => 'string', 'null' => true, 'default' => NULL),
+		'shipping_tel2' => array('type' => 'string', 'null' => true, 'default' => NULL),
+		'shipping_email' => array('type' => 'string', 'null' => true, 'default' => NULL),
+		'shipping_type' => array('type' => 'string', 'null' => true, 'default' => NULL),
+		'shipping_carrier_name' => array('type' => 'string', 'null' => true, 'default' => NULL),
+		'shipping_carrier_account' => array('type' => 'string', 'null' => true, 'default' => NULL),
+		'shipping_age' => array('type' => 'string', 'null' => true, 'default' => NULL),
+		'shipping_newsletter' => array('type' => 'boolean', 'null' => true, 'default' => NULL),
+		'shipping_company' => array('type' => 'string', 'null' => false, 'default' => NULL),
+		'shipping_businesstitle' => array('type' => 'string', 'null' => false, 'default' => NULL),
+		'shipping_industry' => array('type' => 'string', 'null' => false, 'default' => NULL),
+		'shipping_otherindustry' => array('type' => 'string', 'null' => false, 'default' => NULL),
+		'shipping_ein' => array('type' => 'string', 'null' => false, 'default' => NULL),
+		'shipping_lang' => array('type' => 'string', 'null' => true, 'default' => NULL),
+		'supplement_choices' => array('type' => 'text', 'null' => true, 'default' => NULL),
+		'hearfromus' => array('type' => 'string', 'null' => true, 'default' => NULL),
+		'otherhearfromus' => array('type' => 'string', 'null' => true, 'default' => NULL),
+		'dev_mode' => array('type' => 'boolean', 'null' => true, 'default' => NULL),
+		'allowmail' => array('type' => 'boolean', 'null' => true, 'default' => NULL),
+		'active' => array('type' => 'boolean', 'null' => true, 'default' => NULL),
+		'lock' => array('type' => 'integer', 'null' => false, 'default' => '0'),
+		'created' => array('type' => 'datetime', 'null' => true, 'default' => NULL),
+		'modified' => array('type' => 'datetime', 'null' => true, 'default' => NULL),
+		'indexes' => array('PRIMARY' => array('column' => 'id', 'unique' => 1)),
+		'tableParameters' => array('charset' => 'utf8', 'collate' => 'utf8_unicode_ci', 'engine' => 'MyISAM')
+	);
+	var $shop_orders_items = array(
+		'id' => array('type' => 'integer', 'null' => false, 'default' => NULL, 'key' => 'primary'),
+		'order_id' => array('type' => 'integer', 'null' => true, 'default' => NULL),
+		'product_id' => array('type' => 'integer', 'null' => true, 'default' => NULL),
+		'nb' => array('type' => 'integer', 'null' => true, 'default' => NULL),
+		'item_title' => array('type' => 'string', 'null' => true, 'default' => NULL),
+		'item_desc' => array('type' => 'string', 'null' => true, 'default' => NULL),
+		'comment' => array('type' => 'text', 'null' => true, 'default' => NULL),
+		'item_price' => array('type' => 'float', 'null' => true, 'default' => NULL),
+		'item_tax_applied' => array('type' => 'text', 'null' => true, 'default' => NULL),
+		'final_price' => array('type' => 'float', 'null' => true, 'default' => NULL),
+		'active' => array('type' => 'boolean', 'null' => true, 'default' => NULL),
+		'created' => array('type' => 'datetime', 'null' => true, 'default' => NULL),
+		'modified' => array('type' => 'datetime', 'null' => true, 'default' => NULL),
+		'indexes' => array('PRIMARY' => array('column' => 'id', 'unique' => 1)),
+		'tableParameters' => array('charset' => 'utf8', 'collate' => 'utf8_unicode_ci', 'engine' => 'MyISAM')
+	);
+	var $shop_orders_payments = array(
+		'id' => array('type' => 'integer', 'null' => false, 'default' => NULL, 'key' => 'primary'),
+		'order_id' => array('type' => 'integer', 'null' => true, 'default' => NULL),
+		'payment_id' => array('type' => 'integer', 'null' => true, 'default' => NULL),
+		'amount' => array('type' => 'float', 'null' => true, 'default' => NULL),
+		'created' => array('type' => 'datetime', 'null' => true, 'default' => NULL),
+		'modified' => array('type' => 'datetime', 'null' => true, 'default' => NULL),
+		'indexes' => array('PRIMARY' => array('column' => 'id', 'unique' => 1)),
+		'tableParameters' => array('charset' => 'utf8', 'collate' => 'utf8_unicode_ci', 'engine' => 'MyISAM')
+	);
+	var $shop_orders_subitems = array(
+		'id' => array('type' => 'integer', 'null' => false, 'default' => NULL, 'key' => 'primary'),
+		'shop_orders_item_id' => array('type' => 'integer', 'null' => true, 'default' => NULL),
+		'shop_subproduct_id' => array('type' => 'integer', 'null' => true, 'default' => NULL),
+		'descr' => array('type' => 'string', 'null' => true, 'default' => NULL),
+		'nb' => array('type' => 'integer', 'null' => true, 'default' => NULL),
+		'item_price' => array('type' => 'float', 'null' => true, 'default' => NULL),
+		'item_operator' => array('type' => 'string', 'null' => true, 'default' => NULL),
+		'lft' => array('type' => 'integer', 'null' => true, 'default' => NULL),
+		'rght' => array('type' => 'integer', 'null' => true, 'default' => NULL),
+		'parent_id' => array('type' => 'integer', 'null' => true, 'default' => NULL),
+		'active' => array('type' => 'boolean', 'null' => true, 'default' => NULL),
+		'created' => array('type' => 'datetime', 'null' => true, 'default' => NULL),
+		'modified' => array('type' => 'datetime', 'null' => true, 'default' => NULL),
+		'indexes' => array('PRIMARY' => array('column' => 'id', 'unique' => 1)),
+		'tableParameters' => array('charset' => 'utf8', 'collate' => 'utf8_unicode_ci', 'engine' => 'MyISAM')
+	);
+	var $shop_payments = array(
+		'id' => array('type' => 'integer', 'null' => false, 'default' => NULL, 'key' => 'primary'),
+		'type' => array('type' => 'string', 'null' => true, 'default' => NULL),
+		'amount' => array('type' => 'float', 'null' => true, 'default' => NULL),
+		'currency' => array('type' => 'string', 'null' => true, 'default' => NULL),
+		'status' => array('type' => 'string', 'null' => true, 'default' => NULL),
+		'data' => array('type' => 'text', 'null' => true, 'default' => NULL),
+		'dev_mode' => array('type' => 'boolean', 'null' => true, 'default' => NULL),
+		'active' => array('type' => 'boolean', 'null' => true, 'default' => NULL),
+		'lock' => array('type' => 'integer', 'null' => false, 'default' => '0'),
+		'created' => array('type' => 'datetime', 'null' => true, 'default' => NULL),
+		'modified' => array('type' => 'datetime', 'null' => true, 'default' => NULL),
+		'indexes' => array('PRIMARY' => array('column' => 'id', 'unique' => 1)),
+		'tableParameters' => array('charset' => 'utf8', 'collate' => 'utf8_unicode_ci', 'engine' => 'MyISAM')
+	);
+	var $shop_product_subproducts = array(
+		'id' => array('type' => 'integer', 'null' => false, 'default' => NULL, 'key' => 'primary'),
+		'shop_product_id' => array('type' => 'integer', 'null' => true, 'default' => NULL),
+		'parent_subproduct_id' => array('type' => 'integer', 'null' => true, 'default' => NULL),
+		'shop_subproduct_id' => array('type' => 'integer', 'null' => true, 'default' => NULL),
+		'default' => array('type' => 'boolean', 'null' => true, 'default' => NULL),
+		'active' => array('type' => 'boolean', 'null' => true, 'default' => NULL),
+		'created' => array('type' => 'datetime', 'null' => true, 'default' => NULL),
+		'modified' => array('type' => 'datetime', 'null' => true, 'default' => NULL),
+		'indexes' => array('PRIMARY' => array('column' => 'id', 'unique' => 1)),
+		'tableParameters' => array('charset' => 'utf8', 'collate' => 'utf8_unicode_ci', 'engine' => 'MyISAM')
+	);
+	var $shop_products = array(
+		'id' => array('type' => 'integer', 'null' => false, 'default' => NULL, 'key' => 'primary'),
+		'code' => array('type' => 'string', 'null' => true, 'default' => NULL),
+		'model' => array('type' => 'string', 'null' => true, 'default' => NULL),
+		'foreign_id' => array('type' => 'integer', 'null' => true, 'default' => NULL),
+		'price' => array('type' => 'float', 'null' => true, 'default' => NULL),
+		'currency_prices' => array('type' => 'text', 'null' => true, 'default' => NULL),
+		'shipping_req' => array('type' => 'boolean', 'null' => true, 'default' => NULL),
+		'needed_data' => array('type' => 'text', 'null' => true, 'default' => NULL),
+		'tax_applied' => array('type' => 'text', 'null' => true, 'default' => NULL),
+		'active' => array('type' => 'boolean', 'null' => true, 'default' => NULL),
+		'created' => array('type' => 'datetime', 'null' => true, 'default' => NULL),
+		'modified' => array('type' => 'datetime', 'null' => true, 'default' => NULL),
+		'indexes' => array('PRIMARY' => array('column' => 'id', 'unique' => 1)),
+		'tableParameters' => array('charset' => 'utf8', 'collate' => 'utf8_unicode_ci', 'engine' => 'MyISAM')
+	);
+	var $shop_promotions = array(
+		'id' => array('type' => 'integer', 'null' => false, 'default' => NULL, 'key' => 'primary'),
+		'code' => array('type' => 'string', 'null' => true, 'default' => NULL),
+		'title_fre' => array('type' => 'string', 'null' => true, 'default' => NULL),
+		'title_eng' => array('type' => 'string', 'null' => true, 'default' => NULL),
+		'desc_fre' => array('type' => 'text', 'null' => true, 'default' => NULL),
+		'desc_eng' => array('type' => 'text', 'null' => true, 'default' => NULL),
+		'code_needed' => array('type' => 'boolean', 'null' => false, 'default' => '0'),
+		'limited_coupons' => array('type' => 'boolean', 'null' => false, 'default' => '0'),
+		'coupon_code_needed' => array('type' => 'boolean', 'null' => false, 'default' => '0'),
+		'method' => array('type' => 'string', 'null' => true, 'default' => NULL),
+		'method_params' => array('type' => 'text', 'null' => true, 'default' => NULL),
+		'cond' => array('type' => 'text', 'null' => true, 'default' => NULL),
+		'cond_params' => array('type' => 'text', 'null' => true, 'default' => NULL),
+		'val' => array('type' => 'float', 'null' => true, 'default' => NULL),
+		'operator' => array('type' => 'integer', 'null' => false, 'default' => '1'),
+		'action_id' => array('type' => 'integer', 'null' => true, 'default' => NULL),
+		'action_params' => array('type' => 'text', 'null' => true, 'default' => NULL),
+		'active' => array('type' => 'boolean', 'null' => true, 'default' => NULL),
+		'created' => array('type' => 'datetime', 'null' => true, 'default' => NULL),
+		'modified' => array('type' => 'datetime', 'null' => true, 'default' => NULL),
+		'indexes' => array('PRIMARY' => array('column' => 'id', 'unique' => 1)),
+		'tableParameters' => array()
+	);
+	var $shop_subproducts = array(
+		'id' => array('type' => 'integer', 'null' => false, 'default' => NULL, 'key' => 'primary'),
+		'type' => array('type' => 'string', 'null' => true, 'default' => NULL),
+		'code' => array('type' => 'string', 'null' => true, 'default' => NULL),
+		'label_fre' => array('type' => 'string', 'null' => true, 'default' => NULL),
+		'label_eng' => array('type' => 'string', 'null' => true, 'default' => NULL),
+		'model' => array('type' => 'string', 'null' => true, 'default' => NULL),
+		'foreign_id' => array('type' => 'integer', 'null' => true, 'default' => NULL),
+		'price' => array('type' => 'float', 'null' => true, 'default' => NULL),
+		'currency_prices' => array('type' => 'text', 'null' => true, 'default' => NULL),
+		'data' => array('type' => 'text', 'null' => true, 'default' => NULL),
+		'operator' => array('type' => 'string', 'null' => true, 'default' => NULL),
+		'active' => array('type' => 'boolean', 'null' => true, 'default' => NULL),
+		'created' => array('type' => 'datetime', 'null' => true, 'default' => NULL),
+		'modified' => array('type' => 'datetime', 'null' => true, 'default' => NULL),
+		'indexes' => array('PRIMARY' => array('column' => 'id', 'unique' => 1)),
+		'tableParameters' => array()
+	);
+	var $shop_taxes = array(
+		'id' => array('type' => 'integer', 'null' => false, 'default' => NULL, 'key' => 'primary'),
+		'country' => array('type' => 'string', 'null' => true, 'default' => NULL, 'length' => 100),
+		'region' => array('type' => 'string', 'null' => true, 'default' => NULL, 'length' => 100),
+		'code' => array('type' => 'string', 'null' => true, 'default' => NULL, 'length' => 50),
+		'name_fre' => array('type' => 'string', 'null' => true, 'default' => NULL),
+		'name_eng' => array('type' => 'string', 'null' => true, 'default' => NULL),
+		'rate' => array('type' => 'float', 'null' => true, 'default' => NULL),
+		'apply_prev' => array('type' => 'boolean', 'null' => true, 'default' => NULL),
+		'apply' => array('type' => 'boolean', 'null' => true, 'default' => '1'),
+		'active' => array('type' => 'boolean', 'null' => true, 'default' => NULL),
+		'created' => array('type' => 'datetime', 'null' => true, 'default' => NULL),
+		'modified' => array('type' => 'datetime', 'null' => true, 'default' => NULL),
+		'indexes' => array('PRIMARY' => array('column' => 'id', 'unique' => 1)),
+		'tableParameters' => array('charset' => 'utf8', 'collate' => 'utf8_unicode_ci', 'engine' => 'MyISAM')
+	);
+}
+?>

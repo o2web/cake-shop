@@ -3,41 +3,83 @@ class CartHelper extends AppHelper {
 
 	var $helpers = array('Html', 'Form', 'Javascript', 'O2form.O2form');
 	
-	function buyUrl($id=null,$nb=null,$model=null,$options=array()){
-		if(is_array($id)){
-			$options = $id;
-		}else{
-			$options['id'] = $id;
-			if(!empty($nb)){
-				$options['nb'] = $nb;
-			}
-			if(!empty($model)){
-				$options['model'] = $model;
-			}
+	function defID(){
+		if(!empty($this->params['id'])){
+			return $options['id'] = $this->params['id'];
+		}else if(!empty($this->params['named']['id'])){
+			return $options['id'] = $this->params['named']['id'];
+		}else if(!empty($this->params['pass'][0]) && is_numeric($this->params['pass'][0])){
+			return $options['id'] = $this->params['pass'][0];
 		}
-		if(empty($options['id'])){
-			if(!empty($this->params['id'])){
-				$options['id'] = $this->params['id'];
-			}else if(!empty($this->params['named']['id'])){
-				$options['id'] = $this->params['named']['id'];
-			}else if(!empty($this->params['pass'][0]) && is_numeric($this->params['pass'][0])){
-				$options['id'] = $this->params['pass'][0];
+		$model = $this->defModel();
+		if($model){
+			if(!empty($this->data[$model]['id'])){
+				return $this->data[$model]['id'];
+			}
+			$view =& ClassRegistry::getObject('view');
+			if(!empty($view->viewVars[Inflector::variable($model)][$model]['id'])){
+				return $view->viewVars[Inflector::variable($model)][$model]['id'];
 			}
 		}
-		if(empty($options['id']) || !is_numeric($options['id'])){
-			return null;
-		}
+		return null;
+	}
+	
+	function defModel(){
 		$defmodel = null;
 		//$defmodel = $this->model();
 		if($defmodel == null){
 			$defmodel = Inflector::classify($this->params['controller']);
 		}
-		$localOpt = array('routed');
+		return $defmodel;
+	}
+	
+	function buyUrl($id=null,$nb=null,$model=null,$options=array()){
+		if(is_array($id) && !is_array($id)){
+			$options = $id;
+		}else{
+			if(is_array($nb)){
+				$options = $nb;
+			}elseif(!empty($nb)){
+				$options['nb'] = $nb;
+			}
+			if(is_array($id)){
+				$options['product'] = $id;
+			}else{
+				$options['id'] = $id;
+			}
+			
+			if(!empty($model)){
+				$options['model'] = $model;
+			}
+		}
+		if(empty($options['id']) && !empty($options['product'])){
+			if(!empty($options['product']['id'])){
+				$options['id'] = $options['product']['id'];
+			}else{
+				if(empty($options['model'])){
+					$options['model'] = $this->defModel();
+				}
+				if(!empty($options['product'][$options['model']]['id'])){
+					$options['id'] = $options['product'][$options['model']]['id'];
+				}
+			}
+		}
+		/*if(is_array($options['id'])){
+			
+		}*/
+		if(empty($options['id']) && $defID = $this->defID()){
+			$options['id'] = $defID;
+		}
+		if(empty($options['id']) || !is_numeric($options['id'])){
+			return null;
+		}
+		$localOpt = array('routed','product');
 		$defaultOptions = array(
-			'model' => $defmodel,
-			'nb' => 1,
+			'model' => $this->defModel(),
+			'nb' => null,
 			'routed' => true,
 			'back' => null,
+			'redirect' => null,
 		);
 		$options = array_merge($defaultOptions,$options);
 		if(!empty($options['back'])){
@@ -47,8 +89,13 @@ class CartHelper extends AppHelper {
 			//debug($options['back']);
 			//debug(UrlParam::decode($options['back']));
 		}
+		if(!empty($options['redirect'])){
+			App::import('Lib', 'Shop.UrlParam');
+			$options['redirect'] = UrlParam::encode($options['redirect']);
+		}
 		$urlOpt = array('plugin'=>'shop','controller'=>'shop_cart','action'=>'add');
 		$urlOpt = array_merge(array_diff_key($options,array_flip($localOpt)),$urlOpt);
+		//debug($urlOpt);
 		if($options['routed']){
 			return $this->Html->url($urlOpt);
 		}else{
@@ -89,6 +136,31 @@ class CartHelper extends AppHelper {
 		return $this->Html->link($options['label'],$url,$this->O2form->normalizeAttributesOpt($options,$localOpt));
 	}
 	
+	function subitemInputs($prod = null, $options = array(), $no = null){
+		App::import('Lib', 'Shop.ShopConfig');
+		$types = ShopConfig::getSubProductTypes();
+		if(!empty($types)) { 
+			$localOpt = array('list');
+			$inputOpt = array_diff_key($options,array_flip($localOpt));
+			$myTypes = array();
+			foreach($types as $key => $type){
+				$type['input'] = $this->subitemInput($type,$prod,$inputOpt,$no);
+				if($type['input']){
+					$myTypes[$key] = $type;
+				}
+			}
+			if(!empty($options['list'])){
+				return $myTypes;
+			}
+			$html='';
+			foreach($myTypes as $myType){
+				$html .= $myType['input'];
+			}
+			return $html;
+		}
+		return null;
+	}
+	
 	function subitemInput($type, $prod = null, $options = array(), $no = null){
 		$view =& ClassRegistry::getObject('view');
 		if(!is_array($type)){
@@ -101,8 +173,10 @@ class CartHelper extends AppHelper {
 		}
 		$defOpt = array(
 			'label'=>$type['label'],
+			'class'=>'subItem',
 		);
 		$opt = array_merge($defOpt, $options);
+		//debug($prod);
 		if(!is_array($prod)){
 			$prod = null;
 			$no = $prod;
@@ -142,6 +216,66 @@ class CartHelper extends AppHelper {
 			$name = 'ShopCart.nb';
 		}
 		return $this->O2form->input($name,$opt);
+	}
+	
+	function addedQty($id=null,$model=null){
+		if(empty($model)) $model = $this->defModel();
+		if(is_array($id)){
+			if(!empty($id['id'])){
+				$id = $id['id'];
+			}
+			if(!empty($id[$model]['id'])){
+				$id = $id[$model]['id'];
+			}
+		}
+		if(empty($id)) $id = $this->defID();
+		if(!empty($this->params['Shop']['qtys'][$model][$id])){
+			return $this->params['Shop']['qtys'][$model][$id];
+		}
+		return 0;
+	}
+	
+	
+	function cartUpdateScript($options = array()){
+		$defOpt = array(
+			'autoSubmit' => false,
+			'timeout' => 4 * 1000,
+		);
+		$opt = array_merge($defOpt,$options);
+		$this->Html->scriptBlock('
+			(function( $ ) {
+				'.($opt['autoSubmit'] && $opt['timeout'] ? 'var timeout;' : '').'
+				function should_update(now,triggerer){
+					'.(
+						$opt['autoSubmit'] 
+						? '	if(now){ 
+								$("#ShopCartIndexForm").submit();
+							}else{
+								$("#ShopCartIndexForm .btUpdate").show();
+								'.($opt['timeout'] ? '
+								if(timeout) clearTimeout(timeout);
+								timeout = setTimeout(function(){
+									should_update(true);
+								}, '.$opt['timeout'].');
+								' : '').'
+							}'
+						: '$("#ShopCartIndexForm .btUpdate").show();'
+					).'
+				}
+				$(function(){
+					$("#ShopCartIndexForm .btUpdate").hide();
+					$("body").delegate("#ShopCartIndexForm select","change",function(){
+						should_update(true,this);
+					});
+					$("body").delegate("#ShopCartIndexForm input","keyup",function(){
+						should_update(false,this);
+					});
+					$("body").delegate("#ShopCartIndexForm input","change",function(){
+						should_update(true,this);
+					});
+				});
+			})( jQuery );
+		',array('inline'=>false));
 	}
 	
 	function cartUrl(){

@@ -155,16 +155,19 @@ class ShopFunctComponent extends Object
 				//============ calculate ============//
 				App::import('Lib', 'Shop.Operations');
 				foreach($subItems as &$subItem){
-					$new_price = $cur_price;
-					$subPrice = $subItem['item_price'] * $subItem['nb'];
-					if($subItem['item_operator'] == '='){
-						$new_price = $subPrice;
-						$p['overwritten_price'] = true;
-					}else{
-						$new_price = Operations::simpleOperation($cur_price,$subItem['item_operator'],$subPrice);
+					//debug($subItem);
+					if($subItem['item_price'] != '' && !is_null($subItem['item_price'])){
+						$new_price = $cur_price;
+						$subPrice = $subItem['item_price'] * $subItem['nb'];
+						if($subItem['item_operator'] == '='){
+							$new_price = $subPrice;
+							$p['overwritten_price'] = true;
+						}else{
+							$new_price = Operations::simpleOperation($cur_price,$subItem['item_operator'],$subPrice);
+						}
+						$subItem['modif'] = $new_price-$cur_price;
+						$cur_price = $new_price;
 					}
-					$subItem['modif'] = $new_price-$cur_price;
-					$cur_price = $new_price;
 				}
 				$p['SubItem'] = $subItems;
 			}
@@ -320,24 +323,26 @@ class ShopFunctComponent extends Object
 	}
 	
 	function _oldPromoCalcul(&$promo,&$order){
-		foreach($promo['ShopProduct'] as &$p){
-			$price = $p['item_price'];
-			
-			$newPrice = $this->ShopPromotion->applyOperator($price,$promo['ShopPromotion']['operator'],$promo['ShopPromotion']['val']);
-			if(!empty($promo['ShopPromotion']['ShopAction']) && !empty($promo['ShopPromotion']['ShopAction']['id'])){
-				$action = $this->ShopPromotion->ShopAction->toCallBack($promo['ShopPromotion']['ShopAction'],array($p,$newPrice,$promo['action_params']));
-				$res = $this->callExternalfunction($action);
-				if($res === true){
-				}elseif($res === false){
-					$newPrice = $price;
-				}elseif(is_numeric($res)){
-					$newPrice = $res;
-				}else{
-					$newPrice = $price;
+		if(!empty($promo['ShopProduct'])) {
+			foreach($promo['ShopProduct'] as &$p){
+				$price = $p['item_price'];
+				
+				$newPrice = $this->ShopPromotion->applyOperator($price,$promo['ShopPromotion']['operator'],$promo['ShopPromotion']['val']);
+				if(!empty($promo['ShopPromotion']['ShopAction']) && !empty($promo['ShopPromotion']['ShopAction']['id'])){
+					$action = $this->ShopPromotion->ShopAction->toCallBack($promo['ShopPromotion']['ShopAction'],array($p,$newPrice,$promo['action_params']));
+					$res = $this->callExternalfunction($action);
+					if($res === true){
+					}elseif($res === false){
+						$newPrice = $price;
+					}elseif(is_numeric($res)){
+						$newPrice = $res;
+					}else{
+						$newPrice = $price;
+					}
 				}
+				$promo['rebate'] = $price - $newPrice;
+				$p['item_price'] = $newPrice;
 			}
-			$promo['rebate'] = $price - $newPrice;
-			$p['item_price'] = $newPrice;
 		}
 	}
 	
@@ -648,6 +653,8 @@ class ShopFunctComponent extends Object
 	}
 	
 	function extractSubItemData($productAndOptions,$order=null){
+		//debug($productAndOptions);
+		//debug($order);
 		if(!empty($productAndOptions['ShopOrdersSubitem'])){
 			return $productAndOptions['ShopOrdersSubitem'];
 		}
@@ -655,6 +662,8 @@ class ShopFunctComponent extends Object
 		$subItemDef = array(
 			'nb' => 1,
 		);
+		
+		$currency = !empty($order['ShopOrder']['currency'])?$order['ShopOrder']['currency']:ShopConfig::load('currency');
 		
 		$orderItemMode = isset($productAndOptions['item_price']);
 		if($orderItemMode){
@@ -695,7 +704,7 @@ class ShopFunctComponent extends Object
 			$subProduct = $this->ShopSubproduct->ShopProductSubproduct->find('all', array(
 				'conditions' => array(
 						'ShopProductSubproduct.shop_product_id' => $p['product_id'],
-						'ShopProductSubproduct.shop_SUBproduct_id' => $ids,
+						'ShopProductSubproduct.shop_subproduct_id' => $ids,
 					)
 			));
 			$subProduct = SetMulti::group($subProduct,'ShopSubproduct.id',array('singleArray'=>false));
@@ -711,11 +720,12 @@ class ShopFunctComponent extends Object
 							'shop_subproduct_id' => 'ShopSubproduct.id',
 							'descr' => array('ShopSubproduct.label'),
 							'nb' => array('nb'),
-							'item_price' => array('ShopSubproduct.price'),
+							'item_price' => array('ShopSubproduct.currency_prices.'.$currency,'ShopSubproduct.price'),
 							'item_operator' => 'ShopSubproduct.operator',
 							'type' => 'ShopSubproduct.type',
 						);
 						$data = SetMulti::extractHierarchicMulti($extract_data,$data);
+						//debug($data);
 						$finalSubItems[] = $data;
 					}
 				}
@@ -726,7 +736,7 @@ class ShopFunctComponent extends Object
 	}
 	function extractOrderItemData($productAndOptions,$order=null){
 		App::import('Lib', 'Shop.ShopConfig');
-+		$currency = !empty($order['ShopOrder']['currency'])?$order['ShopOrder']['currency']:ShopConfig::load('currency');
+		$currency = !empty($order['ShopOrder']['currency'])?$order['ShopOrder']['currency']:ShopConfig::load('currency');
 		$extract_data = array(
 			'id' => 'id',
 			'product_id' => 'ShopProduct.id',

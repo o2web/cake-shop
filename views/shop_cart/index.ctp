@@ -1,14 +1,8 @@
 <?php
+	$this->Cart->cartUpdateScript();
 	$this->Html->scriptBlock('
 		(function( $ ) {
 			$(function(){
-				$("#ShopCartIndexForm .btUpdate").hide();
-				$("#ShopCartIndexForm input").change(function(){
-					$("#ShopCartIndexForm .btUpdate").show();
-				});
-				$("#ShopCartIndexForm input").keyup(function(){
-					$("#ShopCartIndexForm .btUpdate").show();
-				});
 				$("#ShopCartIndexForm a.BtShowCodePromo").click(function(){
 					$("#ShopCartIndexForm a.BtShowCodePromo").hide();
 					$("#ShopCartIndexForm .promotionCodes").show();
@@ -64,7 +58,7 @@
 						<?php 
 						if(!empty($types) && Configure::read('Shop.cart.inlineSubProduct') ) { 
 							foreach($types as $key => $type){ ?>
-								<td class="SubItem <?php echo $key ?>"><?php echo $this->Cart->subitemInput('Size',$cartItem,array('div'=>false,'label'=>false),$no); ?></td>
+								<td class="SubItem <?php echo $key ?>"><?php echo $this->Cart->subitemInput($type,$cartItem,array('div'=>false,'label'=>false),$no); ?></td>
 							<?php } ?>
 						<?php } ?>
 						<td class="Price"><?php echo $this->Shop->fullprice($cartItem); ?>&nbsp;</td>

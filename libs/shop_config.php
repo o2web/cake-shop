@@ -144,7 +144,7 @@ class ShopConfig {
 		foreach($types as $key => $type){
 			$type = array_merge($def,(array)$type);
 			if(empty($type['label'])){
-				$type['label'] = __($key,true);
+				$type['label'] = __(Inflector::humanize($key),true);
 			}else{
 				$type['label'] = __($type['label'],true);
 			}

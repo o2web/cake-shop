@@ -13,6 +13,15 @@ class ShopAppController extends AppController {
 		parent::__construct();
 	}
 	
+	function constructClasses() {
+	
+		if(in_array('Upgrader',App::objects('plugin')) && !empty($this->params['admin'])) {
+			App::import('Lib', 'Upgrader.Upgrader');
+			Upgrader::requireUpgraded('Shop',$this);
+		}
+		
+		return parent::constructClasses();
+	}
 	
 	function beforeFilter() {
 		parent::beforeFilter();

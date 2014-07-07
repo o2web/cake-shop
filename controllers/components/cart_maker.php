@@ -30,6 +30,7 @@ class CartMakerComponent extends Object{
 		}else{
 			$this->controller->params['Shop']['nbItem'] = $this->nbItem();
 		}
+		$this->controller->params['Shop']['qtys'] = $this->qtysByProduct();
 	}
 	
 	function itemList(){
@@ -51,6 +52,19 @@ class CartMakerComponent extends Object{
 		}
 		
 		return $qty;
+	}
+	
+	function qtysByProduct(){
+		// debug($this->data['products']);
+		$qts = array();
+		foreach($this->data['products'] as $prod){
+			$model = !empty($prod['model']) ? Inflector::classify($prod['model']) : 'shop_product';
+			$id = !empty($prod['foreign_id']) ? $prod['foreign_id'] : $prod['id'];
+			if(empty($qts[$model][$id])) $qts[$model][$id] = 0;
+			$qts[$model][$id] += $prod['nb'];
+		}
+		//debug($qts);
+		return $qts;
 	}
 	
 	function getSubTotal(){
@@ -179,14 +193,7 @@ class CartMakerComponent extends Object{
 		foreach($options['products'] as $product){
 			$product = $this->ShopFunct->formatProductAddOption($product);
 			//debug($product);
-			$conditions = $this->ShopFunct->productFindConditions($product,array('tcheckActive'=>false));
-			//debug($conditions);
-			//debug($this->data['products']);
-			//exit();
-			if(!empty($product['SubItem'])){
-				$conditions['SubItem'] = $product['SubItem'];
-			}
-			$pos = $this->indexOf($conditions);
+			$pos = $this->match($product);
 			if($pos>-1){
 				$this->data['products'][$pos]['nb']+=$product['nb'];
 				if($this->data['products'][$pos]['nb'] <= 0){
@@ -321,6 +328,15 @@ class CartMakerComponent extends Object{
 		$this->OrderMaker->add($opt);
 	}
 	
+	function match($product){
+		$conditions = $this->ShopFunct->productFindConditions($product,array('tcheckActive'=>false));
+		if(!empty($product['SubItem'])){
+			$conditions['SubItem'] = $product['SubItem'];
+		}else{
+			$conditions['SubItem'] = null;
+		}
+		return $this->indexOf($conditions);
+	}
 	
 	////////////////// private //////////////////
 	function indexOf($condition,$start=0){
@@ -330,7 +346,8 @@ class CartMakerComponent extends Object{
 		if(!empty($condition)){
 			$i = $start;
 			foreach($this->data['products'] as $index => $product){
-				if(!count(array_diff_assoc($condition,$product))){
+				$product = array_intersect_key($product,$condition);
+				if(!count(Set::diff( $condition,$product))){
 					return $index;
 				}
 				$i++;

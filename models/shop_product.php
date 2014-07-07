@@ -337,6 +337,10 @@ class ShopProduct extends ShopAppModel {
 			if($this->getPromos){
 				$product['ShopPromotion'] = $this->possiblePromo($product);
 			}
+			if(!empty($product['ShopProduct']['ShopSubproduct'])){
+				$product['ShopSubproduct'] = $product['ShopProduct']['ShopSubproduct'];
+				unset($product['ShopProduct']['ShopSubproduct']);
+			}
 			if(!empty($product['ShopSubproduct'])){
 				$product['ShopSubproduct'] = SetMulti::group($product['ShopSubproduct'],'type');
 			}

@@ -2,7 +2,7 @@
 class ShopSubproduct extends ShopAppModel {
 	var $name = 'ShopSubproduct';
 	var $displayField = 'label';
-	var $actsAs = array('Locale');
+	var $actsAs = array('Locale','Shop.Serialized'=>array('currency_prices'));
 	
 	//The Associations below have been created with all possible keys, those that are not needed can be removed
 

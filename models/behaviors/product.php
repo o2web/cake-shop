@@ -27,7 +27,21 @@ class ProductBehavior extends ModelBehavior {
 				)
 			)
 		,false);
-
+		
+		if(Configure::read('admin') == true) {
+			App::import('Lib', 'Shop.ShopConfig');
+			$types = ShopConfig::getSubProductTypes();
+			if(!empty($types)){
+				$this->productContain($Model);
+			}
+		}
+	}
+	
+	function productContain(&$model, $opt = array()){
+		$model->Behaviors->attach('Containable');
+		$contains = Set::merge($opt,array('ShopProduct'=>array('ShopSubproduct')));
+		$model->contain($contains);
+		return $contains;
 	}
 	
 	function afterSave(&$model, $created) {

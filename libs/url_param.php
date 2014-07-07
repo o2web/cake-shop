@@ -31,12 +31,19 @@ class UrlParam extends Object {
 		$_this =& UrlParam::getInstance();
 		$serialized = false;
 		$encoded = $url;
+		if($encoded === true){
+			$encoded = array();
+		}
+		if($human){
+			if(is_array($encoded)){
+				$encoded['base'] = false;
+				$encoded = Router::url($encoded);
+			}
+			$encoded = str_replace(array_values($_this->escape),array_keys($_this->escape),$encoded);
+		}
 		if(is_array($encoded)){
 			$serialized = true;
 			$encoded = serialize($encoded);
-		}
-		if($human){
-			$encoded = str_replace(array_values($_this->escape),array_keys($_this->escape),$encoded);
 		}
 		if($serialized){
 			$encoded = $_this->serializedFlag.$encoded;

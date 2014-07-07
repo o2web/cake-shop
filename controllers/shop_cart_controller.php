@@ -87,26 +87,39 @@ class ShopCartController extends ShopAppController {
 	
 	function add($model=null, $id = null, $nb = 1){
 		$extract_data = array(
-			'products.model' => array('data.ShopCart.model','params.named.model','params.model'),
-			'products.foreign_id' => array('data.ShopCart.id','params.named.id','params.id'),
-			'products.nb' => array('data.ShopCart.nb','params.named.nb','params.nb'),
+			'products.model' => array('data.ShopCart.model','params.named.model','params.model','pass.model'),
+			'products.foreign_id' => array('data.ShopCart.id','params.named.id','params.id','pass.id'),
+			'products.nb' => array('data.ShopCart.nb','params.named.nb','params.nb','pass.nb'),
 			'back_encoded' => array('params.named.back','params.back'),
+			'redirect_encoded' => array('params.named.redirect','params.redirect'),
+			'redirect' => array('data.ShopCart.redirect'),
 			'back' => array('data.ShopCart.back'),
+			'products.SubItem' => array('data.ShopCart.SubItem'),
 		);
 		App::import('Lib', 'Shop.SetMulti');
-		$source = array('params'=>$this->params, 'data'=>$this->data);
+		$source = array('params'=>$this->params, 'data'=>$this->data, 'pass'=>array('model'=>$model,'id'=>$id,'nb'=>$nb));
 		$opt = SetMulti::extractHierarchicMulti($extract_data,$source);
 		if(!empty($opt['back_encoded'])){
 			App::import('Lib', 'Shop.UrlParam');
 			$opt['back'] = UrlParam::decode($opt['back_encoded']);
 			unset($opt['back_encoded']);
 		}
-		
+		$redirect = array('action' => 'index');
+		if(!empty($opt['redirect_encoded'])){
+			App::import('Lib', 'Shop.UrlParam');
+			$opt['redirect'] = UrlParam::decode($opt['redirect_encoded']);
+			unset($opt['redirect_encoded']);
+		}
+		if(!empty($opt['redirect'])){
+			$redirect = $opt['redirect'];
+			$opt['redirect'] = false;
+		}
 		if (empty($opt['products']['foreign_id']) || empty($opt['products']['model'])) {
 			$this->Session->setFlash(sprintf(__('Invalid %s', true), 'product'));
-			$this->redirect(array('action' => 'index'));
+			$this->redirect($redirect);
 		}
 		$this->CartMaker->add($opt);
+		$this->redirect($redirect);
 	}
 	
 	function clear(){

@@ -25,8 +25,8 @@
 		<div class="shopSubProductSelector">
 			<p class="label"><?php __('subProduct') ?></p>
 			<?php
-			foreach($types as $key =>$options){
-				$html .= '				'.$this->O2form->input($key,$options)."\n";
+			foreach($typeFields as $key =>$options){
+				echo '				'.$this->O2form->input($key,$options)."\n";
 			}
 			?>
 		
