@@ -32,7 +32,11 @@ class SetMulti {
 		foreach($pathsAssoc as $name => $paths){
 			$val = SetMulti::extractHierarchic($paths, $data, $options);
 			if(!is_null($val) || $options['extractNull']){
-				$res = Set::insert($res, $name, $val);
+				if(is_numeric($name)){
+					$res[$name] = $val;
+				}else{
+					$res = Set::insert($res, $name, $val);
+				}
 			}
 		}
 		return $res;
@@ -108,6 +112,41 @@ class SetMulti {
 			}
 		}
 		return $r;
+	}
+	function complexMerge($arr1, $arr2, $options=array()) {
+		$defOpt = array(
+			'depth'=>100,
+			'curDepth'=>1,
+			'sequences'=>true, // true , false or 'first'
+		);
+		if(is_int($options)) $options = array('depth'=>$options);
+		$opt = array_merge($defOpt,$options);
+		return SetMulti::_complexMerge($arr1, $arr2, $opt);
+	}
+	function _complexMerge($arr1, $arr2, $opt) {
+		$r = (array)$arr1;
+		foreach ((array)$arr2 as $key => $val)    {
+			if ($opt['sequences'] === 'first' && is_int($key)) {
+				$r[] = $val;
+			} elseif ($opt['curDepth'] < $opt['depth'] && is_array($val) && isset($r[$key]) && is_array($r[$key])) {
+				$subOpt = $opt;
+				$subOpt['curDepth']++;
+				$r[$key] = SetMulti::_complexMerge($r[$key], $val, $subOpt);
+			} elseif ($opt['sequences'] && is_int($key)) {
+				$r[] = $val;
+			} else {
+				$r[$key] = $val;
+			}
+		}
+		return $r;
+	}
+	
+	function replaceRef(&$from,$to){
+		$tmp = $from;
+		foreach($tmp as $key => $val){
+			unset($from[$key]);
+		}
+		$from = array_merge($to,$from);
 	}
 	
 	function replaceTree($search="", $replace="", $array=false, $keys_too=false){
@@ -221,6 +260,50 @@ class SetMulti {
 			}
 		}
 		return $out;
+	}
+	
+	function testCond($cond, $data, $or = false, $empty = false){
+		$valid = true;
+		$def = $empty;
+		$modifKeys = array('and','or');
+		App::import('Lib', 'Operations');
+		foreach($cond as $key => $cnd){
+			$op = false;
+			$path = $key;
+			if(is_numeric($path)){
+				$val = $data;
+			}elseif(in_array($path,$modifKeys)){
+				$val = $data;
+			}elseif(array_key_exists($path,$data)){
+				$val = $data[$path];
+			}else{
+				$op = Operations::parseStringOperation($path,array('mode'=>'left','type'=>'bool','sepPattern'=>'\h+'));
+				if($op){
+					$path = $op['subject'];
+				}
+				$val = Set::Extract($path,$data);
+			}
+			if($op){
+				$op['subject'] = $val;
+				$op['val'] = $cnd;
+				$valid = Operations::applyOperation($op);
+			}elseif(is_null($cnd)){
+				$valid = is_null($val);
+			}elseif(is_array($cnd)){
+				$or = ($path == 'or');
+				$valid = SetMulti::testCond($cnd,$val,$or);
+			}elseif(!is_null($data)){
+				$valid = $val == $cnd;
+			}else{
+				$valid = false;
+			}
+			if($valid == $or){
+				return $or;
+			}
+			$def = $valid;
+		}
+		return $def;
+		
 	}
 }
 ?>

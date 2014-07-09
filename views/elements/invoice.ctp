@@ -57,33 +57,9 @@
 				<td class="amount"><?php echo $this->Shop->currency($orderItem['total'],$currency); ?></td>
 			</tr>
 			
-			<?php if(!empty($orderItem['SubItem'])){ ?>
-				<?php foreach($orderItem['SubItem'] as $orderSubItem){ ?>
-					<tr class="item itemSubItem">
-						<td>&nbsp;</td>
-						<td><?php 
-						if($orderItem['nb']>1){ 
-							echo $orderItem['nb'];
-							if($orderItem['nb']>1){ 
-								echo '*';
-							}
-						}
-						if($orderItem['nb']>1){ 
-							echo $orderItem['nb'];
-						}
-						?></td>
-						<td><?php echo $orderSubItem['descr']; ?></td>
-						<?php  ?>
-						<td class="amount"><?php echo $this->Shop->currency(
-							($orderSubItem['item_operator'] == "=")?
-								$orderSubItem['item_price']
-							:
-								$orderSubItem['modif']
-						,$currency); ?></td>
-						<td class="amount">&nbsp;</td>
-					</tr>
-				<?php } ?>
-			<?php } ?>
+			<?php if(!empty($orderItem['SubItem'])){
+				echo $this->element('invoice_subitems',array('plugin'=>'shop', 'orderItem' => $orderItem));
+			} ?>
         <?php } ?>
 		
 		<?php if(!empty($order['ShopOrder']['discount']) || !empty($order['ShopOrder']['taxes']) || !empty($order['ShopOrder']['total_shipping'])){ ?>

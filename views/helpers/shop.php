@@ -48,12 +48,26 @@ class ShopHelper extends AppHelper {
 			$this->O2form->data['ShopSubproduct'] = $this->data['ShopSubproduct'];
 			$this->Form->data['ShopSubproduct'] = $this->data['ShopSubproduct'];
 		}
+		$typeFields = $this->_subProductsFields($types);
+		
+		$view =& ClassRegistry::getObject('view');
+		$html = $view->element('edit_form',array('plugin'=>'shop','opt'=>$opt,'typeFields'=>$typeFields,'currencies'=>$config['currencies']));
+		
+		return $html;
+	}
+	
+	function _subProductsFields($types,$prefix = 'ShopSubproduct.'){
+		$config = ShopConfig::load();
 		$typeFields = array();
 		if(!empty($types)){
 			foreach($types as $key =>$type){
 				$fields = set::normalize(array('id','code','label_fre','label_eng', 'operator','price'));
 				
-				if(!empty($config['currencies'])){
+				if(isset($type['price']) && $type['price'] === false){
+					unset($fields['price']);
+				}
+				
+				if(array_key_exists('price',$fields) && !empty($config['currencies'])){
 					//$fields['price']['label'] = __('Default Price',true);
 					unset($fields['price']);
 					foreach($config['currencies'] as $currency){
@@ -74,14 +88,17 @@ class ShopHelper extends AppHelper {
 				if(isset($type['adminFields'])){
 					$fields = set::merge($fields,$type['adminFields']);
 				}
-				$typeFields['ShopSubproduct.'.$key] = array('type'=>'multiple','fields'=>$fields,'div'=>array('class'=>'type'));
+				
+				$typeField = array('type'=>'multiple','fields'=>$fields,'div'=>array('class'=>'type'));
+				
+				if(!empty($type['children'])){
+					$typeField['subline'] = $this->_subProductsFields($type['children'],'children.');
+				}
+				
+				$typeFields[$prefix.$key] = $typeField;
 			}
 		}
-		
-		$view =& ClassRegistry::getObject('view');
-		$html = $view->element('edit_form',array('plugin'=>'shop','opt'=>$opt,'typeFields'=>$typeFields,'currencies'=>$config['currencies']));
-		
-		return $html;
+		return $typeFields;
 	}
 	
 	function countryInput($fieldName, $options = array() ){

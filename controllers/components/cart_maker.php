@@ -299,7 +299,8 @@ class CartMakerComponent extends Object{
 					}
 				}
 			}
-			$this->data = Set::merge($this->data,$nomalized);
+			App::import('Lib', 'Shop.SetMulti');
+			$this->data = SetMulti::complexMerge($this->data,$nomalized,array('sequences'=>false));
 			
 			$this->clearCache();
 		}

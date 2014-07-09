@@ -52,6 +52,7 @@ class ShopCartController extends ShopAppController {
 			//debug($this->data);
 		}
 		$this->data = $this->CartMaker->toData();
+		
 		if(!empty($this->data['ShopCart']['order'])){
 			$this->data['ShopOrder'] = $this->data['ShopCart']['order'];
 			

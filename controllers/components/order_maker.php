@@ -115,18 +115,22 @@ class OrderMakerComponent extends Object
 				$subItems = $this->ShopFunct->extractSubItemData($data);//extract sub items
 				//debug($data);
 				//debug($subItems);
-				//exit();
 				$data['order_id'] = $order_id;
 				////////// save sub items //////////
 				if($this->ShopOrder->ShopOrdersItem->save($data)){
 					if(!empty($subItems)){
-						foreach($subItems as $subItem){
+						foreach($subItems as &$subItem){
 							$this->ShopOrder->ShopOrdersItem->ShopOrdersSubitem->create();
 							$subItem['shop_orders_item_id'] = $this->ShopOrder->ShopOrdersItem->id;
+							if(!empty($subItem['parent'])){
+								$subItem['parent_id'] = $subItem['parent']['id'];
+							}
 							if($this->ShopOrder->ShopOrdersItem->ShopOrdersSubitem->save($subItem)){
+								$subItem['id'] = $this->ShopOrder->ShopOrdersItem->ShopOrdersSubitem->id;
 							}else{
 								$this->log('Could not save OrderSubitem',LOG_DEBUG);
 							}
+							unset($subItem);
 						}
 					}
 				}else{

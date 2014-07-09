@@ -659,9 +659,6 @@ class ShopFunctComponent extends Object
 			return $productAndOptions['ShopOrdersSubitem'];
 		}
 		
-		$subItemDef = array(
-			'nb' => 1,
-		);
 		
 		$currency = !empty($order['ShopOrder']['currency'])?$order['ShopOrder']['currency']:ShopConfig::load('currency');
 		
@@ -679,23 +676,7 @@ class ShopFunctComponent extends Object
 			$this->ShopSubproduct = ClassRegistry::init('Shop.ShopSubproduct');
 			$ids = array();
 			//============ normalize data ============//
-			$subItems = array();
-			foreach($types as $type){
-				$n = $type['name'];
-				if(isset($p['SubItem'][$n])){
-					$subItems[$n] = $p['SubItem'][$n];
-					if(!is_array($subItems[$n]) || SetMulti::isAssoc($subItems[$n])){
-						$subItems[$n] = array($subItems[$n]);
-					}
-					foreach($subItems[$n] as &$subItem){
-						if(!is_array($subItem)){
-							$subItem = array('id'=>$subItem);
-						}
-						$subItem = array_merge($subItemDef,$subItem);
-					}
-				}
-				$ids = array_merge($ids, SetMulti::extractKeepKey('id',$subItems[$n]));
-			}
+			$subItems = $this->_getNormalizedSubItem($types,$p['SubItem'],$ids);
 			//debug($ids);
 			
 			//============ fetch SubProducts ============//
@@ -712,11 +693,12 @@ class ShopFunctComponent extends Object
 			
 			//============ merge data ============//
 			$finalSubItems = array();
-			foreach($subItems as $type => $items){
-				foreach($items as $subItem){
+			foreach($subItems as $type => &$items){
+				foreach($items as &$subItem){
 					if(!empty($subProduct[$subItem['id']])){
 						$data = array_merge($subProduct[$subItem['id']],$subItem);
 						$extract_data = array(
+							'shop_product_subproduct_id' => 'ShopProductSubproduct.id',
 							'shop_subproduct_id' => 'ShopSubproduct.id',
 							'descr' => array('ShopSubproduct.label'),
 							'nb' => array('nb'),
@@ -725,15 +707,60 @@ class ShopFunctComponent extends Object
 							'type' => 'ShopSubproduct.type',
 						);
 						$data = SetMulti::extractHierarchicMulti($extract_data,$data);
-						//debug($data);
-						$finalSubItems[] = $data;
+						if(!empty($subItem['parent'])){
+							$data['parent'] = &$subItem['parent'];
+						}
+						SetMulti::replaceRef($subItem,$data);
+						$finalSubItems[] = &$subItem;
 					}
+					unset($subItem);
 				}
+				unset($items);
 			}
+			
 			return $finalSubItems;
 		}
 		return null;
 	}
+	
+	function _getNormalizedSubItem($types,$subItems,&$ids,&$parent = null){
+		$subItemDef = array(
+			'nb' => 1,
+		);
+		
+		$finalSubItems = array();
+		foreach($types as $type){
+			$n = $type['name'];
+			if(isset($subItems[$n])){
+				if(!is_array($subItems[$n]) || SetMulti::isAssoc($subItems[$n])){
+					$finalSubItems[$n] = array(&$subItems[$n]);
+				}else{
+					$finalSubItems[$n] = $subItems[$n];
+				}
+				foreach($finalSubItems[$n] as &$subItem){
+					if(!is_array($subItem)){
+						$subItem = array('id'=>$subItem);
+					}
+					if($parent){
+						$subItem['parent'] = &$parent;
+					}
+					$subItem = array_merge($subItemDef,$subItem);
+					unset($subItem);
+				}
+				$tmp = array_merge($finalSubItems[$n],array());
+				foreach($tmp as &$subItem){
+					if(!empty($subItems['children'][$subItem['id']])){
+						$finalSubItems = array_merge($finalSubItems,$this->_getNormalizedSubItem($type['children'],$subItems['children'][$subItem['id']],$ids,$subItem));
+					}
+					unset($subItem);
+				}
+			}
+			$ids = array_merge($ids, SetMulti::extractKeepKey('id',$finalSubItems[$n]));
+		}
+		
+		return $finalSubItems;
+	}
+	
 	function extractOrderItemData($productAndOptions,$order=null){
 		App::import('Lib', 'Shop.ShopConfig');
 		$currency = !empty($order['ShopOrder']['currency'])?$order['ShopOrder']['currency']:ShopConfig::load('currency');

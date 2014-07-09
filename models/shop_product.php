@@ -342,7 +342,7 @@ class ShopProduct extends ShopAppModel {
 				unset($product['ShopProduct']['ShopSubproduct']);
 			}
 			if(!empty($product['ShopSubproduct'])){
-				$product['ShopSubproduct'] = SetMulti::group($product['ShopSubproduct'],'type');
+				$product['ShopSubproduct'] = $this->formatSubproduct($product['ShopSubproduct']);
 			}
 		}
 		if($single){
@@ -350,6 +350,23 @@ class ShopProduct extends ShopAppModel {
 		}else{
 			return $prods;
 		}
+	}
+	
+	function formatSubproduct($subproducts){
+		$byId = array();
+		$formated = array();
+		foreach($subproducts as &$subproduct){
+			$byId[$subproduct['id']] =&$subproduct;
+		}
+		foreach($subproducts as &$subproduct){
+			if(empty($subproduct['ShopProductSubproduct']['parent_subproduct_id'])){
+				$formated[$subproduct['type']][] = &$subproduct;
+			}else{
+				$byId[$subproduct['ShopProductSubproduct']['parent_subproduct_id']]['children'][$subproduct['type']][] = &$subproduct;
+			}
+		}
+		//debug($formated);
+		return $formated;
 	}
 	
 	function getAllRelated($products=null,$opt=array()){

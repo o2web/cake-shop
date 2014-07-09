@@ -138,7 +138,7 @@ class CartHelper extends AppHelper {
 	
 	function subitemInputs($prod = null, $options = array(), $no = null){
 		App::import('Lib', 'Shop.ShopConfig');
-		$types = ShopConfig::getSubProductTypes();
+		$types = empty($options['types']) ? ShopConfig::getSubProductTypes() : $options['types'];
 		if(!empty($types)) { 
 			$localOpt = array('list');
 			$inputOpt = array_diff_key($options,array_flip($localOpt));
@@ -165,40 +165,71 @@ class CartHelper extends AppHelper {
 		$view =& ClassRegistry::getObject('view');
 		if(!is_array($type)){
 			App::import('Lib', 'Shop.ShopConfig');
-			$types = ShopConfig::getSubProductTypes();
+			$types = empty($options['types']) ? ShopConfig::getSubProductTypes() : $options['types'];
 			if(empty($types[$type])){
 				return null;
 			}
 			$type = $types[$type];
 		}
+		$localOpt = array('prefix','recursive','types','subProducts');
 		$defOpt = array(
+			'prefix'=> ((!is_null($no) && is_numeric($no)) 
+				? 'ShopCart.products.'.$no.'.SubItem.'
+				: 'ShopCart.SubItem.'),
 			'label'=>$type['label'],
 			'class'=>'subItem',
+			'recursive'=>true,
 		);
 		$opt = array_merge($defOpt, $options);
-		//debug($prod);
-		if(!is_array($prod)){
-			$prod = null;
-			$no = $prod;
+		
+		if(empty($opt['subProducts'])){
+			//debug($prod);
+			if(!is_array($prod)){
+				$prod = null;
+				$no = $prod;
+			}
+			$sources = array(
+				'prod.ShopProduct.ShopSubproduct.'.$type['name'],
+				'prod.ShopSubproduct.'.$type['name'],
+				'data.ShopProduct.ShopSubproduct.'.$type['name'],
+				'vars.'.Inflector::singularize($this->params['controller']).'.ShopProduct.ShopSubproduct.'.$type['name'],
+			);
+			App::import('Lib', 'Shop.SetMulti');
+			$data = array('prod'=>$prod, 'data'=>$this->data,'vars'=>$view->viewVars,'params'=>$this->params);
+			$subProducts = SetMulti::extractHierarchic($sources, $data);
+		}elseif(!empty($opt['subProducts'][$type['name']])){
+			$subProducts = $opt['subProducts'][$type['name']];
+		}else{
+			return null;
 		}
-		$sources = array(
-			'prod.ShopProduct.ShopSubproduct.'.$type['name'],
-			'prod.ShopSubproduct.'.$type['name'],
-			'data.ShopProduct.ShopSubproduct.'.$type['name'],
-			'vars.'.Inflector::singularize($this->params['controller']).'.ShopProduct.ShopSubproduct.'.$type['name'],
-		);
-		App::import('Lib', 'Shop.SetMulti');
-		$data = array('prod'=>$prod, 'data'=>$this->data,'vars'=>$view->viewVars,'params'=>$this->params);
-		$subProducts = SetMulti::extractHierarchic($sources, $data);
+		$children = array();
 		if(empty($subProducts)){
 			return null;
 		}
-		if(!is_null($no) && is_numeric($no)){
-			$name = 'ShopCart.products.'.$no.'.SubItem.'.$type['name'];
-		}else{
-			$name = 'ShopCart.SubItem.'.$type['name'];
+		$name = $opt['prefix'].$type['name'];
+		if($opt['recursive']){
+			foreach($subProducts as $subProduct){
+				if(!empty($subProduct['children'])){
+					$children[$subProduct['id']] = $this->O2form->conditionalBlock(
+						$this->subitemInputs($prod,array(
+							'types'=>$type['children'],
+							'subProducts'=>$subProduct['children'],
+							'prefix'=>$opt['prefix'].'children.'.$subProduct['id'].'.'
+						), $no),
+						$name,
+						$subProduct['id']
+					);
+				}
+			}
 		}
-		return $view->element('subproduct_select',array('plugin'=>'shop','type'=>$type,'subProducts'=>$subProducts,'name'=>$name,'options'=>$opt));
+		return $view->element('subproduct_select',array(
+			'plugin'=>'shop',
+			'type'=>$type,
+			'subProducts'=>$subProducts,
+			'name'=>$name,
+			'options'=>array_diff_key($opt,array_flip($localOpt)),
+			'children'=>$children
+		));
 	}
 	
 	function qteInput($no = null, $options = array()){

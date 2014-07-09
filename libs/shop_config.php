@@ -134,6 +134,9 @@ class ShopConfig {
 		if(empty($types)){
 			return null;
 		}
+		return ShopConfig::_parseSubProductTypes($types);
+	}
+	function _parseSubProductTypes($types){
 		$def = array(
 			'operators'=>array('=','+','*','-','%','-%'),
 			'min'=>0,
@@ -152,10 +155,17 @@ class ShopConfig {
 				$type['name'] = $key;
 			}
 			$type['operators'] = (array)$type['operators'];
+			
+			if(!empty($type['children'])){
+				$type['children'] = ShopConfig::_parseSubProductTypes($type['children']);
+			}
+			
 			$types[$key] = $type;
 		}
 		return $types;
 	}
+	
+	
 	
 	var $exportedSupplements = array('shipping');
 	var $default_supplement_opt = array(
