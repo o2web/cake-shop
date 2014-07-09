@@ -65,6 +65,7 @@ class ShopHelper extends AppHelper {
 				
 				if(isset($type['price']) && $type['price'] === false){
 					unset($fields['price']);
+					unset($fields['operator']);
 				}
 				
 				if(array_key_exists('price',$fields) && !empty($config['currencies'])){
@@ -78,15 +79,17 @@ class ShopHelper extends AppHelper {
 						$fields['currency_prices.'.$currency] = $fOpt;
 					}
 				}
-
-				if(count($type['operators']==1)){
-					$fields['operator']['type'] = 'hidden';
-					$fields['operator']['value'] = $type['operators'][0];
-				}else{
-					$fields['operator']['options'] = $type['operators'];
-				}
-				if(isset($type['adminFields'])){
-					$fields = set::merge($fields,$type['adminFields']);
+				
+				if(array_key_exists('operator',$fields)){
+					if(count($type['operators'])==1){
+						$fields['operator']['type'] = 'definition';
+						$fields['operator']['value'] = $type['operators'][0];
+					}else{
+						$fields['operator']['options'] = $type['operators'];
+					}
+					if(isset($type['adminFields'])){
+						$fields = set::merge($fields,$type['adminFields']);
+					}
 				}
 				
 				$typeField = array('type'=>'multiple','fields'=>$fields,'div'=>array('class'=>'type'));
