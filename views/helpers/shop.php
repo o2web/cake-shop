@@ -57,6 +57,7 @@ class ShopHelper extends AppHelper {
 	}
 	
 	function _subProductsFields($types,$prefix = 'ShopSubproduct.'){
+		App::import('Lib', 'Shop.SetMulti');
 		$config = ShopConfig::load();
 		$typeFields = array();
 		if(!empty($types)){
@@ -82,7 +83,14 @@ class ShopHelper extends AppHelper {
 				
 				if(array_key_exists('operator',$fields)){
 					if(count($type['operators'])==1){
-						$fields['operator']['type'] = 'definition';
+						$fields = SetMulti::insertBeforeKey($fields,'operator',array(
+							'operator_display' => array(
+								'type' => 'definition',
+								'value' => $type['operators'][0],
+								'label' => __('Operator',true),
+							)
+						));
+						$fields['operator']['type'] = 'hidden';
 						$fields['operator']['value'] = $type['operators'][0];
 					}else{
 						$fields['operator']['options'] = $type['operators'];

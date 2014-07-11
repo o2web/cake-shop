@@ -233,6 +233,15 @@ class SetMulti {
 		}
 		return $out;
 	}
+	function insertBeforeKey($array, $key, $data = null, $appendDefault = true)
+	{
+		if (($offset = array_search($key, array_keys($array))) === false) 
+		{
+			$offset = $appendDefault ? count($array) : 0;
+		}
+
+		return array_merge(array_slice($array, 0, $offset), (array) $data, array_slice($array, $offset));
+	}
 	
 	function threadedToList($treaded, $keyPath, $valPath, $spacer = "  ",$lvl = 0){
 		$out = array();
