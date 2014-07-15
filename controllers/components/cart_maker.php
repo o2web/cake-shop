@@ -97,8 +97,8 @@ class CartMakerComponent extends Object{
 			}elseif(!empty($product['model']) && !empty($product['foreign_id'])){
 				$productData = $ShopProduct->getFullData($productData);
 			}
-			$productData = $this->ShopFunct->calculSubItem($productData);
 			if($minCalcul){
+				$productData = $this->ShopFunct->calculSubItem($productData);
 				$productData = $this->ShopFunct->calculPromo($productData,isset($this->data['order'])?$this->data['order']:null);
 			}
 			$data[] = $productData;

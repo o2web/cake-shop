@@ -401,7 +401,7 @@ class ShopProduct extends ShopAppModel {
 			App::import('Lib', 'Shop.SetMulti');
 			$relatedModel->recursive = -1;
 			$ids = Set::extract('/foreign_id',$refs);
-			$findOpt = array('conditions'=>array('id'=>$ids));
+			$findOpt = array('conditions'=>array($relatedModel->alias.'.id'=>$ids));
 			if($opt['minField']){
 				$fields = $this->dynamicFieldsExtractData($relatedModel,$opt);
 				$fields = array_values(Set::flatten($fields));
