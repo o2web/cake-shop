@@ -1,3 +1,6 @@
+<?php
+	$currency = !empty($order['ShopOrder']['currency'])?$order['ShopOrder']['currency']:null;
+?>
 <?php foreach($orderItem['SubItem'] as $orderSubItem){ ?>
 	<tr class="item itemSubItem">
 		<td>&nbsp;</td>
