@@ -113,11 +113,14 @@ class OrderMakerComponent extends Object
 				$this->ShopOrder->ShopOrdersItem->create();
 				$data = $this->ShopFunct->extractOrderItemData($product);
 				$subItems = $this->ShopFunct->extractSubItemData($data);//extract sub items
-				//debug($data);
+				
 				//debug($subItems);
+				$keep = array('product_id','nb','active');
+				$data = array_intersect_key($data,array_flip($keep));
 				$data['order_id'] = $order_id;
-				////////// save sub items //////////
+				
 				if($this->ShopOrder->ShopOrdersItem->save($data)){
+					////////// save sub items //////////
 					if(!empty($subItems)){
 						foreach($subItems as &$subItem){
 							$this->ShopOrder->ShopOrdersItem->ShopOrdersSubitem->create();
@@ -125,7 +128,11 @@ class OrderMakerComponent extends Object
 							if(!empty($subItem['parent'])){
 								$subItem['parent_id'] = $subItem['parent']['id'];
 							}
-							if($this->ShopOrder->ShopOrdersItem->ShopOrdersSubitem->save($subItem)){
+							
+							$keep = array('shop_product_subproduct_id','shop_subproduct_id','nb','parent_id','shop_orders_item_id','type','active');
+							$sData = array_intersect_key($subItem,array_flip($keep));
+							
+							if($this->ShopOrder->ShopOrdersItem->ShopOrdersSubitem->save($sData)){
 								$subItem['id'] = $this->ShopOrder->ShopOrdersItem->ShopOrdersSubitem->id;
 							}else{
 								$this->log('Could not save OrderSubitem',LOG_DEBUG);
@@ -267,7 +274,7 @@ class OrderMakerComponent extends Object
 		
 		return;
 		// call product events (prototype)
-		$this->ShopOrder->ShopOrdersProduct->recursive = -1;
+		/*$this->ShopOrder->ShopOrdersProduct->recursive = -1;
 		$Aro = ClassRegistry::init("Aro");
 		$Aco = ClassRegistry::init("Aco");
 		$this->ShopOrder->ShopProduct->bindModel(array(
@@ -338,7 +345,7 @@ class OrderMakerComponent extends Object
 					$this->ShopFunct->callExternalfunction(array('component'=>$action['ShopAction']['component'],'functName'=>$action['ShopAction']['function'],'params'=>$params));
 				}
 			}
-		}
+		}*/
 	}
 	
 	

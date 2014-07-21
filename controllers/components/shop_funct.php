@@ -654,13 +654,29 @@ class ShopFunctComponent extends Object
 	
 	function extractSubItemData($productAndOptions,$order=null){
 		//debug($productAndOptions);
-		//debug($order);
-		if(!empty($productAndOptions['ShopOrdersSubitem'])){
-			return $productAndOptions['ShopOrdersSubitem'];
-		}
-		
 		
 		$currency = !empty($order['ShopOrder']['currency'])?$order['ShopOrder']['currency']:ShopConfig::load('currency');
+		
+		$extract_data = array(
+			'shop_product_subproduct_id' => 'ShopProductSubproduct.id',
+			'shop_subproduct_id' => 'ShopSubproduct.id',
+			'descr' => array('ShopSubproduct.label'),
+			'nb' => array('nb'),
+			'id' => array('id'),
+			'item_price' => array('ShopSubproduct.currency_prices.'.$currency,'ShopSubproduct.price'),
+			'item_operator' => array('ShopSubproduct.operator'),
+			'type' => 'ShopSubproduct.type',
+			'ShopSubproduct' => 'ShopSubproduct',
+		);
+		
+		if(!empty($order['ShopOrder']['confirm'])){
+			$extract_data = Set::merge(array(
+				'descr' => array('descr'),
+				'item_operator' => array('item_operator'),
+				'item_price' => array('item_price'),
+			),$extract_data);
+		}
+		
 		
 		$orderItemMode = isset($productAndOptions['item_price']);
 		if($orderItemMode){
@@ -672,6 +688,8 @@ class ShopFunctComponent extends Object
 		$p['item_alone_price'] = $cur_price;
 		App::import('Lib', 'Shop.ShopConfig');
 		$types = ShopConfig::getSubProductTypes();
+		
+		$subItems = null;
 		if(!empty($types) && !empty($p['SubItem'])) { 
 			$this->ShopSubproduct = ClassRegistry::init('Shop.ShopSubproduct');
 			$ids = array();
@@ -690,34 +708,34 @@ class ShopFunctComponent extends Object
 			));
 			$subProduct = SetMulti::group($subProduct,'ShopSubproduct.id',array('singleArray'=>false));
 			//debug($subProduct);
-			
+			foreach($subItems as $type => &$items){
+				foreach($items as &$subItem){
+					if(!empty($subProduct[$subItem['id']])){
+						$subItem = array_merge($subProduct[$subItem['id']],$subItem);
+					}
+					unset($subItem);
+				}
+			}
+		}
+		if(!empty($productAndOptions['ShopOrdersSubitem'])){
+			$subItems = SetMulti::group($productAndOptions['ShopOrdersSubitem'],'ShopSubproduct.type');
+		}
+		if(!empty($types) && !empty($subItems)) { 
 			//============ merge data ============//
 			$finalSubItems = array();
 			foreach($subItems as $type => &$items){
 				foreach($items as &$subItem){
-					if(!empty($subProduct[$subItem['id']])){
-						$data = array_merge($subProduct[$subItem['id']],$subItem);
-						$extract_data = array(
-							'shop_product_subproduct_id' => 'ShopProductSubproduct.id',
-							'shop_subproduct_id' => 'ShopSubproduct.id',
-							'descr' => array('ShopSubproduct.label'),
-							'nb' => array('nb'),
-							'item_price' => array('ShopSubproduct.currency_prices.'.$currency,'ShopSubproduct.price'),
-							'item_operator' => 'ShopSubproduct.operator',
-							'type' => 'ShopSubproduct.type',
-						);
-						$data = SetMulti::extractHierarchicMulti($extract_data,$data);
-						if(!empty($subItem['parent'])){
-							$data['parent'] = &$subItem['parent'];
-						}
-						SetMulti::replaceRef($subItem,$data);
-						$finalSubItems[] = &$subItem;
+					$data = SetMulti::extractHierarchicMulti($extract_data,$subItem);
+					if(!empty($subItem['parent'])){
+						$data['parent'] = &$subItem['parent'];
 					}
+					SetMulti::replaceRef($subItem,$data);
+					$finalSubItems[] = &$subItem;
 					unset($subItem);
 				}
 				unset($items);
 			}
-			
+			//debug($finalSubItems);
 			return $finalSubItems;
 		}
 		return null;
@@ -768,12 +786,12 @@ class ShopFunctComponent extends Object
 			'id' => 'id',
 			'product_id' => 'ShopProduct.id',
 			'nb' => array('nb','Options.nb'),
-			'comment' => 'Options.comment',
-			'data' => 'Options.data',
+			'comment' => array('comment','Options.comment'),
+			'data' => array('data','Options.data'),
 			'item_title' => array('DynamicField.title','ShopProduct.DynamicField.title','ShopProduct.code'),
 			'item_descr' => array('DynamicField.descr','ShopProduct.DynamicField.descr'),
 			'item_price' => array('ShopProduct.DynamicField.price','DynamicField.price','Options.currency_prices.'.$currency,'Options.price','ShopProduct.currency_prices.'.$currency,'ShopProduct.price'),
-			'item_tax_applied' => 'ShopProduct.tax_applied',
+			'item_tax_applied' => array('ShopProduct.tax_applied'),
 			'ShopPromotion' => array('ShopProduct.ShopPromotion','ShopPromotion'),
 			'ShopSubproduct' => array('ShopProduct.ShopSubproduct','ShopSubproduct'),
 			'SubItem' => array('Options.SubItem','SubItem'),
@@ -783,6 +801,15 @@ class ShopFunctComponent extends Object
 			'product_related_id' => array('ShopProduct.Related.id','Related.id'),
 			'shipping_req' => array('ShopProduct.shipping_req'),
 		);
+		if(!empty($order['ShopOrder']['confirm'])){
+			$extract_data = Set::merge(array(
+				'item_title' => array('item_title'),
+				'item_price' => array('item_price'),
+				'item_desc' => array('item_desc'),
+				'item_tax_applied' => array('item_tax_applied'),
+			),$extract_data);
+		}
+		
 		$data = array();
 		App::import('Lib', 'Shop.SetMulti');
 		$data = SetMulti::extractHierarchicMulti($extract_data,$productAndOptions);

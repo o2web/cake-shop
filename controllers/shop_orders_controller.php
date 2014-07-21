@@ -141,24 +141,8 @@ class ShopOrdersController extends ShopAppController {
 			
 			//////////////////// Finalize order ////////////////////
 			if($order['ShopOrder']['status']=='input'){
-				$dataSource = $this->ShopOrder->getDataSource();
-				$data = array();
-				$data['id'] = $order_id;
-				$data['active'] = 1;
-				$data['date'] = $dataSource->expression('NOW()');
-				$data = array_merge($data,$this->_calculate($order));
-				$order['ShopOrder'] = array_merge($order['ShopOrder'],$data);
-				
-				$extract = array('id'=>'id','final_price'=>'item_price');
-				foreach($data['OrderItem'] as $item){
-					$itemdata = SetMulti::extractHierarchicMulti($extract,$item);
-					$this->ShopOrder->ShopOrdersItem->save($itemdata);
-				}
-				
-				$data['status'] = 'ready';
-				$this->ShopOrder->save($data);
-				$this->OrderMaker->statusUpdated($order_id,$data['status']);
-				$order['ShopOrder'] = array_merge($order['ShopOrder'],$data);
+				$order = $this->OrderMaker->finalizeOrder($order);
+				//return $this->render(false);
 			}
 			
 			if($order['ShopOrder']['status']=='ready'){
@@ -262,6 +246,10 @@ class ShopOrdersController extends ShopAppController {
 			$this->redirect(array('action' => 'index'));
 		}
 		$this->OrderFunct->tcheckAcl($id);
+		$order = $this->ShopOrder->read(null,$id);
+		if (!empty($order['ShopOrder']['confirm'])){
+			$this->redirect(array('action' => 'add',$id));
+		}
 		if (!empty($this->data)) {
 			//$this->dispatchComponentCallback('billing_save');
 			$data = $this->data['ShopOrder'];
@@ -295,6 +283,10 @@ class ShopOrdersController extends ShopAppController {
 			$this->redirect(array('action' => 'index'));
 		}
 		$this->OrderFunct->tcheckAcl($id);
+		$order = $this->ShopOrder->read(null,$id);
+		if (!empty($order['ShopOrder']['confirm'])){
+			$this->redirect(array('action' => 'add',$id));
+		}
 		if (!empty($this->data)) {
 			//$this->dispatchComponentCallback('shipping_save');
 			$data = $this->data['ShopOrder'];
@@ -326,6 +318,14 @@ class ShopOrdersController extends ShopAppController {
 			$this->redirect(array('action' => 'index'));
 		}
 		$this->OrderFunct->tcheckAcl($id);
+		
+		$this->ShopOrder->checkActive = false;
+		$this->ShopOrder->recursive = -1;
+		$order = $this->ShopOrder->read(null,$id);
+		debug($order);
+		if (!empty($order['ShopOrder']['confirm'])){
+			$this->redirect(array('action' => 'add',$id));
+		}
 		if (!empty($this->data)) {
 			//$this->dispatchComponentCallback('shipping_save');
 			//$this->dispatchComponentCallback('billing_save');
@@ -341,9 +341,6 @@ class ShopOrdersController extends ShopAppController {
 			
 			$this->redirect(array('action' => 'add', $id));
 		}else{
-			$this->ShopOrder->checkActive = false;
-			$this->ShopOrder->recursive = -1;
-			$order = $this->ShopOrder->read(null,$id);
 			
 			$remind = $this->Session->read('Shop.address');
 			if(!empty($remind)){
@@ -700,12 +697,18 @@ class ShopOrdersController extends ShopAppController {
 			$this->redirect(array('action' => 'index'));
 		}
 		$this->ShopOrder->setupForFullData();
-		$shopOrder = $this->ShopOrder->read(null, $id);
-		
+		$original = $shopOrder = $this->ShopOrder->read(null, $id);
 		$calcul = $this->_calculate($shopOrder);
-		//debug($calcul);
+		
 		$shopOrder['ShopOrder'] = array_merge($shopOrder['ShopOrder'],$calcul);
+		if(!empty($original['ShopOrder']['total']) && $original['ShopOrder']['total'] != $shopOrder['ShopOrder']['total']){
+			$this->Session->setFlash(sprintf(__('This order may date from an older version of the system and some calcul may be inexact. But the total is the actual amount billed  to the client.', true), 'shopOrder'));
+			
+			$recover = array('sub_total','total','taxes','total_taxes','total_shipping','supplements','total_supplements');
+			$shopOrder['ShopOrder'] = array_merge($shopOrder['ShopOrder'],array_intersect_key($original['ShopOrder'],array_flip($recover)));
+		}
 		$this->set('shopOrder', $shopOrder);
+		$this->set('order', $shopOrder);
 	}
 	
 }
