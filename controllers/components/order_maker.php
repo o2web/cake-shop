@@ -165,10 +165,8 @@ class OrderMakerComponent extends Object
 		$codeMapping = $this->ShopOrder->ShopPromotion->codesExists($codes,true,true);
 		$codeMapping = array_filter($codeMapping);
 		if(!empty($codeMapping)){
-			$promoWithCode = SetMulti::group($codeMapping,'ShopPromotion.id',array('singleArray' => false));
+			$promoWithCode = SetMulti::group(SetMulti::flatten($codeMapping,array('level'=>1)),'ShopPromotion.id',array('singleArray' => false));
 		}
-		//debug($codeMapping);
-		//debug($promoWithCode);
 		if(!empty($order['ShopProduct'])){
 			$products = $order['ShopProduct'];
 		}else{

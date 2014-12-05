@@ -198,12 +198,13 @@ class ShopPromotion extends ShopAppModel {
 			$codes = array($codes);
 		}
 		$res = array_combine($codes,array_fill(0, count($codes), false));
+		
 		$findOpt = array('conditions'=>array('code'=>$codes),'recursive'=>-1);
 		if($full){
 			App::import('Lib', 'Shop.SetMulti');
 			$existingPromo = $this->find('all',$findOpt);
 			if(!empty($existingPromo)){
-				$existingPromo = SetMulti::group($existingPromo,'ShopPromotion.code',array('singleArray' => false));
+				$existingPromo = SetMulti::group($existingPromo,'ShopPromotion.code',array('singleArray' => true));
 			}
 		}else{
 			$findOpt['fields'] = array('id','code');

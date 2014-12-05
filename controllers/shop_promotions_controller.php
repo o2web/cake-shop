@@ -49,6 +49,7 @@ class ShopPromotionsController extends ShopAppController {
 														'ShopPromotion.desc_fre LIKE' => '%'.$q.'%',
 														'ShopPromotion.desc_eng LIKE' => '%'.$q.'%');
 		}
+		$this->paginate['order'] = 'ShopPromotion.created DESC';
 
 		$this->ShopPromotion->recursive = 0;
 		$shopPromotions = $this->paginate();
@@ -149,12 +150,13 @@ class ShopPromotionsController extends ShopAppController {
 		$promotion = $this->ShopPromotion->read(null, $id);
 		$aros = $this->ShopPromotion->productAros();
 		if(!empty($aros)){
-			$promotion[$this->ShopPromotion->alias]['aroProduct'] = $aros[0]['Aro']['id'];
+			$promotion[$this->ShopPromotion->alias]['aroProduct'] = set::extract('{n}.Aro.id',$aros);
 		}
 		if (!empty($this->data)) {
 			if ($this->ShopPromotion->save($this->data)) {
 				if(!empty($this->data['ShopPromotion']['aroProduct'])){
 					//debug($this->ShopProduct->Aro->Permission->alias);
+					//// unset old $aros ////
 					foreach($aros as $aro){
 						if(!empty($aro[$this->ShopProduct->Aro->alias]['alias'])){
 							$aro = $aro[$this->ShopProduct->Aro->alias]['alias'];
@@ -163,13 +165,16 @@ class ShopPromotionsController extends ShopAppController {
 						}
 						$this->Acl->inherit($aro, $this->ShopPromotion);
 					}
-					$aro = $this->ShopProduct->Aro->read(null,$this->data['ShopPromotion']['aroProduct']);
-					if(!empty($aro[$this->ShopProduct->Aro->alias]['alias'])){
-						$aro = $aro[$this->ShopProduct->Aro->alias]['alias'];
-					}else{
-						$aro = $aro[$this->ShopProduct->Aro->alias];
+					//// set new $aros ////
+					$aros = $this->ShopProduct->Aro->find('all',array('conditions'=>array('id'=>$this->data['ShopPromotion']['aroProduct'])));
+					foreach($aros as $aro){
+						if(!empty($aro[$this->ShopProduct->Aro->alias]['alias'])){
+							$aro = $aro[$this->ShopProduct->Aro->alias]['alias'];
+						}else{
+							$aro = $aro[$this->ShopProduct->Aro->alias];
+						}
+						$this->Acl->allow($aro, $this->ShopPromotion);
 					}
-					$this->Acl->allow($aro, $this->ShopPromotion);
 				}
 				$this->Session->setFlash(sprintf(__('The %s has been saved', true), 'shop promotion'));
 				$this->redirect(array('action' => 'index'));

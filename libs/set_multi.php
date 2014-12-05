@@ -214,7 +214,7 @@ class SetMulti {
 			if($opt['singleArray']){
 				$result[$gkey][$key] = $nval;
 			}elseif(isset($result[$gkey]) ){
-				$result[$gkey] = (array)$result[$gkey];
+				$result[$gkey] = array($result[$gkey]);
 				$result[$gkey][$key] = $nval;
 			}else{
 				$result[$gkey] = $nval;
@@ -222,7 +222,31 @@ class SetMulti {
 		}
 		return $result;
 	}
+	function flatten($data, $options = array()) {
+		$defaultOptions = array(
+			'separator' => '.',
+			'path' => null,
+			'level' => true,
+		);
+		$opt = array_merge($defaultOptions,$options);
 	
+        $result = array();
+        if (!is_null($opt['path'])) {
+            $opt['path'] .= $opt['separator'];
+        }
+        foreach ($data as $key => $val) {
+            if (is_array($val) && $opt['level'] > 0) {
+                $result += (array)SetMulti::flatten($val, array(
+                    'separator' => $opt['separator'],
+                    'path' => $opt['path']. $key,
+					'level' => ($opt['level'] === true) ? true : $opt['level']-1
+                ));
+            } else {
+                $result[ $opt['path'] . $key] = $val;
+            }
+        }
+        return $result;
+    }
 	function extractKeepKey($path,$data){
 		$out = array();
 		foreach($data as $key => $val){
