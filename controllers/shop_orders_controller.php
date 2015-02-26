@@ -127,8 +127,8 @@ class ShopOrdersController extends ShopAppController {
 					$this->redirect(array('action' => 'shipping_billing', $order_id));
 				}
 			}else{
-				$inverseShippingRequired = Configure::read('Shop.inverseShippingRequired');
-				if(!$inverseShippingRequired){ //Shipping then Billing (ByDefault)
+				$inverseShippingBilling = Configure::read('Shop.inverseShippingBilling');
+				if(!$inverseShippingBilling){ //Shipping then Billing (ByDefault)
 					if($needShipping && empty($order['ShopOrder']['shipping_address'])){
 						$this->redirect(array('action' => 'shipping', $order_id));
 					}
