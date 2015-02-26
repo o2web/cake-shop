@@ -345,8 +345,39 @@ class OrderMakerComponent extends Object
 			}
 		}*/
 	}
+	function finalizeOrder($order){
+		$dataSource = $this->ShopOrder->getDataSource();
+		$data = array();
+		$data['id'] = $order['ShopOrder']['id'];
+		$data['active'] = 1;
+		$data['date'] = $dataSource->expression('NOW()');
+		$data = array_merge($data,$this->ShopFunct->calculate($order));
+		$order['ShopOrder'] = array_merge($order['ShopOrder'],$data);
 	
 	
+		$extract = array('id'=>'id','final_price'=>'item_price','item_price'=>'item_alone_price');
+		foreach($data['OrderItem'] as $item){
+			$itemdata = SetMulti::extractHierarchicMulti($extract,$item);
+			$itemdata = array_merge($item,$itemdata);
+			$this->ShopOrder->ShopOrdersItem->save($itemdata);
+			if(!empty($item['SubItem'])){
+				foreach($item['SubItem'] as $subitem){
+					$this->ShopOrder->ShopOrdersItem->ShopOrdersSubitem->save($subitem);
+				}
+			}
+		}
 	
+		//debug($data);
+		//debug($data['OrderItem']);
+		//debug($data['ShopOrdersSubitem']);
+		//return null;
+		
+		$data['status'] = 'ready';
+		$this->ShopOrder->save($data);
+		$this->statusUpdated($data['id'], $data['status']);
+		$order['ShopOrder'] = array_merge($order['ShopOrder'],$data);
+		
+		return $order;
+	}
 }
 ?>

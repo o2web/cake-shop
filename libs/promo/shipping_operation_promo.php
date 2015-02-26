@@ -17,6 +17,7 @@ class ShippingOperationPromo extends PromoMethod {
 		
 		$this->ShopPromotion = ClassRegistry::init('Shop.ShopPromotion'); 
 		
+		$order['Supplements']['shipping']['default']['promo'] = $promo['ShopPromotion']['id'];
 		if($promo['ShopPromotion']['operator'] == 1){
 			$order['Supplements']['shipping']['default']['calcul'] = null;
 			$order['Supplements']['shipping']['default']['price'] = $promo['ShopPromotion']['val'];
