@@ -24,6 +24,7 @@ class ShopConfig {
 				'qtyInNbItem' => true,		//If true, the number of item in the cart will include the quantity of each product
 			),
 			'groupShippingBilling' => true,
+			'inverseShippingBilling' => false,
 			'currencyFormats' => array(
 				'fre' => array('before'=>false, 'after'=>' $', 'thousands' => ' ', 'decimals'=>',', 'places'=>2),
 				'eng'=> array('before'=>'$', 'thousands' => ',', 'decimals'=>'.', 'places'=>2),
