@@ -127,12 +127,21 @@ class ShopOrdersController extends ShopAppController {
 					$this->redirect(array('action' => 'shipping_billing', $order_id));
 				}
 			}else{
-				if($needShipping && empty($order['ShopOrder']['shipping_address'])){
-					$this->redirect(array('action' => 'shipping', $order_id));
-				}
-				
-				if(Configure::read('Shop.billingAddressRequired') && empty($order['ShopOrder']['billing_address'])){
-					$this->redirect(array('action' => 'billing', $order_id));
+				$inverseShippingBilling = Configure::read('Shop.inverseShippingBilling');
+				if(!$inverseShippingBilling){ //Shipping then Billing (ByDefault)
+					if($needShipping && empty($order['ShopOrder']['shipping_address'])){
+						$this->redirect(array('action' => 'shipping', $order_id));
+					}
+					if(Configure::read('Shop.billingAddressRequired') && empty($order['ShopOrder']['billing_address'])){
+						$this->redirect(array('action' => 'billing', $order_id));
+					}
+				} else{ //Billing then Shipping
+					if(Configure::read('Shop.billingAddressRequired') && empty($order['ShopOrder']['billing_address'])){
+						$this->redirect(array('action' => 'billing', $order_id));
+					}
+					if($needShipping && empty($order['ShopOrder']['shipping_address'])){
+						$this->redirect(array('action' => 'shipping', $order_id));
+					}
 				}
 			}
 			if(empty($order['ShopOrder']['confirm'])){
