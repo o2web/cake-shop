@@ -55,6 +55,9 @@ class ProductBehavior extends ModelBehavior {
 		}elseif(!$model->hasField('active')) {
 			$data['active'] = 1;
 		}
+		$defaultShippingRequired = Configure::read('Shop.defaultShippingRequired');
+		$data['shipping_req'] = (isset($model->shipping_req)) ? $model->shipping_req : $defaultShippingRequired;
+		
 		if (!$created) {
 			$model->ShopProduct->recursive = -1;
 			$product = $model->ShopProduct->find('first',array('conditions'=>array('model' => $model->alias, 'foreign_id' => $model->id)));
