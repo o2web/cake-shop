@@ -86,6 +86,7 @@ class OrderMakerComponent extends Object
 			$this->initShopOrder();
 			$this->ShopOrder->create();
 			$orderData = $this->ShopOrder->filterExposedfields($options['order']);
+			$orderData['active'] = true;
 			$orderData['status'] = 'input';
 			$orderData['currency'] = ShopConfig::load('currency');
 			App::import('Lib', 'Shop.ShopConfig');
