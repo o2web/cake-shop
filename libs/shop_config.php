@@ -106,6 +106,7 @@ class ShopConfig {
 			foreach($_this->defaultConfig as $group){
 				$def = Set::merge($def,$group);
 			}
+			if(isset($config['payment']['available'])) $def['payment']['available'] = $config['payment']['available'];
 			$config = Set::merge($def,$config);
 			Configure::write('Shop',$config);
 			$_this->loaded = true;
