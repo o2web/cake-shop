@@ -14,7 +14,14 @@
 			<fieldset>
 				<legend><?php __('Conditions'); ?></legend>
 				<?php
-					echo $this->Form->input('aroProduct',array('label'=>__('Choose Products', true),'options'=>$products,'empty'=>__('None',true),'after'=>'<div class="note">'.__('Choisir le produit concerné par la promotion, ou tous les produits.<br>S\'il y a plus d\'un produit, il faut créer plusieurs promos.',true).'</div>'));
+					echo $this->Form->input('aroProduct',array(
+						'label'=>__('Choose Products', true),
+						'options'=>$products, 
+						'multiple'=>true,
+						'size'=>"10",
+						'empty'=>__('None',true),
+						'after'=>'<div class="note">'.__('Choisir le produit concerné par la promotion, ou tous les produits.<br>S\'il y a plus d\'un produit, il faut créer plusieurs promos.',true).'</div>'
+					));
 				
 					if(!empty($conds)){
 						echo $this->element('promo_method_def',array(
