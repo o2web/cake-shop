@@ -101,7 +101,9 @@ class CartMakerComponent extends Object{
 				$productData = $this->ShopFunct->calculSubItem($productData);
 				$productData = $this->ShopFunct->calculPromo($productData,isset($this->data['order'])?$this->data['order']:null);
 			}
-			$data[] = $productData;
+			if(!empty($productData)){
+				$data[] = $productData;
+			}
 		}
 		
 		$this->data['cache']['itemListData'] = $data;

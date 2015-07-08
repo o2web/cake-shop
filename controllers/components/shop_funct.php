@@ -191,7 +191,7 @@ class ShopFunctComponent extends Object
 
 	function calculPromo(&$order){
 		App::import('Lib', 'Shop.SetMulti');
-		if(SetMulti::isAssoc($order['ShopOrdersItem'])){
+		if(isset($order['ShopOrdersItem']) && SetMulti::isAssoc($order['ShopOrdersItem'])){
 			$prods =  array(&$order['ShopOrdersItem']);
 		}else{
 			$prods = &$order['ShopOrdersItem'];
@@ -205,83 +205,85 @@ class ShopFunctComponent extends Object
 			}
 		}
 		$calculatedProd = array();
-		foreach($prods as $key => &$prod){
-			$orderItemMode = isset($prod['item_price']);
-			if($orderItemMode){
-				$p = &$prod;
-			}else{
-				$p = $this->extractOrderItemData($p2 = $prod,$order);
-			}
-			$calculatedProd[$key] = &$p;
-			if(empty($p['item_original_price'])){
-				$price = $p['item_price'];
-				//debug($p);
-				if(!empty($p['ShopPromotion'])){
-					$promoCodes = array();
-					if(isset($order['ShopOrder']['promo_codes'])){
-						$promoCodes = $order['ShopOrder']['promo_codes'];
-					}elseif(isset($order['promo_codes']) && !empty($order['ShopOrder'])){
-						$promoCodes = $order['promo_codes'];
-					}
-					//debug($order);
-					foreach($p['ShopPromotion'] as &$promo){
-						$exists = (!empty($applicablePromos[$promo['id']]));
-						$promoData = $exists?$applicablePromos[$promo['id']]:array('ShopPromotion'=>&$promo);
-						
-						$applicable = true;
-						if($exists || !empty($order['ShopPromotion'])){
-							$applicable = $exists;
-						}else{
-							if($promo['code_needed']){
-								if(!empty($promoCodes) && !empty($promo['code']) && in_array($promo['code'],$promoCodes)){
-								}else{
-									$applicable = false;
-								}
-							}
-							if($applicable && $promo['limited_coupons']){
-								if($promo['coupon_code_needed'] && empty($promoCodes) ){
-									$applicable = false;
-								}else{
-									$findOpt = array('conditions'=>array('shop_promotion_id'=>$promo['id'],'or'=>array('ShopCoupon.status not'=>array('used','reserved'),'ShopCoupon.status'=> null)));
-									if($promo['coupon_code_needed']){
-										$findOpt['conditions']['ShopCoupon.code'] = $promoCodes;
-									}
-									$coupon = $this->ShopPromotion->ShopCoupon->find('first',$findOpt);
-									$applicable = !empty($coupon);
-								}
-							}
-						}
-						$methods = array();
-						if($applicable){
-							if(empty($promoData['Method'])){
-								$methods = $this->ShopPromotion->getMethods($promo);
-								$promoData['Method'] = $methods;
-							}
-							foreach($methods as $method){
-								if(method_exists($method,'validate')){
-									$res = $method->validate($prod,$order);
-									if($res === false){
-										$applicable = false;
-										break;
-									}
-								}
-							}
-						}
-						$promoData['ShopProduct'][] = &$p;
-						if($applicable){
-							$applicablePromos[$promo['id']] = $promoData;
-						}
-						unset($promo);
-						unset($promoData);
-					}
+		if(!empty($prods)){
+			foreach($prods as $key => &$prod){
+				$orderItemMode = isset($prod['item_price']);
+				if($orderItemMode){
+					$p = &$prod;
+				}else{
+					$p = $this->extractOrderItemData($p2 = $prod,$order);
 				}
-				
-				$p['item_original_price'] = $p['item_price'];
-				
-				
+				$calculatedProd[$key] = &$p;
+				if(empty($p['item_original_price'])){
+					$price = $p['item_price'];
+					//debug($p);
+					if(!empty($p['ShopPromotion'])){
+						$promoCodes = array();
+						if(isset($order['ShopOrder']['promo_codes'])){
+							$promoCodes = $order['ShopOrder']['promo_codes'];
+						}elseif(isset($order['promo_codes']) && !empty($order['ShopOrder'])){
+							$promoCodes = $order['promo_codes'];
+						}
+						//debug($order);
+						foreach($p['ShopPromotion'] as &$promo){
+							$exists = (!empty($applicablePromos[$promo['id']]));
+							$promoData = $exists?$applicablePromos[$promo['id']]:array('ShopPromotion'=>&$promo);
+							
+							$applicable = true;
+							if($exists || !empty($order['ShopPromotion'])){
+								$applicable = $exists;
+							}else{
+								if($promo['code_needed']){
+									if(!empty($promoCodes) && !empty($promo['code']) && in_array($promo['code'],$promoCodes)){
+									}else{
+										$applicable = false;
+									}
+								}
+								if($applicable && $promo['limited_coupons']){
+									if($promo['coupon_code_needed'] && empty($promoCodes) ){
+										$applicable = false;
+									}else{
+										$findOpt = array('conditions'=>array('shop_promotion_id'=>$promo['id'],'or'=>array('ShopCoupon.status not'=>array('used','reserved'),'ShopCoupon.status'=> null)));
+										if($promo['coupon_code_needed']){
+											$findOpt['conditions']['ShopCoupon.code'] = $promoCodes;
+										}
+										$coupon = $this->ShopPromotion->ShopCoupon->find('first',$findOpt);
+										$applicable = !empty($coupon);
+									}
+								}
+							}
+							$methods = array();
+							if($applicable){
+								if(empty($promoData['Method'])){
+									$methods = $this->ShopPromotion->getMethods($promo);
+									$promoData['Method'] = $methods;
+								}
+								foreach($methods as $method){
+									if(method_exists($method,'validate')){
+										$res = $method->validate($prod,$order);
+										if($res === false){
+											$applicable = false;
+											break;
+										}
+									}
+								}
+							}
+							$promoData['ShopProduct'][] = &$p;
+							if($applicable){
+								$applicablePromos[$promo['id']] = $promoData;
+							}
+							unset($promo);
+							unset($promoData);
+						}
+					}
+					
+					$p['item_original_price'] = $p['item_price'];
+					
+					
+				}
+				unset($p);
+				unset($prod);
 			}
-			unset($p);
-			unset($prod);
 		}
 		//debug($applicablePromos);
 		foreach($applicablePromos as $promo){
