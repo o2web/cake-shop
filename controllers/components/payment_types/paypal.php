@@ -32,7 +32,9 @@ class PaypalPaymentComponent extends PaymentComponent{
 		$shipping = 0;
 		$total = 0;
 		$discount = 0;
+		$currentShopOrderId = null;
 		foreach($this->payment['ShopOrder'] as $o_num => $order){
+			$currentShopOrderId = $order['id'];
 			foreach($order['ShopOrdersItem'] as $i_num => $item){
 				//debug($item);
 				$buttonData['items'][] = array(
@@ -69,6 +71,10 @@ class PaypalPaymentComponent extends PaymentComponent{
 		$buttonData['discount_amount_cart'] = $discount;
 		$buttonData['charset'] = Configure::read('App.encoding');
 		
+		//Change Return Path Paypal
+		if(isset($this->settings['skipFinishStepOnReturn']) && $this->settings['skipFinishStepOnReturn'] && is_numeric($currentShopOrderId)){
+			$buttonData['return'] = array('plugin' => 'shop', 'controller' => 'shop_orders', 'action' => 'ordered', $currentShopOrderId, 'type'=>'paypal');
+		}
 		
 		$this->set('buttonData',$buttonData);
 		parent::listItemPreprocess();
