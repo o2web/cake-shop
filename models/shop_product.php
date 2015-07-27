@@ -55,7 +55,7 @@ class ShopProduct extends ShopAppModel {
 	
 	function afterFind($results,$primary){
 		$results = parent::afterFind($results,$primary);
-		if($primary && $this->recursive > -1 && $this->fullDataEnabled){
+		if($primary && (empty($this->lastQueryData['recursive'])? $this->recursive > -1 : $this->lastQueryData['recursive'] > -1) && $this->fullDataEnabled){
 			$results = $this->getFullData($results);
 		}
 		return $results;

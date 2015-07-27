@@ -4,6 +4,12 @@ class ShopAppModel extends AppModel {
 	
 	var $actsAs = array('Shop.AssociationEvent');
 	
+  
+	function beforeFind($queryData){
+    $this->lastQueryData = $queryData;
+		$results = parent::beforeFind($queryData);
+  }
+  
 	function afterFind($results,$primary){
 		$results = parent::afterFind($results,$primary);
 		
